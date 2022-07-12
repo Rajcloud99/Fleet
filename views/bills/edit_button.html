@@ -1,0 +1,13 @@
+<!DOCTYPE html>
+<html>
+<button id="edit">Edit</button>
+<script>
+$("#edit").click(function() {
+	var editable = $("#edit").html() == "Edit" ? true : false;
+	$("#edit").html(editable? "Save" : "Edit");
+		var editables = document.getElementsByClassName("editable");
+		for(var i=0; i<editables.length; i++)
+			editables[i].setAttribute("contentEditable", editable);
+	});
+</script>
+</html>

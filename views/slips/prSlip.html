@@ -1,0 +1,221 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width">
+    <title>PR Preview</title>
+
+    <script src="../../node_modules/angular/angular.min.js"></script>
+    <script src="../../node_modules/jquery/dist/jquery.min.js"></script>
+    <script src="../../node_modules/bootstrap/dist/js/bootstrap.min.js"></script>
+    <link href="../../node_modules/bootstrap/dist/css/bootstrap.min.css" rel="stylesheet" type="text/css" />
+
+    <script src="prSlip.js"></script>
+</head>
+
+<body>
+    <div ng-app="PrApp">
+        <div ng-controller="PrController">
+            <form role="form" name="previewPrData" autocomplete="off" novalidate>
+                <div class="modal-header" style="padding: 10px 26px 0px;">
+                    <h4 class="modal-title" align="center">{{prLocalData.client_full_name}}</h4>
+                    <h5 class="modal-title" align="center">{{prLocalData.client_address}}</h5>
+                    <hr>
+                    <p align="center" style="margin-bottom: 6px;">Material Indent Request Form – {{prLocalData.client_full_name}}</p>
+                    <hr>
+                </div>
+                <div class="modal-body">
+                    <div class="row" style="margin:15px">
+                        <div class="col-xs-12">
+                            <div class="">
+                                <label>To,</label><br>
+                                <label> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Officer in Charge, Purchase Division, For {{prLocalData.client_full_name}}</label>
+                            </div>
+                            <div class="up_data">
+                                <p><b>PR Detail:</b></p>
+                                <div class="col-xs-4">
+                                    <div class="form-group m-b-0">
+                                        <label class="col-xs-4 control-label">PR No:</label>
+                                        <div class="col-xs-6">
+                                            <label>{{prLocalData.prnumber}}</label>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-xs-4">
+                                    <div class="form-group m-b-0">
+                                        <label class="col-xs-4 control-label">PR Date:</label>
+                                        <div class="col-xs-6">
+                                            <label>{{prLocalData.created_at | date:'dd-MM-yyyy'}}</label>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-xs-4">
+                                    <div class="form-group m-b-0">
+                                        <label class="col-xs-4 control-label">Department:</label>
+                                        <div class="col-xs-6">
+                                            <label>{{prLocalData.prnumber.department || 'Store'}} </label>
+                                        </div>
+                                    </div>
+                                </div>
+
+                            </div>
+                            <div class="clearfix"></div>
+                            <div class="up_data">
+                                <div class="col-xs-4">
+                                    <div class="form-group m-b-0">
+                                        <label class="col-xs-4 control-label">Concern Person:</label>
+                                        <div class="col-xs-6">
+                                            <label>{{prLocalData.pr_created_by_name}}</label>
+                                        </div>
+                                    </div>
+                                </div>
+                                <!-- <div class="col-xs-4">
+                    <div class="form-group m-b-0">
+                      <label class="col-xs-4 control-label">Priority:</label>
+                      <div class="col-xs-6">
+                        <label>{{prLocalData.priority}}</label>
+                      </div>
+                    </div>
+                  </div> -->
+                            </div>
+                            <div class="clearfix"></div>
+                            <br>
+                            <div>
+                                <p><b>Item Wise Detail of Required Material;</b></p>
+                                <table class="table table-bordered">
+                                    <thead>
+                                        <tr>
+                                            <th>SL No.</th>
+                                            <th style="min-width: 120px;">Item</th>
+                                            <th>Reqd. For Veh. Make</th>
+                                            <th>UOM</th>
+                                            <th>Priority</th>
+                                            <th style="min-width: 47px;word-break: break-all">Physical Stock in Hand</th>
+                                            <th style="min-width: 47px;word-break: break-all">Qty. Required</th>
+                                            <th>Brand</th>
+                                            <th style="min-width: 47px;word-break: break-all">Last Purchase Price</th>
+                                            <th style="min-width: 47px;word-break: break-all">Last Purchase Qty.</th>
+                                            <th>Last Purchase Date</th>
+                                            <th>Availability Date</th>
+                                            <th>Vendor's Name</th>
+                                            <th>Remark</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr data-ng-repeat="pr in prLocalData.spare" class="pointer">
+                                            <td>{{$index+1}}</td>
+                                            <td>{{pr.name || 'NA'}} / {{pr.code}}</td>
+                                            <td>{{pr.vehicle_make || 'NA'}}</td>
+                                            <td>{{pr.uom || 'NA'}}</td>
+                                            <td>{{pr.priority || 'NA'}}</td>
+                                            <td>{{pr.inStockQty}}</td>
+                                            <td>{{pr.quantity}}</td>
+                                            <td>{{pr.brand || 'Unknown'}}</td>
+                                            <td>{{pr.previousRate}}</td>
+                                            <td>{{pr.previousQty}}</td>
+                                            <td>{{pr.previousDate | date:'dd-MM-yyyy'}}</td>
+                                            <!-- <td>{{pr.type || 'NA'}}</td> -->
+                                            <td>{{pr.needed_date | date:'dd-MM-yyyy'}}</td>
+                                            <td>{{pr.previousVendorName || 'NA'}}</td>
+                                            <td>{{pr.remark || 'NA'}}</td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                            <div class="footAct">
+                                <div class="col-xs-4">
+                                    <div>
+                                        <div><b>Requested By</b></div>
+                                    </div>
+                                </div>
+                                <div class="col-xs-4">
+                                    <div>
+                                        <div><b>Checked By</b></div>
+                                    </div>
+                                </div>
+                                <div class="col-xs-4">
+                                    <div>
+                                        <div><b>Approved By</b></div>
+                                    </div>
+                                </div>
+                                <div class="clearfix"></div>
+                                <div class="col-xs-4">
+                                    <div>
+                                        <div>({{prLocalData.pr_created_by_name}})</div>
+                                    </div>
+                                </div>
+                                <div class="col-xs-4">
+                                    <div>
+                                        <div>(Works Manager/AVP Tech )</div>
+                                    </div>
+                                </div>
+                                <div class="col-xs-4">
+                                    <div>
+                                        <div>({{prLocalData.approver.name}})</div>
+                                    </div>
+                                </div>
+                                <div class="clearfix"></div>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <style>
+        hr {
+            margin-top: 5px;
+            margin-bottom: 2px;
+        }
+        
+        .modal-dialog {
+            width: 70%;
+        }
+        
+        .footAct div div {
+            text-align: center;
+        }
+        
+        .footAct {
+            margin-top: 91px;
+        }
+        
+        .table-bordered>thead>tr>th,
+        .table-bordered>tbody>tr>th,
+        .table-bordered>tfoot>tr>th,
+        .table-bordered>thead>tr>td,
+        .table-bordered>tbody>tr>td,
+        .table-bordered>tfoot>tr>td {
+            border: 1px solid #3b3b3b;
+            font-size: 11px;
+        }
+        
+        .table-bordered {
+            border: 1px solid #3b3b3b;
+            border-bottom: 1px solid #3b3b3b;
+        }
+        
+        .table>thead>tr>th:first-child,
+        .table>tbody>tr>th:first-child,
+        .table>tfoot>tr>th:first-child,
+        .table>thead>tr>td:first-child,
+        .table>tbody>tr>td:first-child,
+        .table>tfoot>tr>td:first-child {
+            padding-left: 0;
+        }
+        
+        .table>thead>tr>th:last-child,
+        .table>tbody>tr>th:last-child,
+        .table>tfoot>tr>th:last-child,
+        .table>thead>tr>td:last-child,
+        .table>tbody>tr>td:last-child,
+        .table>tfoot>tr>td:last-child {
+            padding-right: 0;
+        }
+    </style>
+</body>
+
+</html>

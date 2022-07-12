@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width">
+    <title>PR Preview</title>
+
+    <script src="../../node_modules/angular/angular.min.js"></script>
+    <script src="../../node_modules/jquery/dist/jquery.min.js"></script>
+    <script src="../../node_modules/bootstrap/dist/js/bootstrap.min.js"></script>
+    <link href="../../node_modules/bootstrap/dist/css/bootstrap.min.css" rel="stylesheet" type="text/css" />
+
+    <script src="tyreRetreadSlip.js"></script>
+  </head>
+  <body>
+    <div ng-app="app">
+      <div ng-controller="MyController">
+		  <form role="form"  name="" autocomplete="off" novalidate>
+			  <div class="modal-header" style="padding: 10px 26px 0px;" >
+				  <button type="button" ng-click="closeModal()" class="close"
+						  data-dismiss="modal" aria-label="Close">
+					  <span aria-hidden="true">&times;</span>
+				  </button>
+				  <h4 class="modal-title" align="center">{{retData.client_full_name}}</h4>
+				  <h5 class="modal-title" align="center">{{retData.client_address}}</h5>
+				  <hr>
+				  <p align="center" style="margin-bottom: 6px;">Retreated <span ng-show="retData.returned == false">Issue</span>  <span ng-show="retData.returned == true">Return</span> Slip For – {{retData.client_full_name}}</p>
+				  <hr>
+			  </div>
+			  <div class="modal-body">
+				  <div class="row" style="margin:15px">
+					  <div class="col-md-12">
+						  <div class="up_data">
+							  <div class="col-sm-4">
+								  <div class="form-group m-b-0">
+									  <label class="col-sm-6 control-label">Slip No:</label>
+									  <div class="col-sm-6">
+										  <label>{{retData.issue_slip_no}}</label>
+									  </div>
+								  </div>
+							  </div>
+							  <div class="col-sm-4">
+								  <div class="form-group m-b-0">
+									  <label class="col-sm-6 control-label">Tyre Number:</label>
+									  <div class="col-sm-6">
+										  <label>{{retData.tyre_number}}</label>
+									  </div>
+								  </div>
+							  </div>
+							  <div class="col-sm-4">
+								  <div class="form-group m-b-0" ng-show="retData.returned == false">
+									  <label class="col-sm-6 control-label">Issued By:</label>
+									  <div class="col-sm-6">
+										  <label>{{retData.issued_by_employee_name}} </label>
+									  </div>
+								  </div>
+								  <div class="form-group m-b-0" ng-show="retData.returned == true">
+									  <label class="col-sm-6 control-label">Return By:</label>
+									  <div class="col-sm-6">
+										  <label>{{retData.returned_by_employee_name}} </label>
+									  </div>
+								  </div>
+							  </div>
+
+						  </div>
+						  <div class="clearfix"></div>
+						  <div class="up_data">
+							  <div class="col-sm-4">
+								  <div class="form-group m-b-0" ng-show="retData.returned == false">
+									  <label class="col-sm-6 control-label">Issued Date:</label>
+									  <div class="col-sm-6">
+										  <label>{{retData.issue_date | date:'dd-MM-yyyy'}}</label>
+									  </div>
+								  </div>
+								  <div class="form-group m-b-0" ng-show="retData.returned == true">
+									  <label class="col-sm-6 control-label">Return Date:</label>
+									  <div class="col-sm-6">
+										  <label>{{retData.return_date | date:'dd-MM-yyyy'}}</label>
+									  </div>
+								  </div>
+							  </div>
+							  <div class="col-sm-4">
+								  <div class="form-group m-b-0">
+									  <label class="col-sm-6 control-label">Vendor:</label>
+									  <div class="col-sm-6">
+										  <label>{{retData.vendor_name}}</label>
+									  </div>
+								  </div>
+							  </div>
+							  <div class="col-sm-4" ng-show="retData.returned == false">
+								  <div class="form-group m-b-0">
+									  <label class="col-sm-6 control-label">Expected Return Date:</label>
+									  <div class="col-sm-6">
+										  <label>{{retData.expected_return_date | date:'dd-MM-yyyy'}}</label>
+									  </div>
+								  </div>
+							  </div>
+						  </div>
+						  <div class="clearfix"></div>
+						  <div class="up_data">
+							  <div class="col-sm-4">
+								  <div class="form-group m-b-0" ng-show="retData.returned == true">
+									  <label class="col-sm-6 control-label">Cost:</label>
+									  <div class="col-sm-6">
+										  <label>{{retData.cost}}</label>
+									  </div>
+								  </div>
+							  </div>
+							  <div class="col-sm-4">
+								  <div class="form-group m-b-0">
+									  <label class="col-sm-6 control-label">Tax:</label>
+									  <div class="col-sm-6">
+										  <label>{{retData.tax}}</label>
+									  </div>
+								  </div>
+							  </div>
+							  <div class="col-sm-4" ng-show="retData.returned == true">
+								  <div class="form-group m-b-0">
+									  <label class="col-sm-6 control-label">Freight:</label>
+									  <div class="col-sm-6">
+										  <label>{{retData.freight}}</label>
+									  </div>
+								  </div>
+							  </div>
+						  </div>
+						  <div class="clearfix"></div>
+						  <div class="up_data">
+							  <div class="col-sm-4">
+								  <div class="form-group m-b-0" ng-show="retData.returned == true">
+									  <label class="col-sm-6 control-label">Bill Date:</label>
+									  <div class="col-sm-6">
+										  <label>{{retData.bill_date | date:'dd-MM-yyyy'}}</label>
+									  </div>
+								  </div>
+							  </div>
+							  <div class="col-sm-4" ng-show="retData.returned == true">
+								  <div class="form-group m-b-0">
+									  <label class="col-sm-6 control-label">Bill No:</label>
+									  <div class="col-sm-6">
+										  <label>{{retData.bill_no}}</label>
+									  </div>
+								  </div>
+							  </div>
+							  <div class="col-sm-4" ng-show="retData.returned == true">
+								  <div class="form-group m-b-0">
+									  <label class="col-sm-6 control-label">Total Cost:</label>
+									  <div class="col-sm-6">
+										  <label>{{retData.total_cost}}</label>
+									  </div>
+								  </div>
+							  </div>
+						  </div>
+						  <div class="clearfix"></div>
+
+					  </div>
+				  </div>
+
+			  </div>
+		  </form>
+      </div>
+    </div>
+	<style>
+		hr {
+			margin-top: 5px;
+			margin-bottom: 2px;
+		}
+		.modal-dialog{width: 80%;}
+		.footAct div div {
+			text-align: center;
+		}
+		.footAct{    margin-top: 91px;}
+
+	</style>
+  </body>
+</html>

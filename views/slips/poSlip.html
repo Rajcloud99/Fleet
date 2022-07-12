@@ -1,0 +1,332 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width">
+    <title>Purchase Order</title>
+
+    <script src="../../node_modules/angular/angular.min.js"></script>
+    <script src="../../node_modules/jquery/dist/jquery.min.js"></script>
+    <script src="../../node_modules/bootstrap/dist/js/bootstrap.min.js"></script>
+    <link href="../../node_modules/bootstrap/dist/css/bootstrap.min.css" rel="stylesheet" type="text/css" />
+
+    <script src="poSlip.js"></script>
+</head>
+
+<body>
+    <div ng-app="PoApp">
+        <div ng-controller="PoController">
+            <form role="form" name="previewPrData" autocomplete="off" novalidate>
+                <div class="modal-header" style="padding: 10px 26px 0px;">
+                    <h4 class="modal-title" align="center">Purchase Order</h4>
+                    <h4 class="modal-title" align="center">{{poLocalData.client_full_name}}</h4>
+                    <h5 class="modal-title" align="center">{{poLocalData.client_address}}</h5>
+                    <hr>
+                </div>
+                <div class="modal-body">
+                    <div class="row" style="margin:15px">
+                        <div class="col-xs-6">
+                            <div class="col-xs-12">
+                                <div class="form-group m-b-0">
+                                    <label class="col-xs-4 control-label">Supplier Code:</label>
+                                    <div class="col-xs-6">
+                                        <label>{{poLocalData.vendorId}}</label>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-xs-12">
+                                <div class="form-group m-b-0">
+                                    <label class="col-xs-4 control-label">Supplier Name:</label>
+                                    <div class="col-xs-6">
+                                        <label>{{poLocalData.vendor_name}}</label>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-xs-12">
+                                <div class="form-group m-b-0">
+                                    <label class="col-xs-4 control-label">Supplier Address:</label>
+                                    <div class="col-xs-6">
+                                        <label>{{poLocalData.supplier_address || 'Store'}} </label>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-xs-12">
+                                <div class="form-group m-b-0">
+                                    <label class="col-xs-4 control-label">Telephone:</label>
+                                    <div class="col-xs-6">
+                                        <label>{{poLocalData.telephone}}</label>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-xs-12">
+                                <div class="form-group m-b-0">
+                                    <label class="col-xs-4 control-label">Email Id:</label>
+                                    <div class="col-xs-6">
+                                        <label>{{poLocalData.email_id}}</label>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-xs-12">
+                                <div class="form-group m-b-0">
+                                    <label class="col-xs-4 control-label">Ship to Location:</label>
+                                    <div class="col-xs-6">
+                                        <label>{{poLocalData.shipping_location}}</label>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-xs-12">
+                                <div class="form-group m-b-0">
+                                    <label class="col-xs-4 control-label">Bill to Location:</label>
+                                    <div class="col-xs-6">
+                                        <label>{{poLocalData.billing_location}}</label>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-xs-12">
+                                <div class="form-group m-b-0">
+                                    <label class="col-xs-4 control-label">Subject:</label>
+                                    <div class="col-xs-6">
+                                        <label>PO of Listed items</label>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-xs-12">
+                                <div class="form-group m-b-0">
+                                    <label class="col-xs-4 control-label">Currency:</label>
+                                    <div class="col-xs-6">
+                                        <label>{{poLocalData.currency}}</label>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-xs-6">
+                            <div class="col-xs-12">
+                                <div class="form-group m-b-0">
+                                    <label class="col-xs-4 control-label">PO No./ Release No.:</label>
+                                    <div class="col-xs-6">
+                                        <label>{{poLocalData.ponumder}}</label>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-xs-12">
+                                <div class="form-group m-b-0">
+                                    <label class="col-xs-4 control-label">PO Date:</label>
+                                    <div class="col-xs-6">
+                                        <label>{{poLocalData.created_at | date:'dd-MM-yyyy'}}</label>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-xs-12">
+                                <div class="form-group m-b-0">
+                                    <label class="col-xs-4 control-label">Promised Date:</label>
+                                    <div class="col-xs-6">
+                                        <label>{{poLocalData.promised_date | date:'dd-MM-yyyy'}} </label>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-xs-12">
+                                <div class="form-group m-b-0">
+                                    <label class="col-xs-4 control-label">PO Approver:</label>
+                                    <div class="col-xs-6">
+                                        <label>{{poLocalData.approver.name}}</label>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-xs-12">
+                                <div class="form-group m-b-0">
+                                    <label class="col-xs-4 control-label">Agreement Amount:</label>
+                                    <div class="col-xs-6">
+                                        <label>{{poLocalData.total}}</label>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-xs-12">
+                                <div class="form-group m-b-0">
+                                    <label class="col-xs-4 control-label">PO Status:</label>
+                                    <div class="col-xs-6">
+                                        <label>{{poLocalData.status}}</label>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-xs-12">
+                                <div class="form-group m-b-0">
+                                    <label class="col-xs-4 control-label">Description:</label>
+                                    <div class="col-xs-6">
+                                        <label>{{poLocalData.remark}}</label>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-xs-12">
+                                <div class="form-group m-b-0">
+                                    <label class="col-xs-4 control-label">PR(s):</label>
+                                    <div class="col-xs-6">
+                                        <label>{{poLocalData.prs.join(', ')}}</label>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-xs-12">
+                                <div class="form-group m-b-0">
+                                    <label class="col-xs-4 control-label">Payment Terms:</label>
+                                    <div class="col-xs-6">
+                                        <label>{{poLocalData.payment_terms}}</label>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-xs-12">
+                                <div class="form-group m-b-0">
+                                    <label class="col-xs-4 control-label">Freight Terms:</label>
+                                    <div class="col-xs-6">
+                                        <label>{{poLocalData.freightTerms}}</label>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-sm-12">
+                            <div>
+                                <p><b>Item Wise Detail of Material:</b></p>
+                                <table class="table table-bordered">
+                                    <thead>
+                                        <tr>
+                                            <th>SL No.</th>
+                                            <th>Item Code</th>
+                                            <th style="min-width: 120px;">Item Description</th>
+                                            <th>Brand</th>
+                                            <th>PR No.</th>
+                                            <th>UOM</th>
+                                            <th>QTY</th>
+                                            <th>Unit Price</th>
+                                            <th>Price</th>
+                                            <th>Tax(%)</th>
+                                            <th>Price Inc. Tax</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr data-ng-repeat="po in poLocalData.spare" class="pointer">
+                                            <td>{{$index+1}}</td>
+                                            <td>{{po.code}}</td>
+                                            <td>{{po.name || 'NA'}}</td>
+                                            <td>{{po.brand || 'Unknown'}}</td>
+                                            <td>{{po.prnumber}}</td>
+                                            <td>{{po.uom || 'NA'}}</td>
+                                            <td>{{po.quantity}}</td>
+                                            <td>{{po.rate}}</td>
+                                            <td>{{(po.rate*po.quantity) | number: 2}}</td>
+                                            <td>{{po.tax | number: 2}}</td>
+                                            <td>{{(po.rate_inc_tax*po.quantity) | number: 2}}</td>
+                                        </tr>
+                                        <tr>
+                                            <td colspan="10" style="text-align:right">Sub Total</td>
+                                            <td>{{poLocalData.modif_subtotal | number: 2}}</td>
+                                        </tr>
+                                        <tr>
+                                            <td colspan="10" style="text-align:right">Freight</td>
+                                            <td>{{poLocalData.freight | number: 2 }}</td>
+                                        </tr>
+                                        <tr>
+                                            <td colspan="10" style="text-align:right">Total</td>
+                                            <td>{{(poLocalData.modif_subtotal + poLocalData.freight) | number: 2}}</td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                            <div style="font-size: 12px; margin-top: 30px">
+                                <div>
+                                    <div class="ib bold vat" style="width: 30%">Amount in Words</div>
+                                    <div class="ib bold" style="width: 68%;">: {{poLocalData.amount_in_words}}</div>
+                                </div>
+                                <div>
+                                    <div class="ib bold vat" style="width: 30%">Payment Terms</div>
+                                    <div class="ib bold" style="width: 68%;">: {{poLocalData.payment_terms}}</div>
+                                </div>
+                                <div>
+                                    <div class="ib bold vat" style="width: 30%">Note to Supplier</div>
+                                    <div class="ib bold" style="width: 68%;">: {{poLocalData.note_to_supplier}}</div>
+                                </div>
+                                <div>
+                                    <div class="ib bold vat" style="width: 30%">Additional Note to Supplier</div>
+                                    <div class="ib bold" style="width: 68%;">: {{poLocalData.additional_note_to_supplier}}</div>
+                                </div>
+                            </div>
+                            <p class="f12 bold">Important(Std. Notes to Supplier)</p>
+                            <p class="f12">01. All the Bills / Invoices are to be raised on us at our "Bill to Location" address only.</p>
+                            <p class="f12">02. Material shall be despatched only along with Original Bill / Invoice having PO No., PO Date with correct item code and item description as mentioned.</p>
+                            <p class="f12">03. Invoice shall be raised for each "Ship to Location" separately.</p>
+                            <p class="f12">04. Acceptance of the material will be subjected to Company Quality Standards.</p>
+
+                        </div>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <style>
+        html {
+            zoom: 0.68;
+            /*workaround for phantomJS2 rendering pages too large*/
+        }
+        
+        hr {
+            margin-top: 5px;
+            margin-bottom: 2px;
+        }
+        
+        .modal-dialog {
+            width: 70%;
+        }
+        
+        .vat {
+            vertical-align: top
+        }
+        
+        .ib {
+            display: inline-block;
+        }
+        
+        .footAct div div {
+            text-align: center;
+        }
+        
+        .footAct {
+            margin-top: 91px;
+        }
+        
+        .table-bordered>thead>tr>th,
+        .table-bordered>tbody>tr>th,
+        .table-bordered>tfoot>tr>th,
+        .table-bordered>thead>tr>td,
+        .table-bordered>tbody>tr>td,
+        .table-bordered>tfoot>tr>td {
+            border: 1px solid #3b3b3b;
+            font-size: 11px;
+        }
+        
+        .table-bordered {
+            border: 1px solid #3b3b3b;
+            border-bottom: 1px solid #3b3b3b;
+        }
+        
+        .table>thead>tr>th:first-child,
+        .table>tbody>tr>th:first-child,
+        .table>tfoot>tr>th:first-child,
+        .table>thead>tr>td:first-child,
+        .table>tbody>tr>td:first-child,
+        .table>tfoot>tr>td:first-child {
+            padding-left: 0;
+        }
+        
+        .table>thead>tr>th:last-child,
+        .table>tbody>tr>th:last-child,
+        .table>tfoot>tr>th:last-child,
+        .table>thead>tr>td:last-child,
+        .table>tbody>tr>td:last-child,
+        .table>tfoot>tr>td:last-child {
+            padding-right: 0;
+        }
+    </style>
+</body>
+
+</html>

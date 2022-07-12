@@ -1,0 +1,183 @@
+<div>
+    <div class="container">
+        <div class="header">
+            <div class="headerImage">
+                <div style="width: 127px;height: 100px;border: 1px solid">
+                    <img src="{{tripData.client_logo}}" alt="logo" style="width:127px;height:100px;">
+                </div>
+            </div>
+            <div style="text-align:center">
+                <div class="companyNameBlock">
+                    <div style="    font-weight: bold;
+                    font-size: 22px;">{{gr.client_full_name}}</div>
+                    <div style="font-weight:bold">{{gr.client_iso}}</div>
+                    <div>F-35/3 Industrial Area Okhla Phase 11 Delhi New Delhi Dehli India</div>
+                </div>
+            </div>
+            <div class="officeInfo">
+                <div>
+                    <b>Office:</b> {{gr.client_primary_contact_no}}</div>
+                <div>
+                    <b>Fax :</b> {{gr.client_fax}}</div>
+                <div>
+                    <b>PAN :</b> {{gr.client_pan_no}}</div>
+            </div>
+        </div>
+        <div style="text-align: center;
+        font-weight: bold;">BUILTY/DELIVERY CHALLAN</div>
+        <div class="table">
+            <div>
+                <div style="display:flex">
+                        <div style="padding: 0px 41.9%0px 0px;border-bottom: 2px solid;border-right: 1px solid;background-color: lightgray;">Consignor</div>
+                    <div style="border-bottom: 2px solid;padding-right: 44.5%;background-color: lightgray;">Consignee</div>
+                </div>
+                <div style="display:flex">
+                        <div style="padding: 0px 29% 0px 0px;border-bottom: 1px solid;border-right: 1px solid;">{{tripData.consignor_name}}</div>
+                    <div style="border-bottom: 1px solid;padding-right: 437px;">{{tripData.consignee_name}}</div>
+                </div>
+            </div>
+            <div class="step2">
+                <div>From: {{tripData.from}}</div>
+                <div> To: {{tripData.to}}</div>
+                {{#if tripData.to1}}
+                     <div> To: {{tripData.to1}}</div>
+                {{/if}}
+                <div>Date : {{tripData.allocation_date}}</div>
+            </div>
+            <div class="step3">
+                <div class="step4Container" style="display: flex; font-size: 13px">
+                    <div style="width: 5%;border-right: 1px solid;border-bottom: 1px solid;border-top: 1px solid;background-color: lightgray">SI NO</div>
+                    <div style="width: 10%;border-right: 1px solid;border-bottom: 1px solid;border-top: 1px solid;background-color: lightgray">
+                        Container No</div>
+                    <div style="width: 26%;border-right: 1px solid;border-bottom: 1px solid;border-top: 1px solid;background-color: lightgray">BOE No/Invoice No/Shipping Bill No</div>
+                    <div style="width: 17%;border-right: 1px solid;border-bottom: 1px solid;border-top: 1px solid;background-color: lightgray">Value</div>
+                    <div style="width: 21%;border-right: 1px solid;border-bottom: 1px solid;border-top: 1px solid;background-color: lightgray">Material Name</div>
+                    <div style="width: 14%;border-right: 1px solid;border-bottom: 1px solid;border-top: 1px solid;background-color: lightgray">Weight</div>
+                    <div style="width: 4%; border-right: 1px solid;border-bottom: 1px solid;border-top: 1px solid;background-color: lightgray">
+                        Rate</div>
+                    <div style="width: 5%;border-bottom: 1px solid;border-top: 1px solid;background-color: lightgray">Freight</div>
+                </div>
+
+                {{#if tripData.clientName}} {{#each tripData.gr.booking_info}}
+                <div class="step4Iterator" style="display: flex;justify-content: space-between; text-align: center; font-size: 13px;">
+                    <div style="width: 5%;border-right: 1px solid;border-bottom: 1px solid;border-top: 1px solid;">1</div>
+                    <div style="width: 10%;border-right: 1px solid;border-bottom: 1px solid;border-top: 1px solid;">{{tripData.container_no}}
+                    </div>
+                    <div style="width: 26%;border-right: 1px solid;border-bottom: 1px solid;border-top: 1px solid;">{{tripData.boe_no}}</div>
+                    <div style="width: 17%;border-right: 1px solid;border-bottom: 1px solid;border-top: 1px solid;">As per BOE attached </div>
+                    <div style="width: 21%;border-right: 1px solid;border-bottom: 1px solid;border-top: 1px solid;">{{material_type}} ({{material_group}}) </div>
+                    <div style="width: 14%;border-right: 1px solid;border-bottom: 1px solid;border-top: 1px solid;">As per BOE attached </div>
+                    <div style="width: 4%;border-right: 1px solid;border-bottom: 1px solid;border-top: 1px solid;">
+                        fixed </div>
+                    <div style="width: 5%;border-bottom: 1px solid;border-top: 1px solid;">{{freight}}</div>
+                </div>
+                {{/each}} {{else}} {{#each tripData.gr.booking_info}}
+                <div class="step4Iterator" style="display: flex;justify-content: space-between; text-align: center; font-size: 13px;">
+                    <div style="width: 5%;border-right: 1px solid;border-bottom: 1px solid;border-top: 1px solid;">1</div>
+                    <div style="width: 10%;border-right: 1px solid;border-bottom: 1px solid;border-top: 1px solid;">{{tripData.container_no}}
+                    </div>
+                    <div style="width: 26%;border-right: 1px solid;border-bottom: 1px solid;border-top: 1px solid;">{{tripData.boe_no}}</div>
+                    <div style="width: 17%;border-right: 1px solid;border-bottom: 1px solid;border-top: 1px solid;">{{value}} </div>
+                    <div style="width: 21%;border-right: 1px solid;border-bottom: 1px solid;border-top: 1px solid;">{{material_type}} ({{material_group}}) </div>
+                    <div style="width: 14%;border-right: 1px solid;border-bottom: 1px solid;border-top: 1px solid;">{{weight.value}} {{weight.unit}} </div>
+                    <div style="width: 4%;border-right: 1px solid;border-bottom: 1px solid;border-top: 1px solid;">{{rate}} </div>
+                    <div style="width: 5%;border-bottom: 1px solid;border-top: 1px solid;">{{freight}}</div>
+                </div>
+                {{/each}} {{/if}}
+                <div class="step5">
+                    <div>
+                        <b> GR Charges :</b> 0</div>
+                    <div>
+                        <b> Weightment Charges : </b> 0</div>
+                    <div>
+                        <b> Chargeable Expenses :</b> 0</div>
+                </div>
+                <div class="step6" style="margin-top: 3px;">
+                    <div class="step6Container1" style="text-align: center; display: flex;">
+                        <div style="width: 30%; border-right: 1px solid;border-bottom: 1px solid;border-top: 1px solid;">
+                            <b>Vehicle No</b>
+                        </div>
+                        <div style="width: 20%; border-right: 1px solid;border-bottom: 1px solid;border-top: 1px solid;">
+                            <b>GR No / ManualGRNo</b>
+                        </div>
+                        <div style="width: 20%;border-right: 1px solid;border-bottom: 1px solid;border-top: 1px solid;">
+                            <b> Trip No</b>
+                        </div>
+                        <div style="width: 30%;border-bottom: 1px solid;border-top: 1px solid;">
+                            <b> TIN/CST/LST/VAT</b>
+                        </div>
+                    </div>
+                    <div class="step6Container2" style="text-align: center; display: flex;">
+                        <div style="width: 30%; border-bottom: 1px solid;border-right: 1px solid;">
+                            {{tripData.vehicle_no}}
+                        </div>
+                        <div style="width: 20%; border-bottom: 1px solid;border-right: 1px solid;">
+                            {{tripData.gr_no}}
+                        </div>
+                        <div style="width: 20%;border-bottom: 1px solid;border-right: 1px solid;">
+                            {{tripData.trip_no}}
+                        </div>
+                        <div style="width: 30%;border-bottom: 1px solid;">
+                        </div>
+                    </div>
+
+                </div>
+                <div class="step7">
+                    <div style="margin-top: 7px; margin-left: 2px;">Service Tax to be paid by consignee</div>
+                    <div style="margin-top: 7px;margin-left: 2px;">DELIVERY AT: --------------,Beopari is responsible for illegal goods & Octroi</div>
+                    <div style="margin-top: 7px;margin-left: 13%;">I hereby solemnly declare to the company that the particulars mentioned above are correct.</div>
+                </div>
+                <div class="step8">
+                    <div>CONDITION OVERLEAF</div>
+                    <div>BOOKING CLERK</div>
+                    <div>Signature of the DRIVER/OWNER</div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div style="margin-left: 74%; margin-top: 5px">
+        <b>{{tripData.today}}</b>
+
+    </div>
+<style>
+    .top {
+        height: 25%;
+    }
+
+    .header {
+        display: flex;
+        justify-content: space-between;
+    }
+
+    .headerImage {}
+
+    .companyName {}
+
+    .officeInfo {}
+
+    .table {
+        min-height: 300px;
+        border: 1px solid grey;
+    }
+
+    .step1 {}
+
+    .step2 {
+        display: flex;
+        justify-content: space-between;
+    }
+
+    .step5 {
+        margin-left: 78%;
+        line-height: 21px;
+        font-size: 15px;
+    }
+
+    .step8 {
+        margin-top: 63px;
+        display: flex;
+        justify-content: space-around;
+
+    }
+</style>
+</div>

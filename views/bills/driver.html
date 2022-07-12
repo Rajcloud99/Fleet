@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<script src="../../node_modules/angular/angular.min.js"></script>
+    <script src="../../node_modules/jquery/dist/jquery.min.js"></script>
+    <script src="../../node_modules/bootstrap/dist/js/bootstrap.min.js"></script>
+    <link href="../../node_modules/bootstrap/dist/css/bootstrap.min.css" rel="stylesheet" type="text/css" />
+	<style type="text/css">
+		* {
+			margin: 0;
+			padding: 0;
+		}
+
+		#heading {
+			text-align: center;
+			font-weight: bold
+		}
+
+		.num {
+			font-size: 9px;
+		}
+
+		.centertext= {
+			text-align: center;
+		}
+
+		.header {
+			font-size: 12px;
+			background-color: #d3d3d3
+		}
+
+		.data {
+			font-size: 12px;
+			padding-left: 2px;
+		}
+
+		.ctable,
+		.cth,
+		.ctd {
+			border: 1px solid black;
+			border-collapse: collapse;
+		}
+
+		.ctd {
+			padding-left: 2px;
+		}
+
+		.cthnotop {
+			border: 1px solid black;
+			border-collapse: collapse;
+			border-top: 0;
+		}
+
+		.bold {
+			font-weight: bold
+		}
+
+		.calign {
+			text-align: center
+		}
+
+		body {
+			width: 80%;
+			margin-left: auto;
+			margin-right: auto;
+			font-size: 10px;
+		}
+	</style>
+</head>
+
+<body style="width:670px" ng-app="driver" ng-controller="driverCtrl">
+	<div id="company" style="height:160px"></div>
+	<!-- <script>
+		document.getElementById("company").innerHTML = '<object id="companyObject" type="text/html" data="company.html" style="width:100%; height:100%"></object>';
+	</script> -->
+	<div style="float: left;width: 25%">
+		<img src="{{client_logo}}" alt="logo" style="width:160px;height:70px;">
+	</div>
+	<div style="float: left;width: 50%">
+		<h4 style="font-size: 12px;" class="modal-title" align="center">
+          {{client_full_name}}</h4>
+        <p align="center" style="margin-bottom: 6px;font-size: 12px;">(An ISO 9001 : 2000 Certified Company)</p>
+        
+        <p align="center" style="margin-bottom: 6px;font-size: 12px;">FLEET OWNERS GOVT. TRANSPORT CONTRACTOR(20,40 FEET TRAILER & COVERED BODY)</p>
+        
+        <p align="center" style="margin-bottom: 6px;font-size: 12px;">Head Office : {{client_address}}</p>
+	</div>
+	<div style="float: right;width: 18%">
+		<table style="padding-left:5px">
+			<tr>
+				<td>Office : </td>
+				<td>{{client_primary_contact_no}}</td>
+			</tr>
+			<tr>
+				<td>Fax : </td>
+				<td>{{client_fax}}</td>
+			</tr>
+			<tr>
+				<td>PAN : </td>
+				<td>{{client_pan_no}}</td>
+			</tr>
+		</table>
+	</div>
+	<div class="clearfix"></div>
+
+
+	<div style="border: 1px solid black; border-collapse: collapse;">
+		<p class="calign data bold editable">Builty/Delivery Challan</p>
+		<p class="data editable">I {{driver_name}} {{driver_details}} presently hired as a driver in {{client_full_name}}, {{client_address}} Vehicle No : {{vehicle_no}} have received the consignment as per details below to be taken from {{from}} to {{to}} by me on Date {{date}}.</p>
+		<p class="data editable">I assure & undertake the responsibility to transport the aforesaid consignment as mentioned in the aforesaid Builty with due care & responsibility. I indemnify {{client_full_name}} against all losses/damages/pilferage that will be made/incurred/suffered
+			by {{client_full_name}}, in relation to the aforesaid trip.</p>
+		<p class="data">I also undertake to deposit the complete freight amount in the company (if collected)</p>
+		<p class="data">Details for Advance taken for the Trip is as under.</p>
+
+	</div>
+
+
+	<table id="materials" class="ctable" style="width:100%; border-top: 0;">
+		<tr>
+			<th class="header cth" style="border-top: 0;">Nature</th>
+			<th class="header cth" style="border-top: 0;">Reference</th>
+			<th class="header cth" style="border-top: 0;">Place</th>
+			<th class="header cth" style="border-top: 0;">Qty(Ltrs)</th>
+			<th class="header cth" style="border-top: 0;">Rate/Ltr</th>
+			<th class="header cth" style="border-top: 0;">Amount(Rs)</th>
+		</tr>
+	</table>
+	<div style="border: 1px solid black; border-top: 0; overflow:hidden;">
+		<p class="data bold" style="float:left;">{{total_expenses_in_words}}</p>
+		<p class="data bold" style="float:right;">{{total_expenses}}</p>
+	</div>
+
+
+	<table class="ctable" style="width:100%; border-top: 0;">
+		<tr>
+			<td class="data editable" style="width: 20%">Trip No: {{trip_no}}</td>
+			<td class="data editable" style="width: 20%">Vehicle No: {{vehicle_no}}</td>
+			<td class="data editable" style="width: 30%">Vehicle Type: {{vehicle_type}}</td>
+			<td class="data editable" style="width: 30%">Route: {{from}}-{{to}}</td>
+		</tr>
+	</table>
+	<table class="ctable" style="width:100%; border-top: 0;">
+		<tr>
+			<th class="header cthnotop">Sl No</th>
+			<th class="header cthnotop">Builty No</th>
+			<th class="header cthnotop">Billing Party</th>
+		</tr>
+		<tr>
+			<td class="data ctd">{{sl_no}}</td>
+			<td class="data ctd">{{builty_no}}</td>
+			<td class="data ctd">{{billing_party}}</td>
+		</tr>
+	</table>
+
+
+
+	<div style="border: 1px solid black; border-top: 0; overflow:hidden;">
+		<div style="height:50px"></div>
+		<div style="width:50%; float:left">
+			<p class="data">Signature of Supervisor:</p>
+			<p class="data editable">Name: {{supervisor_name}}</p>
+
+		</div>
+		<div style="width:40%; float:right">
+			<p class="data">Signature of Driver:</p>
+			<table>
+				<tr>
+					<td class="data" style="padding-right:80px">Name: </td>
+					<td class="data editable">{{driver_name}}</td>
+				</tr>
+				<tr>
+					<td class="data">Code: </td>
+					<td class="data editable">{{driver_code}}</td>
+				</tr>
+				<tr>
+					<td class="data">Lic. No: </td>
+					<td class="data editable">{{lic_no}}</td>
+				</tr>
+			</table>
+		</div>
+	</div>
+	<p class="data bold" style="float:right">{{datetime}}</p>
+
+	<script src="driver.js"></script>
+</body>
+
+</html>

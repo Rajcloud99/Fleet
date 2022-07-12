@@ -1,0 +1,117 @@
+<form role="form"  name="" autocomplete="off" novalidate>
+  <div class="modal-header" style="padding: 10px 26px 0px;" >
+    <button type="button" ng-click="closeModal()" class="close"
+    data-dismiss="modal" aria-label="Close">
+      <span aria-hidden="true">&times;</span>
+    </button>
+    <h4 class="modal-title" align="center">{{tyreData.client_full_name}}</h4>
+    <h5 class="modal-title" align="center">{{tyreData.client_address}}</h5>
+    <hr>
+    <p align="center" style="margin-bottom: 6px;">Tyre Issue Slip For – {{tyreData.client_full_name}}</p>
+    <hr>
+  </div>
+  <div class="modal-body">
+    <div class="row" style="margin:15px">
+      <div class="col-md-12">
+        <div class="up_data">
+          <div class="col-md-4">
+            <div class="form-group m-b-0">
+              <label class="col-sm-6 control-label">Slip No:</label>
+              <div class="col-sm-6">
+                <label>{{tyreDataNew.issue_slip_number}}</label>
+              </div>
+            </div>
+          </div>
+          <div class="col-md-4">
+            <div class="form-group m-b-0">
+              <label class="col-sm-6 control-label">Branch:</label>
+              <div class="col-sm-6">
+                <label>{{tyreDataNew.branch}}</label>
+              </div>
+            </div>
+          </div>
+          <div class="col-md-4">
+            <div class="form-group m-b-0">
+              <label class="col-sm-6 control-label">Job Id:</label>
+              <div class="col-sm-6">
+                <label>{{tyreDataNew.jobId}} </label>
+              </div>
+            </div>
+          </div>
+          
+        </div>
+        <div class="clearfix"></div>
+        <div class="up_data">
+          <div class="col-md-4">
+            <div class="form-group m-b-0">
+              <label class="col-sm-6 control-label">Task Id:</label>
+              <div class="col-sm-6">
+                <label>{{tyreDataNew.taskId}}</label>
+              </div>
+            </div>
+          </div>
+          <div class="col-md-4">
+            <div class="form-group m-b-0">
+              <label class="col-sm-6 control-label">Driver/Mechanic:</label>
+              <div class="col-sm-6">
+                <label>{{tyreDataNew.issued_by_employee_name}}</label>
+              </div>
+            </div>
+          </div>
+          <div class="col-md-4">
+            <div class="form-group m-b-0">
+              <label class="col-sm-6 control-label">Tyre No.:</label>
+              <div class="col-sm-6">
+                <label>{{tyreDataNew.tyre_number}}</label>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="clearfix"></div>
+        <div class="up_data">
+          <div class="col-md-4">
+            <div class="form-group m-b-0">
+              <label class="col-sm-6 control-label">Vehicle No.:</label>
+              <div class="col-sm-6">
+                <label>{{tyreDataNew.vehicle_no}}</label>
+              </div>
+            </div>
+          </div>
+          <div class="col-md-4">
+            <div class="form-group m-b-0">
+              <label class="col-sm-6 control-label">Issue Date:</label>
+              <div class="col-sm-6">
+                <label>{{tyreDataNew.created_at | date:'dd-MM-yyyy'}}</label>
+              </div>
+            </div>
+          </div>
+          <div class="col-md-4">
+            <div class="form-group m-b-0">
+              <label class="col-sm-6 control-label">Structure Name:</label>
+              <div class="col-sm-6">
+                <label>{{tyreDataNew.structure_name}}</label>
+              </div>
+            </div>
+          </div>
+          
+        </div>
+        
+      </div>
+    </div>
+    
+  </div>    
+
+</form>
+
+<style>
+  hr {
+    margin-top: 5px;
+    margin-bottom: 2px;
+  }
+  .modal-dialog{width: 80%;}
+  .footAct div div {
+      text-align: center;
+  }
+  .footAct{    margin-top: 91px;}
+  
+</style>

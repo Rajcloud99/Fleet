@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width">
+    <title>PR Preview</title>
+
+    <script src="../../node_modules/angular/angular.min.js"></script>
+    <script src="../../node_modules/jquery/dist/jquery.min.js"></script>
+    <script src="../../node_modules/bootstrap/dist/js/bootstrap.min.js"></script>
+    <link href="../../node_modules/bootstrap/dist/css/bootstrap.min.css" rel="stylesheet" type="text/css" />
+
+    <script src="inventoryInwardApp.js"></script>
+  </head>
+  <body>
+    <div ng-app="InventoryInwardApp">
+      <div ng-controller="InventoryInwardController">
+        <form role="form"  name="previewPrData" autocomplete="off" novalidate>
+          <div class="modal-header" style="padding: 10px 26px 0px;" >
+            <!-- <button type="button" ng-click="closeModal()" class="close"
+            data-dismiss="modal" aria-label="Close">
+              <span aria-hidden="true">&times;</span>
+            </button> -->
+            <!-- <h4 class="modal-title" align="center">MAPLE LOGISTICS PVT LTD</h4>
+            <hr>
+            <p align="center" style="margin-bottom: 6px;">Material Indent Request Form – Maple Logistics Pvt Ltd</p> -->
+            <h4 class="modal-title" align="center">{{localInwardData.client_full_name}}</h4>
+            <h5 class="modal-title" align="center">Goods Inwards Report --- Bill Number Wise</h5>
+            <h5 class="modal-title" align="center">For The Period : Non Periodic</h5>
+            <hr>
+          </div>
+          <div class="modal-body">
+            <div class="row" style="margin:15px">
+              <div class="col-md-12">
+                <div class="up_data">
+                  <div class="col-md-6">
+                    <label><b>Bill Number: {{localInwardData.data[0].invoice_number}} &nbsp;&nbsp; PO: {{localInwardData.data[0].po_number}}</b></label>
+                    <br>
+                    <label><b>Vendor Name & Address:</b></label>
+                    <p>{{localInwardData.data[0].vendor_name}}</p>
+                  </div>
+                  <div class="col-md-6" style="text-align: right;">
+                    <label class="control-label">Bill Date: &nbsp;{{localInwardData.data[0].bill_date | date:'dd-MM-yyyy' || 'NA'}}</label>
+                  </div>
+
+                </div>
+                <div class="clearfix"></div>
+                <br>
+                <div>
+                  <table class="table table-bordered">
+                    <thead>
+                      <tr>
+                        <th>SL No.</th>
+                        <th style="min-width: 120px;">Spare Name</th>
+                        <th>UOM</th>
+                        <th>Quantity</th>
+                        <th>Rate</th>
+                        <th>Tax</th>
+                        <th>Amount</th>
+                        <th>Branch</th>
+
+                      </tr>
+                    </thead>
+                    <tbody ng-init="totalAmt = 0">
+                      <tr data-ng-repeat="inv in localInwardData.data" class="pointer">
+                        <td>{{$index+1}}</td>
+                        <td>{{inv.spare_name || 'NA'}} / {{inv.spare_code}}</td>
+                        <td>{{inv.uom || 'NA'}}</td>
+                        <td>{{inv.quantity || 'NA'}}</td>
+                        <td>{{inv.rate_per_piece || 'NA'}}</td>
+                        <td>{{inv.tax}}</td>
+                        <td>{{inv.billing_amount}}</td>
+                        <td>{{inv.branchName || 'Unknown'}}</td>
+                      </tr>
+					  <tr>
+						  <td colspan="6" style="text-align: right;">Sub Total</td>
+						  <td colspan="2" style="text-align: left;">{{localInwardData.totalAmt}}</td>
+					  </tr>
+					  <tr>
+						  <td colspan="6" style="text-align: right;">Freight</td>
+						  <td colspan="2" style="text-align: left;">{{localInwardData.data[0].freight}}</td>
+					  </tr>
+					  <tr>
+						  <td colspan="6" style="text-align: right;">Total Amount</td>
+						  <td colspan="2" style="text-align: left;" >{{localInwardData.fTotalAmt}}</td>
+					  </tr>
+                    </tbody>
+                  </table>
+                </div>
+                <div class="footAct">
+                  <div class="col-sm-6">
+                    <div>
+                      <div><b>Data Inserted By: {{localInwardData.data[0].created_by_employee_name || 'NA'}}</b></div>
+                    </div>
+                  </div>
+                  <div class="col-sm-6">
+                    <div>
+                      &nbsp;
+                    </div>
+                  </div>
+
+                  <div class="clearfix"></div>
+                </div>
+              </div>
+            </div>
+
+          </div>
+        </form>
+      </div>
+    </div>
+
+    <style>
+  hr {
+    margin-top: 5px;
+    margin-bottom: 2px;
+  }
+  .modal-dialog{width: 70%;}
+
+  .table-bordered > thead > tr > th, .table-bordered > tbody > tr > th, .table-bordered > tfoot > tr > th, .table-bordered > thead > tr > td, .table-bordered > tbody > tr > td, .table-bordered > tfoot > tr > td {
+    border: 1px solid #3b3b3b;
+        font-size: 11px;
+  }
+  .table-bordered {
+    border: 1px solid #3b3b3b;
+    border-bottom: : 1px solid #3b3b3b;
+  }
+  .table > thead > tr > th:first-child, .table > tbody > tr > th:first-child, .table > tfoot > tr > th:first-child, .table > thead > tr > td:first-child, .table > tbody > tr > td:first-child, .table > tfoot > tr > td:first-child {
+    padding-left: 0;
+  }
+  .table > thead > tr > th:last-child, .table > tbody > tr > th:last-child, .table > tfoot > tr > th:last-child, .table > thead > tr > td:last-child, .table > tbody > tr > td:last-child, .table > tfoot > tr > td:last-child {
+    padding-right: 0;
+  }
+
+</style>
+  </body>
+</html>

@@ -1,0 +1,45 @@
+let mongoose = require('mongoose');
+
+let Directory = new mongoose.Schema({
+	//clientId: constant.requiredString,
+	add1: String,
+	add2: String,
+	company_name: String,
+	country: String,
+	city: String,
+	city_state_zip: String,
+	contact_address: String,
+	ceo_salute: String,
+	contact_address: String,
+	designation: String,
+	email1: String,
+	email2: String,
+	email_verified: String,
+	freeshowroom_alias_im: String,
+	first_name: String,
+	glusr_usr_custtype_name: String,
+	glusr_usr_approv: String,
+	glusr_usr_listing_status: String,
+	glusr_usr_sellinterest: String,
+	glusr_usr_company_desc: String,
+	glusr_usr_ph_area: String,
+	glusr_usr_ph_number: Number,
+	glusr_usr_ph_mobile: Number,
+	glusr_usr_ph_mobile_alt: Number,
+	glusr_usr_mobile_country: Number,
+	locality: String,
+	landmark: String,
+	last_name: String,
+	mobile1: Number,
+	mobile2: Number,
+	mobile_verified: String,
+	pns_no: String,
+	salute: String,
+	state: String,
+	website: String,
+	zip: String,
+	}
+);
+
+Directory.index({company_name: 1,first_name:1,mobile1:1,mobile2:1,email1:1,email2:1}, {unique: true});
+module.exports = mongoose.model('addrs', Directory);

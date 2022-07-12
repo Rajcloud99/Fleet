@@ -1,0 +1,15 @@
+cmd1
+cd C:\Program Files\MongoDB 2.6 Standard\bin
+
+mongod.exe --dbpath="C:\kamal\mongo\data"
+
+cmd2
+
+cd C:\Users\kamal\git\node-server
+
+cmd3
+
+cd C:\Users\kamal\git\truckngps-client
+
+cmd 4
+node-inspector

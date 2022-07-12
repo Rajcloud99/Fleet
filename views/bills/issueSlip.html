@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <script src="../../node_modules/angular/angular.min.js"></script>
+        <style type="text/css">
+            * {
+                margin: 0;
+                padding: 0;
+            }
+
+            table {
+                border-collapse: collapse;
+            }
+
+            .num {
+                font-size: 9px;
+            }
+
+            .ctext{
+                text-align: center;
+            }
+            .bold {
+                font-weight: bold
+            }
+            .ib {
+                display: inline-block;
+            }
+            .calign {
+                text-align: center
+            }
+            .data {
+                font-size: 12px;
+                padding-left: 2px;
+            }
+
+            .f12 {
+                font-size: 12px
+            }
+
+            .fr {
+                float: right
+            }
+
+            body {
+                width: 80%;
+                margin-left: auto;
+                margin-right: auto;
+            }
+        	.btop {border-top: 1px solid black;}
+
+            .bbottom {border-bottom: 1px solid black;}
+
+            .nobleft {border-left: 0}
+            .nobright {border-right: 0}
+
+        	.vat {
+                vertical-align: top
+            }
+
+        	.bright {border-right: 1px solid black;}
+            #blank {height:80px}
+            #container {width:100%; font-size: 0;}
+            #left, #middle, #right {display: inline-block; *display: inline; zoom: 1; vertical-align: top; font-size: 12px; font-family:Verdana}
+            #left {width: 15%;}
+            #middle {width: 65%; text-align:center}
+            #right {width: 20%; text-align:center;}
+            #title {font-size: 14px; font-weight: bold}
+            #iso {font-size: 9px; font-weight: bold}
+            #subtitle {font-size: 10px; }
+            #addr {font-size: 9px; }
+            .heading {text-align:center; font-weight: bold}
+        	#heading2 {text-align:center;}
+            .num {font-size: 9px;}
+            .bold { font-weight: bold }
+        </style>
+    </head>
+    <body style="width:670px;" ng-app="app" ng-controller="issueSlipCtrl">
+
+    	<div style="margin: 40px;">
+
+
+        <div>
+            <script>
+                function toggleEdit(editable){
+                    var editables = document.getElementsByClassName("editable");
+                    for(var i=0; i<editables.length; i++)
+                        editables[i].setAttribute("contentEditable", editable);
+                }
+            </script>
+        </div>
+        <p style="overflow:hidden;" id="heading" class="heading">{{client_full_name}}</p>
+    	<p style="overflow:hidden;" id="heading2">{{slip_type}}</p>
+
+    	<div style="font-size: 12px; margin-top: 20px;">
+
+
+            <div class="ib vat" style="width:50%">
+                <div>
+                    <div class="ib bold vat" style="width: 30%">Slip No</div>
+                    <div class="ib bold" style="width: 40%">: {{slip_number}}</div>
+                </div>
+                <div>
+                    <div class="ib bold vat" style="width: 30%">Job Card No</div>
+                    <div class="ib bold" style="width: 40%">: {{jobId}}</div>
+                </div>
+                <div>
+                    <div class="ib bold vat" style="width: 30%">Vehicle No</div>
+                    <div class="ib bold" style="width: 40%">: {{vehicle_number}}</div>
+                </div>
+                <div>
+                    <div class="ib bold vat" style="width: 30%;">Mechanic Name</div>
+                    <div class="ib bold" style="width: 40%">: {{mechanic_name}}</div>
+                </div>
+            </div>
+            <div class="ib vat" style="width: 49%;">
+                <div>
+                    <div class="ib bold vat" style="width: 39%">Date & Time</div>
+                    <div class="ib bold" style="width: 40%">: {{datetime}}</div>
+                </div>
+                <div>
+                    <div class="ib bold vat" style="width: 39%">Job Card Type</div>
+                    <div class="ib bold" style="width: 40%">: {{job_type}}</div>
+                </div>
+                <div>
+                    <div class="ib bold vat" style="width: 39%">Branch Name</div>
+                    <div class="ib bold" style="width: 40%">: {{branchName}}</div>
+                </div>
+				<div>
+					<div class="ib bold vat" style="width: 39%">Issue Type</div>
+					<div class="ib bold" style="width: 40%">: {{issue_type}}</div>
+				</div>
+				<div>
+					<div class="ib bold vat" style="width: 39%">Issuer</div>
+					<div class="ib bold" style="width: 40%">: {{issuer}}</div>
+				</div>
+            </div>
+
+        </div>
+
+        <table border="1" id="t1" class="ctext" style="width:100%; margin-top: 20px">
+            <tr style="font-size: 12px;">
+                <th>Sl No</th>
+                <th>Spare Code</th>
+                <th>Spare Name</th>
+                <th>Category</th>
+                <th>Uom</th>
+                <th>Quantity</th>
+                <th>Rate</th>
+                <th>Total</th>
+                <th>Remarks</th>
+            </tr>
+
+        </table>
+        <table border="1" id="t2" class="ctext" style="width:100%;">
+            <tr>
+                <td colspan="7" style="text-align: right;">Total Amount</td>
+                <td>{{totalData}}</td>
+            </tr>
+        </table>
+
+
+    	<!-- <div class="f12" style="margin-top: 20px; width: 100%">
+    		<div class="ib ctext bold" style="width: 25%">
+                <p>Issued By : {{issued_by}}</p>
+    		</div>
+            <div class="ib ctext bold" style="width: 25%">
+                <p>Verified By : {{verified_by}}</p>
+            </div>
+            <div class="ib ctext bold" style="width: 24%">
+                <p>Received By : {{received_by}}</p>
+            </div>
+            <div class="ib ctext bold" style="width: 24%">
+                <p>Reprinted By : {{reprinted_by}}</p>
+            </div>
+    	</div> -->
+        <br>
+        <br>
+        <div>
+            <div class="data calign" style="width:30%; float:left">&nbsp;</div>
+            <div class="data calign" style="width:30%; float:left">&nbsp; </div>
+            <div class="data calign" style="width:30%; float:left">&nbsp;</div>
+        </div>
+        <div>
+            <div class="data calign" style="width:30%; float:left;">Issued By:</div>
+            <div class="data calign" style="width:30%; float:left;">Verified By:</div>
+            <div class="data calign" style="width:30%; float:right;">Received By:</div>
+        </div>
+    </div>
+    <p class="data bold" style="float:left;margin-left: 40px;">Print Date & Time: {{datetime}}</p>
+
+        <script src="issueSlip.js"></script>
+
+    	</div>
+    </body>
+</html>

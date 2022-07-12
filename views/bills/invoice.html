@@ -1,0 +1,218 @@
+<!DOCTYPE html>
+<html>
+<head>
+<script src="../../node_modules/angular/angular.min.js"></script>
+    <style type="text/css">
+    * {margin: 0; padding: 0;}
+    #heading {text-align:center; font-weight: bold}
+    .num {font-size: 9px;}
+    .centertext = {text-align:center;}
+    .header {font-size: 12px; background-color: #d3d3d3}
+    .data {font-size: 12px; padding-left: 2px;}
+    .ctable, .cth, .ctd {
+        border: 1px solid black;
+        border-collapse: collapse;
+    }
+    .ctd {padding-left: 2px;}
+    .cthnotop {
+    	border: 1px solid black;
+        border-collapse: collapse;
+    	border-top: 0;
+    }
+    .bold { font-weight: bold }
+    .calign { text-align:center}
+    body {
+            width:80%;
+            margin-left:auto;
+            margin-right:auto;
+    }
+    </style>
+</head>
+<body style="width:1144px" ng-app="invoice" ng-controller="invoiceCtrl">
+	<div style="height:160px">
+     <div id="blank">
+    </div>
+        <div id="container">
+            <style type="text/css">
+                * {margin: 0; padding: 0;}
+                #blank {height:80px}
+                #container {width:100%; font-size: 0;}
+                #left, #middle, #right {display: inline-block; *display: inline; zoom: 1; vertical-align: top; font-size: 12px; font-family:Verdana}
+                #left {width: 15%;}
+                #middle {width: 65%; text-align:center}
+                #right {width: 20%; text-align:center;}
+                #title {font-size: 14px; font-weight: bold}
+                #iso {font-size: 9px; font-weight: bold}
+                #subtitle {font-size: 10px; }
+                #addr {font-size: 9px; }
+                #heading {text-align:center; font-weight: bold}
+                .num {font-size: 9px;}
+                .bold { font-weight: bold }
+                .myTableWordWrap {word-wrap: break-word; border-top: 0;};
+            </style>
+            <div id="left">
+                <img src={{client_logo}} alt="logo" style="width:90px;height:70px;">
+            </div>
+            <div id="middle" >
+                <p id="title" class="editable">{{client_full_name}}</p>
+                <p id="addr" class="editable">{{client_iso}}</p>
+                <p id="addr" class="editable">{{client_subtitle}}</p>
+                <p id="addr" class="editable">{{client_address}}</p>
+            </div>
+            <div id="right">
+                <table style="padding-left:5px">
+                    <tr>
+                        <td class="num bold" >Office : </td>
+                        <td class="num editable" >{{client_primary_contact_no}}</td>
+                    </tr>
+                    <tr>
+                        <td class="num bold" >Fax : </td>
+                        <td class="num editable" >{{client_fax}}</td>
+                    </tr>
+                    <tr>
+                        <td class="num bold" >PAN : </td>
+                        <td class="num editable" >{{client_pan_no}}</td>
+                    </tr>
+                </table>
+            </div>
+        </div>
+    </div>
+	<!-- <script>
+		document.getElementById("company").innerHTML='<object type="text/html" data="company.html" style="width:110%; height:100%"></object>';
+	</script> -->
+	<p id="heading">INVOICE</p>
+
+	<div class="data ctd"  style="border: 1px solid black; overflow:hidden;">
+        <p class="bold" style="float:left">Billing Party </p>
+        <div style="float:left; margin-left:20px">
+            <p style="font-weight: bold">{{billing_party_name}}</p>
+            <p>{{billing_party_address}}</p>
+        </div>
+        <div style="float:right; margin-left:20px">
+            <p style="font-weight: bold">{{bill_no}}</p>
+            <p style="font-weight: bold">{{billed_date | date:'dd-MM-yyyy'}}</p>
+            <!-- <p style="font-weight: bold">{{due_date | date:'dd-MM-yyyy'}}</p> -->
+        </div>
+        <div style="float:right; margin-left:20px">
+            <p style="font-weight: bold">Bill No </p>
+            <p style="font-weight: bold">Bill Date</p>
+            <!-- <p style="font-weight: bold">Due Date</p> -->
+        </div>
+    </div>
+
+    <table id="trips" class="ctable" style="width:100%; border-top:0">
+        <tr>
+            <th class="header cth myTableWordWrap" >SLNO</th>
+            <th class="header cth myTableWordWrap">Trip No</th>
+            <th class="header cth myTableWordWrap">GR Date</th>
+            <th class="header cth myTableWordWrap">GR No</th>
+            <th class="header cth myTableWordWrap">Vehicle</th>
+            <th class="header cth myTableWordWrap">Route</th>
+            <th class="header cth myTableWordWrap">Consignor Consignee</th>
+            <th class="header cth myTableWordWrap">Containor No</th>
+            <th class="header cth myTableWordWrap">Weight</th>
+            <th class="header cth myTableWordWrap">Rate</th>
+            <th class="header cth myTableWordWrap">Freight</th>
+            <th class="header cth myTableWordWrap">Dtn. Amt</th>
+            <th class="header cth myTableWordWrap">Wt Charge</th>
+            <th class="header cth myTableWordWrap">Othr Exp*</th>
+            <th class="header cth myTableWordWrap">TOTAL (Rs.)</th>
+        </tr>
+    </table>
+
+	<div style="border: 1px solid black; border-top: 0; overflow:hidden;">
+		<p class="data bold" style="float:left;">{{total_expenses_in_words}}</p>
+    	<table style="float:right; border-left:0;">
+			<tr>
+				<td  class="data bold" style="padding:2px; padding-right:150px;">Sub Total:</td>
+				<td  class="data bold" style="padding:2px">{{sub_total}}</td>
+			</tr>
+			<tr>
+				<td class="data bold" style="padding:2px">Service Tax {{service_tax_percent}}% :</td>
+				<td class="data bold" style="padding:2px">{{service_tax}}</td>
+			</tr>
+			<tr>
+				<td class="data bold" style="padding:2px">Total :</td>
+				<td class="data bold" style="padding:2px">{{total_expenses}}</td>
+			</tr>
+		</table>
+    </div>
+    <div style="border: 1px solid black; border-top: 0; border-bottom:0; overflow:hidden;">
+		<table style="float:left; border-left:0;">
+			<tr>
+				<td  class="data" style="padding:2px; ">SERVICE TAX CODE NO</td>
+				<td  class="data bold" style="padding:2px">:- {{service_tax_code}}</td>
+			</tr>
+			<tr>
+				<td class="data" style="padding:2px">PAN NO</td>
+				<td class="data bold" style="padding:2px">:- {{pan}}</td>
+			</tr>
+		</table>
+        <p class="data bold" style="float:right;">Classification of the Service : " Transport of goods by road."</p>
+        <p class="data bold" style="float:right;">DECLARATION:</p>
+    </div>
+    <div style="padding-top:10px; border: 1px solid black; border-top: 0; border-bottom:0;">
+        <p class="data bold" style="float:left; padding-right:20px; padding-right:20px;">NOTE: </p>
+        <p class="data bold">Service Tax to be paid by Consignee</p>
+    </div>
+    <p class="data" style="padding-top:10px; border: 1px solid black; border-top: 0; border-bottom:0;">CENVAT CREDIT :-"We hereby certify that we have not availed Credit of duty paid on inputs or capital goods or CENVAT credit of service tax on input services, used for providing such taxable service under provisions of CENVAT
+        credit Rules, 2004 nor we have availed the benefit of Notification No 12/2003-ST dtd 20.06.2003"</p>
+    <table class="ctable" style="float:left; border-top:0; border-bottom:0; width:100%;">
+		<tr>
+			<td  class="data" >1:</td>
+			<td  class="data" >Declare that this invoice shows the actual freight of the goods described that all particulars are true & correct.</td>
+		</tr>
+		<tr>
+			<td class="data" >2:</td>
+			<td class="data" >Description of the Service Rendered : "Transportation".</td>
+		</tr>
+        <tr>
+			<td  class="data" >3:</td>
+			<td  class="data" >Subject to Delhi Jurisdiction only.</td>
+		</tr>
+		<tr>
+			<td class="data" >4:</td>
+			<td class="data" >Any discrepancy should be intimated in writing with-in seven days from the date of the submission of bill.</td>
+		</tr>
+        <tr>
+			<td  class="data" >5:</td>
+			<td  class="data" >Under section 194c(c) : No deduction shall be made on A/C of Income Tax in term of under section 194c(6) w.e.f 1st oct, 2009</td>
+		</tr>
+		<tr>
+			<td class="data" >6:</td>
+			<td class="data" >Payments delayed beyond agreed credit terms will attract interest @18% Per annum</td>
+		</tr>
+        <tr>
+			<td class="data" >*:</td>
+			<td class="data" ></td>
+		</tr>
+
+	</table>
+    <div style="border: 1px solid black; border-top:0; padding-top:5px; overflow:hidden;">
+        <div style="float:left;">
+            <p class="data" >Terms And Conditions :-</p>
+            <p class="data bold" style="padding-top:10px">PLEASE PAY BY A/C. PAYEE CHEQUE/D.D ONLY IN FAVOUR OF {{client_full_name}}</p>
+            <p class="data bold" style="padding-top:10px">E. & O. E.</p>
+        </div>
+        <div style="float:right; padding-right:10px;">
+            <p class="data bold" >For {{client_full_name}}</p>
+            <p class="data calign" style="padding-top:20px;">(Manager Billing)</p>
+            <p class="data bold" >MobileNo : {{client_primary_contact_no}}</p>
+            <p class="data bold" >Email Id : {{client_primary_email}}</p>
+
+        </div>
+
+    </div>
+
+
+
+
+
+
+
+	<p class="data bold" style="float:right">{{datetime | date:'dd-MM-yyyy'}}</p>
+
+	<script src="invoice.js"></script>
+
+</body>
+</html>

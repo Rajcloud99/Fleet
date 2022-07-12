@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width">
+    <title>Service Preview</title>
+    
+    <script src="../../node_modules/angular/angular.min.js"></script>
+    <script src="../../node_modules/jquery/dist/jquery.min.js"></script>
+    <script src="../../node_modules/bootstrap/dist/js/bootstrap.min.js"></script>
+    <link href="../../node_modules/bootstrap/dist/css/bootstrap.min.css" rel="stylesheet" type="text/css" />
+    
+    <script src="jobServiceSlip.js"></script>
+  </head>
+  <body>
+    <div ng-app="JobApp">
+      <div ng-controller="ServiceController">
+        <form role="form"  name="previewData" autocomplete="off" novalidate>
+          <div class="modal-header" style="padding: 10px 26px 0px;" >
+            <button type="button" ng-click="closeModal()" class="close"
+            data-dismiss="modal" aria-label="Close">
+              <span aria-hidden="true">&times;</span>
+            </button>
+            <h4 class="modal-title" align="center">{{dataForPrev.client_full_name}}</h4>
+            <hr>
+            <p align="center" style="margin-bottom: 6px;">Additional Expense Slip</p>
+            <hr>
+          </div>
+          <div class="modal-body">
+            <div class="row" style="margin:15px">
+              <div class="col-md-12">
+                <div class="up_data">
+                  <div class="col-md-4">
+                    <div class="form-group m-b-0">
+                      <label class="col-sm-4 control-label">Slip No.:</label>
+                      <div class="col-sm-6">
+                        <label>{{dataForPrev.prnumber}}</label>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="col-md-4">
+                    <div class="form-group m-b-0">
+                      <label class="col-sm-4 control-label">Date:</label>
+                      <div class="col-sm-6">
+                        <label>{{dataForPrev.created_at | date:'dd-MM-yyyy'}}</label>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="col-md-4">
+                    <div class="form-group m-b-0">
+                      <label class="col-sm-4 control-label">Vehicle No.:</label>
+                      <div class="col-sm-6">
+                        <label>{{dataForPrev.vehicle_number}} </label>
+                      </div>
+                    </div>
+                  </div>
+                  
+                </div>
+                <div class="clearfix"></div>
+                <div class="up_data">
+                  <div class="col-md-4">
+                    <div class="form-group m-b-0">
+                      <label class="col-sm-4 control-label">JobCard Id:</label>
+                      <div class="col-sm-6">
+                        <label>{{dataForPrev.jobId}}</label>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="col-md-4">
+                    <div class="form-group m-b-0">
+                      <label class="col-sm-4 control-label">JobCard Type:</label>
+                      <div class="col-sm-6">
+                        <label>{{dataForPrev.job_type}}</label>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="col-md-4">
+                    <div class="form-group m-b-0">
+                      <label class="col-sm-4 control-label">Branch Name:</label>
+                      <div class="col-sm-6">
+                        <label>{{dataForPrev.branchName}}</label>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                <div class="clearfix"></div>
+                <br>
+                <div>
+                  <table class="table table-bordered">
+                    <thead>
+                      <tr>
+                        <th>SL No.</th>
+                        <th>Expense Party Name</th>
+                        <th>Bill No.</th>
+                        <th>Task Name</th>
+                        <th>Amount</th>
+                        <th>Remark</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      <tr data-ng-repeat="dt in dataForPrev.contractorData" class="pointer">
+                        <td>{{$index+1}}</td>
+                        <td>{{dt.contractor_name || 'NA'}}</td>
+                        <td>{{dt.bill_no || 'NA'}}</td>
+                        <td>{{dt.task_name || 'NA'}}</td>
+                        <td>{{dt.amount || 'Unknown'}}</td>
+                        <td>{{dt.remark || 'NA'}}</td>
+                      </tr>
+                    </tbody>
+                  </table>
+                </div>
+                <div class="footAct">
+                  <div class="col-sm-4">
+                    <div>
+                      <div><b>Data Inserted By</b></div>
+                    </div>
+                  </div>
+                  <div class="col-sm-4">
+                    <div>
+                      <div><b>Data Entry Date</b></div>
+                    </div>
+                  </div>
+                  <div class="col-sm-4">
+                    <div>
+                      <div><b>Actural Print Date</b></div>
+                    </div>
+                  </div>
+                  <div class="clearfix"></div>
+                  <div class="col-sm-4">
+                    <div>
+                      <div>({{dataForPrev.created_by}})</div>
+                    </div>
+                  </div>
+                  <div class="col-sm-4">
+                    <div>
+                      <div>({{dataForPrev.created_at | date:'dd-MM-yyyy'}})</div>
+                    </div>
+                  </div>
+                  <div class="col-sm-4">
+                    <div>
+                      <div>({{dataForPrev.printDate | date:'dd-MM-yyyy'}})</div>
+                    </div>
+                  </div>
+                  <div class="clearfix"></div>
+                </div>
+              </div>
+            </div>
+          </div>    
+        </form>
+      </div>
+    </div>
+    <style>
+      hr {
+        margin-top: 5px;
+        margin-bottom: 2px;
+      }
+      .modal-dialog{width: 70%;}
+      .footAct div div {
+          text-align: center;
+      }
+      .footAct{    margin-top: 91px;}
+    </style>
+  </body>
+</html>

@@ -1,0 +1,1151 @@
+{
+  "Client": {
+	"Admin": true
+  },
+  "Vehicle": {
+	"Admin": true
+  },
+  "Material": {
+	"Admin": true
+  },
+  "ICD": {
+	"Admin": true
+  },
+  "Branch": {
+	"Read": true,
+	"Add": true,
+	"Update": true,
+	"Delete": true,
+	"Enable": true,
+	"Disable": true
+  },
+  "Vehicle Expense": {
+	"Read": true,
+	"Add": true,
+	"Update": true,
+	"Delete": true
+  },
+  "All Vendor": {
+	"Read": true,
+	"Add": true,
+	"Update": true,
+	"Delete": true
+  },
+  "Vehicle Accident": {
+	"Read": true,
+	"Add": true,
+	"Update": true,
+	"Delete": true
+  },
+  "Dues": {
+	"Read": true,
+	"Add": true,
+	"Update": true,
+	"Delete": true,
+	"Update Policy": true,
+	"Summary Report": true
+  },
+  "Driver": {
+	"Read": true,
+	"Add": true,
+	"Update": true,
+	"Delete": true,
+	"Add Happay": true,
+	"Upload Excel": true,
+	"Old Docs": true,
+	"Preview": true,
+	"Aggrement": true
+  },
+  "Fleet": {
+	"Read": true,
+	"Add": true,
+	"Update": true,
+	"Delete": true
+  },
+  "Registered Vehicle": {
+	"Read": true,
+	"Add": true,
+	"Add Rates": true,
+	"View Rates": true,
+	"Upload Rates": true,
+	"Update": true,
+	"Report": true,
+	"Add Fasttag": true,
+	"Associate Segment": true,
+	"Fleet Segment": true,
+	"Upload Excel": true,
+	"Delete Document": true,
+	"Update Status": true,
+	"Sold Vehicle": true
+  },
+  "Transport Route": {
+	"Read": true,
+	"Add": true,
+	"Delete": true,
+	"Update": true,
+	"Upload Excel": true,
+	"Edit KM": true
+  },
+  "MIS Config": {
+	"Read": true,
+	"Add": true,
+	"Update": true
+  },
+  "Customer": {
+	"Read": true,
+	"Add": true,
+	"Update": true,
+	"Download Report": true,
+	"GpsGaadi Access": true,
+	"Upload Excel Skeleton": true
+  },
+  "Contract": {
+	"Read": true,
+	"Add": true,
+	"Update": true,
+	"Clone": true
+  },
+  "Rates": {
+	"Read": true,
+	"Add": true,
+	"Update": true
+  },
+  "GR Master": {
+	"Read": true,
+	"Add": true,
+	"Update": true,
+	"Free GR": true
+  },
+  "Trip Location": {
+	"Read": true,
+	"Add": true,
+	"Update": true
+  },
+  "Courier Vendor": {
+	"Read": true,
+	"Add Vendor": true,
+	"Add Office": true,
+	"Update Vendor": true,
+	"Update Office": true,
+	"Delete": true
+  },
+  "Fuel Vendor": {
+	"Read": true,
+	"Add Station": true,
+	"Add Vendor": true,
+	"Update Vendor": true,
+	"Update Station": true,
+	"Delete": true
+  },
+  "SLDO": {
+	"Add": true,
+	"Read": true
+  },
+  "Bookings": {
+	"Read": true,
+	"Update": true,
+	"Add": true,
+	"Download": true,
+	"Upload": true,
+	"Delete": true,
+	"allocate": true,
+	"Traffic Manager": true,
+	"Quotations": true,
+	"preview": true
+  },
+  "Duty": {
+	"Read": true,
+	"Update": true,
+	"Add": true,
+	"Download": true,
+	"Upload": true,
+	"Delete": true,
+	"allocate": true,
+	"Traffic Manager": true,
+	"Quotations": true,
+	"preview": true
+  },
+  "Trip Memo": {
+	"Read": true,
+	"Update": true,
+	"Add": true,
+	"delete": true,
+	"multiPaymentReceipt": true,
+	"Delete Receipt": true,
+	"Doc Upload Preview": true
+
+  },
+  "Broker Memo": {
+	"Read": true,
+	"Update": true,
+	"Add": true,
+	"delete": true
+  },
+  "Eway Bill": {
+	  "Update": true,
+	  "Add": true,
+	  "Delete": true,
+	  "Read": true,
+	  "Download": true
+  },
+  "Quotations": {
+	"Read": true,
+	"Update": true,
+	"Add": true,
+	"Download": true,
+	"Delete": true
+  },
+  "Access Control": {
+	"Read": true,
+	"Upadate": true,
+	"Add": true,
+	"Delete": true
+  },
+  "Vehicle Allocation": {
+	"Read": true,
+	"Allocate": true,
+	"GR": true
+  },
+  "Trip": {
+	"Read": true,
+	"Change Route": true,
+	"Trip Update": true,
+	"Trip Cancel": true,
+	"Trip Playback": true,
+	"Trip Itinerary": true,
+	"Trip Analytics": true,
+	"Create Geofence": true,
+	"Admin Edit": true,
+	"Vehicle Update": true,
+	"Live Track": true,
+	"Vendor Payment": true,
+	"Customer Filter": true,
+	"show trip details": true,
+	"DocType Filter": true,
+	"Vehicle Edit": true,
+	"EwayBill Edit": true,
+	"Job Order Report": true,
+	"Job Order Risky Report": true,
+	"Job Order Power Connect Report": true
+  },
+  "GR": {
+	"Read": true,
+	"Add": true,
+	"Update": true,
+	"Report": true,
+	"Advance": true,
+	"Money Receipt": true,
+	"Edit Gr Number": true,
+	"Centralize Book": true,
+	"Edit Customer": true,
+	"Admin Edit": true,
+	"Mark NonBillable": true,
+	"Move Gr": true,
+	"Gr Ack": true,
+	"Gr Receive": true,
+	"Add More Gr": true,
+	"Gr History": true,
+	"Add Remark": true,
+	"status update": true,
+	"GR Detail": true,
+	"Cancel GR": true,
+	"Upload Documents": true,
+	"Preview Documents": true,
+	"Print Builty": true,
+	"Print TDS": true,
+	"Download Report": true,
+	"Download GR Report New": true,
+	"Download GR Report": true,
+	"Download MR Report": true,
+	"Gen Multi Gr": true,
+	"Revert Multi Gr": true,
+	"Sorting": true,
+	"UnMap Gr From Trip": true,
+	"Download Daily MIS Report": true
+  },
+  "GR WithOut Trip": {
+	"Add": true,
+	"Read": true,
+	"Update": true,
+	"Delete": true,
+	"Map Gr Into Trip": true
+  },
+  "Trip GPS": {
+	"Add": true,
+	"Read": true,
+	"Update": true,
+	"Delete": true
+  },
+  "Trip GPS Details": {
+	"Add": true,
+	"Read": true,
+	"Update": true,
+	"Delete": true,
+	"Trip Playback": true,
+	"Trip Itinerary": true,
+	"Trip Analytics": true
+  },
+  "Create Trip": {
+	"Add": true,
+	"Read": true,
+	"Update": true,
+	"Delete": true
+  },
+  "Gps Inventory": {
+	"Delete": true,
+	"Update": true,
+	"Add": true,
+	"Read": true
+  },
+  "Diesels": {
+	"Read": true,
+	"Add": true,
+	"Print Diesel": true,
+	"Print Undertaking": true
+  },
+  "Unbilled Gr": {
+	"Read": true,
+	"Update": true,
+	"Generate Bill Unbilled": true,
+	"Update Gr": true
+  },
+  "Shipment Tracking": {
+	"Read": true,
+	"Update": true,
+	"Sync Event": true,
+	"Sync by Admin": true
+  },
+  "Generated Bills": {
+	"Read": true,
+	"Preview": true,
+	"Approve": true,
+	"Reset Bill": true
+  },
+  "Gen Multi Debitor Bill": {
+	"Read": true
+  },
+  "Gen Multi Creditor Bill": {
+	"Read": true
+  },
+  "Bill Dispatch": {
+	"Read": true,
+	"Edit": true,
+	"Preview": true,
+	"Dispatch": true,
+	"Reset Bill": true
+  },
+  "Bill Acknowledge": {
+	"Read": true,
+	"Edit": true,
+	"Preview": true,
+	"Settle": true,
+	"Upload": true
+  },
+  "Bill Settlement": {
+	"Read": true,
+	"Preview": true,
+	"Settle": true,
+	"Credit Debit": true
+  },
+  "Trip Expense": {
+	"Read": true,
+	"Add Expenses": true,
+	"Deal Acknowledge": true,
+	"Deduct TDS": true
+  },
+  "Purchase Bill": {
+	"Read": true,
+	"Edit": true
+  },
+  "Dues Bill": {
+	"Read": true,
+	"Add": true,
+	"Edit": true,
+	"Delete": true
+  },
+  "Voucher": {
+	"Add": true,
+	"Read": true,
+	"Edit": true,
+	"Reverse": true,
+	"Delete": true,
+	"Preview": true,
+	"Search Deleted": true,
+	"Upload Voucher": true,
+	"TDS Payment": true,
+	"Reverse Clear Cheque": true,
+	"Clear Cheque": true,
+	"Show Voucher History": true
+
+  },
+  "TDS Reports": {
+	"Add": true,
+	"Read": true,
+	"Reports": true
+  },
+  "FPA Report": {
+	"Add": true,
+	"Read": true,
+	"Reports": true
+  },
+  "Money Receipt": {
+	"Add": true,
+	"Edit": true,
+	"Read": true,
+	"Delete": true,
+	"Pull Voucher": true,
+	"Doc Upload Preview": true
+  },
+  "Credit Note": {
+	"Add": true,
+	"Edit": true,
+	"Read": true,
+	"Delete": true,
+	"MiscAdd": true,
+	"MiscEdit": true,
+	"MiscDelete": true
+  },
+  "Debit Note": {
+	"Add": true,
+	"Edit": true,
+	"Read": true,
+	"Delete": true
+  },
+  "Sales Invoice": {
+	"Add": true,
+	"Edit": true,
+	"Read": true,
+	"Delete": true
+  },
+  "Customer Payment": {
+	"Read": true,
+	"Update Payment": true
+  },
+  "Vendor Payment": {
+	"Read": true,
+	"Update Payment": true
+  },
+  "Booking Report": {
+	"Read": true
+  },
+  "GR Report": {
+	"Read": true
+  },
+  "Purchase Bill Report": {
+	"Read": true
+  },
+  "Driver Reports": {
+	"Read": true,
+	"Driver Payment Report": true
+  },
+  "Trip Performance Report": {
+	"DLP": true,
+	"DUP": true,
+	"RTP": true,
+	"RTP Expense": true,
+	"Detail RTP": true,
+	"RTP Gap": true,
+	"Last Settle RTP": true,
+	"Monthly Performance": true,
+	"Read": true
+  },
+  "Settlement Report": {
+	"Read": true
+  },
+  "Unbilled Report": {
+	"Read": true
+  },
+  "Billing Report": {
+	"Read": true,
+	"GST Sales": true
+  },
+  "Costing Report": {
+	"Read": true
+  },
+  "Profit Report": {
+	"Read": true
+  },
+  "Profit Report - GR": {
+	"Read": true
+  },
+  "Initial Profit Report": {
+	"Read": true
+  },
+  "Hire Payment Report": {
+	"Read": true
+  },
+  "Trip Report": {
+	"Read": true,
+	"Trip Profitability Report": true
+  },
+  "Daywise Report": {
+	"Ledger Report" : true,
+	"Ledger Group Report": true,
+	"Account Balance Report": true,
+	"Account Balance Monthly Report": true,
+	"Group Balance Report": true,
+	"Opening Balance Report": true,
+	"Bill to Bill Report": true,
+	"Trial Balance Report": true,
+	"Branch Expense Report": true,
+	"Ledger Outstanding Report Daywise": true,
+	"Ledgers Outstanding Report Period Wise": true,
+	"Group Trial Balance Report": true,
+	"Particulars Trial Balance Report":  true,
+	"Cost-Center Report": true,
+	"Profit and Loss Detail" : true,
+	"Profit and Loss Summary": true,
+	"Vehicle Profit Report":  true,
+	"Vehicle Expense Report": true
+  },
+  "Vehicle Report": {
+	"Read": true
+  },
+  "Fleet Owner Report": {
+	"Read": true
+  },
+  "Diesel Escalation": {
+	"Read": true
+  },
+  "DO": {
+	"Read": true
+  },
+  "Others": {
+	"Profitablity": true,
+	"Trips": true,
+	"Bill-Trip Wise": true
+  },
+  "Customers": {
+	"Read": true,
+	"Add": true,
+	"Update": true,
+	"Delete": true,
+	"Edit Client": true
+  },
+  "Department": {
+	"Read": true,
+	"Add": true,
+	"Update": true,
+	"Update Department": true,
+	"Delete": true,
+	"Trim Read": true
+  },
+  "Role": {
+	"Read": true,
+	"Add": true,
+	"Delete": true,
+	"Update": true
+  },
+  "Category": {
+	"Read": true,
+	"Add": true,
+	"Update": true,
+	"Delete": true
+  },
+  "Vendor": {
+	"Read": true,
+	"Add": true,
+	"Update": true,
+	"Delete": true,
+	"Edit Client": true
+  },
+  "Contractor": {
+	"Add": true,
+	"Read": true,
+	"Update": true,
+	"Delete": true
+  },
+  "Task Master": {
+	"Read": true,
+	"Add": true,
+	"Update": true,
+	"Delete": true
+  },
+  "Part Category": {
+	"Read": true,
+	"Add": true,
+	"Update": true,
+	"Delete": true
+  },
+  "Materials": {
+	"Read": true,
+	"Add": true,
+	"Update": true
+  },
+  "Spares": {
+	"Read": true,
+	"Add": true,
+	"Update": true,
+	"Delete": true
+  },
+  "Consignor Consignee": {
+	"Read": true,
+	"Add": true,
+	"Update": true,
+	"Delete": true,
+	"Edit Client": true
+  },
+  "Billing Party": {
+	"Read": true,
+	"Add": true,
+	"Update": true,
+	"Delete": true,
+	"Edit Client": true
+  },
+  "City State": {
+	"Read": true,
+	"Add": true,
+	"Update": true,
+	"Delete": true
+  },
+  "Directory": {
+	"Read": true
+  },
+  "Trip Settlement": {
+	"Read": true,
+	"Add": true,
+	"Update": true,
+	"Delete": true,
+	"Expense Delete": true,
+	"Edit": true,
+	"Add Driver Payment": true,
+	"Edit Driver Payment": true,
+	"Delete Driver Payment": true,
+	"Driver Association": true,
+	"Add Km": true,
+	"Mark Settle": true,
+	"Update MarkSettle Date": true,
+	"Move To Suspense": true,
+	"Map To Trip": true,
+	"Add Trip": true,
+	"Remove Trip": true,
+	"Revert Completely Settled": true,
+	"Account Manager Remark": true,
+	"Customer Filter": true,
+	"Upload Document": true,
+	"Grossprofit Preview": true,
+	"Tripsheet Preview": true
+  },
+  "Round Trip": {
+	"Read": true,
+	"Add": true,
+	"Update": true,
+	"Delete": true,
+	"Edit": true
+  },
+  "Trip Performance": {
+	"Read": true,
+	"Add": true,
+	"Edit": true,
+	"Delete": true,
+	"Vendor Deal": true,
+	"Acknowledge": true,
+	"Revert Ack": true,
+	"Vendor Payment": true,
+	"Customer Filter": true,
+	"Upload Document": true,
+	"Trip Payment": true,
+	"Print Builty": true
+
+  },
+  "Incidental Expense": {
+	"Read": true,
+	"Add": true,
+	"Edit": true,
+	"Delete": true
+  },
+  "FPA Gr": {
+	"Read": true,
+	"Add": true,
+	"Edit": true,
+	"Delete": true,
+	"Deduction": true
+  },
+  "Driver And Vehicle Association": {
+	"Read": true,
+	"Add": true,
+	"Update": true,
+	"Delete": true,
+	"Edit Association": true,
+	"Back DateEntry": true,
+	"Assistant Driver": true
+  },
+  "Expenses": {
+	"Read": true,
+	"Add": true
+  },
+  "Job Cards": {
+	"Read": true,
+	"Add": true,
+	"Update": true,
+	"Close": true,
+	"Contractor Exp": true,
+	"Jcd": true,
+	"Report": true,
+	"Services Add": true,
+	"Services Update": true,
+	"Services Close": true
+  },
+  "Inventory": {
+	"Read": true,
+	"Return Spare": true,
+	"Issue Spare": true,
+	"Get Pr": true,
+	"Inward": true,
+	"Report": true
+  },
+  "Aggregated Inventory": {
+	"Read": true
+  },
+  "Tools": {
+	"Read": true,
+	"Inward": true,
+	"Tool Issue": true,
+	"Tools Return": true,
+	"History": true,
+	"Report": true
+  },
+  "Spare Slips": {
+	"Read": true,
+	"Download": true
+  },
+  "Maintenance Diesel": {
+	"Read": true,
+	"In-Out": true,
+	"Slip": true,
+	"Report": true
+  },
+  "Maintenance Vendor": {
+	"Read": true,
+	"Add": true,
+	"Update": true,
+	"Delete": true
+  },
+  "PR": {
+	"Read": true,
+	"Add": true,
+	"Update": true,
+	"Approve": true,
+	"Process": true,
+	"PR Download": true
+  },
+  "PR-PO": {
+	"PR-PO": true
+  },
+  "PO Detail": {
+	"Read": true,
+	"Update": true,
+	"Approve": true,
+	"Print": true,
+	"Report": true
+  },
+  "PO Release": {
+	"Read": true,
+	"Release": true,
+	"Print": true,
+	"Report": true
+  },
+  "Spare Inventory": {
+	"Report": true
+  },
+  "Spare Inventory Inward": {
+	"Report": true
+  },
+  "Inventory Snapshot": {
+	"Report": true
+  },
+  "Job Card": {
+	"Report": true
+  },
+  "Job Card Task": {
+	"Report": true
+  },
+  "Tool": {
+	"Report": true
+  },
+  "Tool Issue": {
+	"Report": true
+  },
+  "Contractor Expense": {
+	"Report": true
+  },
+  "PR Report": {
+	"Report": true
+  },
+  "Expense Report": {
+	"Report": true
+  },
+  "Spare Consumption": {
+	"Report": true
+  },
+  "Combined Expense": {
+	"Report": true
+  },
+  "Tyre Master": {
+	"Read": true,
+	"Inward": true,
+	"Issue": true,
+	"Return": true,
+	"Move to Scrap": true,
+	"Move to Stock": true,
+	"Report": true
+  },
+  "Prime mover trailer association": {
+	"Read": true,
+	"Associate": true,
+	"Dis-Associate": true
+  },
+  "Retreated": {
+	"Read": true,
+	"Issue": true,
+	"Return": true
+  },
+  "Tyre": {
+	"Report": true
+  },
+  "Tyre Issue": {
+	"Report": true
+  },
+  "Tyre Retreat": {
+	"Report": true
+  },
+  "Prime Trailer association": {
+	"Report": true
+  },
+  "User": {
+	"Read": true,
+	"Add": true,
+	"Update": true,
+	"Delete": true,
+	"Password": true
+  },
+  "Vehicle Category": {
+	"Read": true,
+	"Type Read": true,
+	"Add": true,
+	"Update": true,
+	"Delete": true,
+	"Type Read Trim": true
+  },
+  "Structure Master": {
+	"Read": true,
+	"Add": true,
+	"Delete": true
+  },
+  "Vehicle Model": {
+	"Read": true,
+	"Matrix Read": true,
+	"Add": true,
+	"Update": true,
+	"Delete": true
+  },
+  "Sim Inventory": {
+	"Read": true,
+	"Add": true,
+	"Update": true,
+	"Delete": true
+  },
+  "Device Inventory": {
+	"Read": true,
+	"Add": true,
+	"Update": true,
+	"Delete": true
+  },
+  "Device Slips": {
+	"Read": true,
+	"Add": true,
+	"Update": true,
+	"Delete": true
+  },
+  "Quotation": {
+	"Read": true,
+	"Add": true,
+	"Update": true,
+	"Delete": true
+  },
+  "Quote to SO": {
+	"Read": true,
+	"Add": true,
+	"Update": true,
+	"Delete": true
+  },
+  "SO": {
+	"Read": true,
+	"Add": true,
+	"Update": true,
+	"Delete": true
+  },
+  "SO Invoice": {
+	"Read": true,
+	"Add": true,
+	"Update": true,
+	"Delete": true
+  },
+  "Quotation Report": {
+	"Read": true
+  },
+  "SO Report": {
+	"Read": true
+  },
+  "DayBook": {
+	"Delete": true,
+	"Update": true,
+	"Add": true,
+	"Read": true
+  },
+  "Reports": {
+	"Read": true
+  },
+  "Ledger": {
+	"Delete": true,
+	"Update": true,
+	"Add": true,
+	"Read": true,
+	"preview Ledger": true
+  },
+  "Bank Reconciliation": {
+	"Delete": true,
+	"Update": true,
+	"Add": true,
+	"Read": true,
+	"preview Ledger": true
+  },
+  "Account Master": {
+	"Delete": true,
+	"Update": true,
+	"Add": true,
+	"Read": true,
+	"OpeningBalance": true,
+	"Upload": true,
+	"Structure": true,
+	"Edit Client": true,
+	"Edit Name": true,
+	"Reset Balance": true,
+	"Structure All": true,
+	"Upload Modified Structure": true,
+	"Balance Sheet": true
+  },
+  "Account Report": {
+	"Read": true,
+	"CSV": true
+  },
+  "GST Report": {
+	"Read": true
+  },
+  "Direct Op Balance": {
+	"Read": true
+  },
+  "TDS Report": {
+	"Read": true
+  },
+  "GSTR-1": {
+	"Read": true
+  },
+  "Invoice Report (SO)": {
+	"Read": true
+  },
+  "Summary": {
+	"Read": true
+  },
+  "Detail": {
+	"Read": true
+  },
+  "Map View": {
+	"Read": true,
+	"Hide Fields": true,
+	"Update Mobile No": true,
+	"Live Tracking": true
+  },
+  "Live Tracking": {
+	  "Read":true,
+	  "Add":true,
+	  "Update": true,
+	  "Delete":true
+  },
+  "GPS Dashboard": {
+	"Read": true
+  },
+  "Playback": {
+	"Read": true
+  },
+  "Geofence": {
+	"Read":true,
+	"Add":true,
+	"Update":true,
+	"Delete":true
+  },
+  "Alarm": {
+	"Read": true,
+	"Add": true,
+	"Update": true,
+	"Delete": true
+  },
+  "GPS Moniter": {
+	"Read": true
+  },
+  "Analytics": {
+	"Read": true
+  },
+  "GPS Reports": {
+	"Read": true
+  },
+  "Parking Reports": {
+	"Read":true,
+	"Add":true,
+	"Update":true,
+	"Delete":true
+  },
+  "Create GR": {
+	"Delete": true,
+	"Update": true,
+	"Add": true,
+	"Read": true
+  },
+  "Cover Note": {
+	"Delete": true,
+	"Update": true,
+	"Add": true,
+	"Read": true
+  },
+  "Trip Advance": {
+	"Delete": true,
+	"Update": true,
+	"Add": true,
+	"Edit": true,
+	"Add DieselReq": true,
+	"Edit DieselReq": true,
+	"Read": true,
+	"Edit Vehicle": true,
+	"voucher Reverse": true,
+	"Delete Contra Reverse": true,
+	"UnMap Advance": true,
+	"Bill Preview": true,
+	"Add Multi Advance": true,
+	"Edit Multi Advance": true,
+	"Delete Multi Advance": true,
+	"Import to Accounts": true,
+	"Import to account Bulk": true,
+	"Upload trip Advance": true,
+	"Trip Advance sample file": true,
+	"Generate Bill": true,
+	"Gen Diesel Bill": true
+  },
+  "Live Tracker": {
+	"Delete": true,
+	"Update": true,
+	"Add": true,
+	"Read": true
+  },
+  "Landmark": {
+	"Delete": true,
+	"Update": true,
+	"Add": true,
+	"Read": true,
+	"download": true
+  },
+  "Alert": {
+	"Delete": true,
+	"Update": true,
+	"Add": true,
+	"Read": true
+  },
+  "Live Trip": {
+	"Delete": true,
+	"Update": true,
+	"Add": true,
+	"Read": true
+  },
+  "Historical Trip Report": {
+	"Delete": true,
+	"Update": true,
+	"Add": true,
+	"Read": true
+  },
+  "POD Tracking": {
+	"Read": true
+  },
+  "GR Invoice Tracking": {
+	"Read": true
+  },
+  "Market Vehicle Allocation": {
+	"Read": true
+  },
+  "Empty Trip": {
+	"Read": true
+  },
+  "Vehicle Tracking": {
+	"Read": true,
+	"downloadCSV" : true
+  },
+  "Rate Chart": {
+	"Delete": true,
+	"Update": true,
+	"Add": true,
+	"Read": true,
+	"upload": true,
+	"download": true
+  },
+  "Incentive": {
+	"Delete": true,
+	"Update": true,
+	"Add": true,
+	"Read": true
+  },
+  "DPH": {
+	"Delete": true,
+	"Update": true,
+	"Add": true,
+	"Read": true
+  },
+  "FPA Master": {
+	"Delete": true,
+	"Update": true,
+	"Add": true,
+	"Read": true
+  },
+  "Stationery": {
+	"Update": true,
+	"Add": true,
+	"Read": true,
+	"Delete Bill Stationery": true,
+	"Delete Book": true,
+	"Soft Delete": true
+  },
+  "Configurations": {
+	"Update": true,
+	"Add": true,
+	"Read": true
+  },
+  "Logs": {
+	"Read": true,
+	"Notification": true
+  },
+  "Log Report": {
+	"Update": true,
+	"Add": true,
+	"Read": true
+  },
+  "Accident Vehicle": {
+	"Update": true,
+	"Add": true,
+	"Read": true,
+	"Delete": true
+  },
+  "Driver Counselling": {
+	"Read": true,
+	"Add": true,
+	"Delete": true
+  },
+  "Cost Category": {
+	"Update": true,
+	"Add": true,
+	"Read": true,
+	"Delete": true
+  },
+  "Cost Center": {
+	"Update": true,
+	"Add": true,
+	"Read": true,
+	"Delete": true
+  }
+}

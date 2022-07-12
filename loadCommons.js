@@ -1,0 +1,11 @@
+let Promise = require('bluebird');
+global.commonUtil = require('./utils/common-util');
+global.config  = commonUtil.mergeObjects(require('./config/default'), require(`./config/${process.env.LMS_ENV || 'dev'}`));
+global.projectHome = __dirname;
+global.constant = require("./constant");
+global.mongoose = Promise.promisifyAll(require('mongoose'));
+global.mongoose.Promise = Promise;
+global.promise = Promise;
+global.dateUtil = require(projectHome + '/utils/dateutils');
+global.otherUtil = Promise.promisifyAll(require(projectHome + '/utils/other-util'));
+global.moment = require('moment');

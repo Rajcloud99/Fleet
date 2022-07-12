@@ -1,0 +1,417 @@
+<!DOCTYPE html>
+<html>
+<script src="../../node_modules/angular/angular.min.js"></script>
+<style type="text/css">
+    * {
+        margin: 0;
+        padding: 0;
+    }
+
+    table {
+        border-collapse: collapse;
+    }
+
+    .num {
+        font-size: 9px;
+    }
+
+    .ctext {
+        text-align: center;
+    }
+
+    .bold {
+        font-weight: bold
+    }
+
+    .ib {
+        display: inline-block;
+    }
+
+    .f12 {
+        font-size: 12px
+    }
+
+    .f14 {
+        font-size: 14px
+    }
+
+    .fr {
+        float: right
+    }
+
+    body {
+        width: 80%;
+        margin-left: auto;
+        margin-right: auto;
+    }
+
+    .btop {
+        border-top: 1px solid black;
+    }
+
+    .bbottom {
+        border-bottom: 1px solid black;
+    }
+
+    .nobleft {
+        border-left: 0
+    }
+
+    .nobright {
+        border-right: 0
+    }
+
+    .vat {
+        vertical-align: top
+    }
+
+    .bright {
+        border-right: 1px solid black;
+    }
+
+    #blank {
+        height: 80px
+    }
+
+    #container {
+        width: 100%;
+        font-size: 0;
+    }
+
+    #left,
+    #middle,
+    #right {
+        display: inline-block;
+        *display: inline;
+        zoom: 1;
+        vertical-align: top;
+        font-size: 12px;
+        font-family: Verdana
+    }
+
+    #left {
+        width: 15%;
+    }
+
+    #middle {
+        width: 65%;
+        text-align: center
+    }
+
+    #right {
+        width: 20%;
+        text-align: center;
+    }
+
+    #title {
+        font-size: 14px;
+        font-weight: bold
+    }
+
+    #iso {
+        font-size: 9px;
+        font-weight: bold
+    }
+
+    #subtitle {
+        font-size: 10px;
+    }
+
+    #addr {
+        font-size: 9px;
+    }
+
+    .heading {
+        text-align: center;
+        font-weight: bold
+    }
+
+    #heading2 {
+        text-align: center;
+    }
+
+    .num {
+        font-size: 9px;
+    }
+
+    .bold {
+        font-weight: bold
+    }
+</style>
+
+<body style="width:800px;" ng-app="app" ng-controller="purchaseOrderCtrl">
+
+    <div style="margin: 40px;">
+
+
+    <div>
+        <script>
+            function toggleEdit(editable) {
+                var editables = document.getElementsByClassName("editable");
+                for (var i = 0; i < editables.length; i++)
+                    editables[i].setAttribute("contentEditable", editable);
+            }
+        </script>
+    </div>
+    <p id="heading" class="heading">Purchase Order</p>
+    <p style="padding-top: 10px" class="ctext bold f14">{{client_full_name}}</p>
+    <p class="ctext bold f14">{{client_address}}</p>
+
+
+
+
+    <div style="font-size: 12px; margin-top: 20px;">
+
+
+        <div class="ib vat" style="width:50%">
+            <div>
+                <div class="ib bold vat" style="width: 30%">Supplier Code</div>
+                <div class="ib bold" style="width: 69%">: {{vendorId}}</div>
+            </div>
+            <div>
+                <div class="ib bold vat" style="width: 30%">Supplier Name</div>
+                <div class="ib bold" style="width: 69%">: {{vendor_name}}</div>
+            </div>
+            <!-- <div>
+                <div class="ib bold vat" style="width: 30%">Supplier Site</div>
+                <div class="ib bold" style="width: 69%">: {{supplier_site}}</div>
+            </div> -->
+            <div>
+                <div class="ib bold vat" style="width: 30%;">Supplier Address</div>
+                <div class="ib bold" style="width: 69%">: {{supplier_address}}</div>
+            </div>
+        </div>
+        <div class="ib vat" style="width: 49%; vertical-align: top;">
+            <div>
+                <div class="ib bold vat" style="width: 39%">PO No./ Release No.</div>
+                <div class="ib bold" style="width: 60%">: {{ponumder}}</div>
+            </div>
+            <!-- <div>
+                <div class="ib bold vat" style="width: 39%">Rev No</div>
+                <div class="ib bold" style="width: 60%">: {{rev_no}}</div>
+            </div> -->
+            <div>
+                <div class="ib bold vat" style="width: 39%">PO Date</div>
+                <div class="ib bold" style="width: 60%">: {{created_at | date:'dd-MM-yyyy'}}</div>
+            </div>
+            <!-- <div>
+                <div class="ib bold vat" style="width: 39%">PO Type</div>
+                <div class="ib bold" style="width: 60%">: {{po_type}}</div>
+            </div> -->
+        </div>
+    </div>
+
+    <div style="font-size: 12px; margin-top: 5px;">
+
+
+            <div class="ib vat" style="width:50%">
+                <div>
+                    <div class="ib bold vat" style="width: 30%">Telephone</div>
+                    <div class="ib bold" style="width: 69%">: {{telephone}}</div>
+                </div>
+                <!-- <div>
+                    <div class="ib bold vat" style="width: 30%">Fax No.</div>
+                    <div class="ib bold" style="width: 69%">: {{fax_no}}</div>
+                </div> -->
+                <div>
+                    <div class="ib bold vat" style="width: 30%">Email Id</div>
+                    <div class="ib bold" style="width: 69%">: {{email_id}}</div>
+                </div>
+            </div>
+            <div class="ib vat" style="width: 49%; vertical-align: top;">
+                <!-- <div>
+                    <div class="ib bold vat" style="width: 39%">Dealer Name</div>
+                    <div class="ib bold" style="width: 60%">: {{dealer_name}}</div>
+                </div> -->
+                <div>
+                    <div class="ib bold vat" style="width: 39%">Promised Date</div>
+                    <div class="ib bold" style="width: 60%">: {{promised_date | date:'dd-MM-yyyy'}}</div>
+                </div>
+                <div>
+                    <div class="ib bold vat" style="width: 39%">PO Approver</div>
+                    <div class="ib bold" style="width: 60%">: {{approver.name}}</div>
+                </div>
+                <!-- <div>
+                    <div class="ib bold vat" style="width: 39%">Purchase Agreement No.</div>
+                    <div class="ib bold" style="width: 60%">: {{purchase_agreement_no}}</div>
+                </div> -->
+                <div>
+                    <div class="ib bold vat" style="width: 39%">Agreement Amount</div>
+                    <div class="ib bold" style="width: 60%">: {{total}}</div>
+                </div>
+                <!-- <div>
+                    <div class="ib bold vat" style="width: 39%">Date Valid</div>
+                    <div class="ib bold" style="width: 60%">: {{date_valid}}</div>
+                </div> -->
+                <!-- <div>
+                    <div class="ib bold vat" style="width: 39%">PR No.</div>
+                    <div class="ib bold" style="width: 60%">: {{pr_no}}</div>
+                </div> -->
+                <!-- <div>
+                    <div class="ib bold vat" style="width: 39%">Line of Business</div>
+                    <div class="ib bold" style="width: 60%">: {{line_of_business}}</div>
+                </div> -->
+                <div>
+                    <div class="ib bold vat" style="width: 39%">PO Status</div>
+                    <div class="ib bold" style="width: 60%">: {{status}}</div>
+                </div>
+                <div>
+                    <div class="ib bold vat" style="width: 39%">Description</div>
+                    <div class="ib bold" style="width: 60%">: {{remark}}</div>
+                </div>
+                <div>
+                    <div class="ib bold vat" style="width: 39%">PRs</div>
+                    <div class="ib bold" style="width: 60%">: <span ng-repeat="a in prs">{{a}},</span></div>
+                </div>
+				<div>
+					<div class="ib bold vat" style="width: 39%">Payment Terms</div>
+					<div class="ib bold" style="width: 60%">: {{payment_terms}}</div>
+				</div>
+				<div>
+					<div class="ib bold vat" style="width: 39%">Freight Terms</div>
+					<div class="ib bold" style="width: 60%">: {{freightTerms}}</div>
+				</div>
+            </div>
+
+        </div>
+
+
+        <div style="font-size: 12px; margin-top: 5px;">
+            <div class="ib vat" style="width:50%">
+                <div>
+                    <div class="ib bold vat" style="width: 30%">Ship to Location</div>
+                    <div class="ib bold" style="width: 69%">: {{shipping_location}}</div>
+                </div>
+                <div>
+                    <div class="ib bold vat" style="width: 30%">Bill to Location</div>
+                    <div class="ib bold" style="width: 69%">: {{billing_location}}</div>
+                </div>
+            </div>
+            <!-- <div class="ib vat" style="width:49%">
+                <div>
+                    <div class="ib bold vat" style="width: 30%">Bill to Location</div>
+                    <div class="ib bold" style="width: 69%">: {{billing_location}}</div>
+                </div>
+            </div> -->
+        </div>
+
+        <!-- <div style="font-size: 12px; margin-top: 5px;">
+            <div class="ib vat" style="width:50%">
+                <div class="bold f14">Excise Registration Details</div>
+                <div>
+                    <div>
+                        <div class="ib bold vat" style="width: 30%">Registration No.</div>
+                        <div class="ib bold" style="width: 69%">: {{reg_no}}</div>
+                    </div>
+                    <div>
+                        <div class="ib bold vat" style="width: 30%">Range</div>
+                        <div class="ib bold" style="width: 69%">: {{range}}</div>
+                    </div>
+                    <div>
+                        <div class="ib bold vat" style="width: 30%">Division</div>
+                        <div class="ib bold" style="width: 69%">: {{division}}</div>
+                    </div>
+                    <div>
+                        <div class="ib bold vat" style="width: 30%">Commissionerate</div>
+                        <div class="ib bold" style="width: 69%">: {{commissionerate}}</div>
+                    </div>
+                    <div>
+                        <div class="ib bold vat" style="width: 30%">VAT TIN No.</div>
+                        <div class="ib bold" style="width: 69%">: {{vat_tin}}</div>
+                    </div>
+                    <div>
+                        <div class="ib bold vat" style="width: 30%">LST No.</div>
+                        <div class="ib bold" style="width: 69%">: {{lst}}</div>
+                    </div>
+                    <div>
+                        <div class="ib bold vat" style="width: 30%">CST TIN No.</div>
+                        <div class="ib bold" style="width: 69%">: {{cst_tin}}</div>
+                    </div>
+                    <div>
+                        <div class="ib bold vat" style="width: 30%">CIN No.</div>
+                        <div class="ib bold" style="width: 69%">: {{cin}}</div>
+                    </div>
+                </div>
+            </div>
+        </div> -->
+
+        <div style="font-size: 12px; margin-top: 15px;">
+            <div class="ib bold vat" style="width: 7.5%">Subject</div>
+            <div class="ib bold" style="width: 68%;">: PO of Listed items</div>
+        </div>
+
+        <!-- <div style="font-size: 12px;">
+            <div class="ib bold vat" style="width: 20%">Performa Inv. No.</div>
+            <div class="ib bold" style="width: 79%; text-transform: uppercase;">: {{performa_inv_no}}</div>
+        </div> -->
+
+    <div style="font-size: 12px;">
+
+           <!-- <div class="ib vat" style="width: 25%;">
+                <div class="ib bold vat" style="width: 30%">Freight</div>
+                <div class="ib bold" style="width: 68%; text-transform: uppercase;">: {{freight}}</div>
+            </div><br>-->
+            <div class="ib vat" style="width: 25%;">
+                <div class="ib bold vat" style="width: 30%">Currency</div>
+                <div class="ib bold" style="width: 68%; text-transform: uppercase;">: {{currency}}</div>
+            </div>
+            <!-- <div class="ib vat" style="width: 49%;">
+                <div class="ib bold vat" style="width: 30%">INCO Terms</div>
+                <div class="ib bold" style="width: 68%; text-transform: uppercase;">: {{inco_terms}}</div>
+            </div> -->
+        </div>
+
+    <table border="1" id="t1" class="ctext" style="width:100%; margin-top: 20px">
+        <tr style="font-size: 12px;">
+            <th>Sr No</th>
+            <!-- <th>Line No</th>
+            <th>Ship No</th> -->
+            <th>Item Code</th>
+            <th>Item Description</th>
+			<th>Brand</th>
+            <th>PR No.</th>
+            <!-- <th>Promised Date</th> -->
+            <!-- <th>Country of Origin</th>
+            <th>Grade/Season</th> -->
+            <th>UOM</th>
+            <th>QTY</th>
+            <th>Unit Price</th>
+            <th>Price</th>
+            <th>Tax(%)</th>
+            <th>Price inc Tax</th>
+
+        </tr>
+    </table>
+
+
+    <div style="font-size: 12px; margin-top: 30px">
+        <div>
+            <div class="ib bold vat" style="width: 30%">Amount in Words</div>
+            <div class="ib bold" style="width: 68%;">: {{amount_in_words}}</div>
+        </div>
+        <div>
+            <div class="ib bold vat" style="width: 30%">Payment Terms</div>
+            <div class="ib bold" style="width: 68%;">: {{payment_terms}}</div>
+        </div>
+        <div>
+            <div class="ib bold vat" style="width: 30%">Note to Supplier</div>
+            <div class="ib bold" style="width: 68%;">: {{note_to_supplier}}</div>
+        </div>
+        <div>
+            <div class="ib bold vat" style="width: 30%">Additional Note to Supplier</div>
+            <div class="ib bold" style="width: 68%;">: {{additional_note_to_supplier}}</div>
+        </div>
+    </div>
+    <p class="f12 bold">Important(Std. Notes to Supplier)</p>
+    <p class="f12">01. All the Bills / Invoices are to be raised on us at our "Bill to Location" address only.</p>
+    <p class="f12">02. Material shall be despatched only along with Original Bill / Invoice having PO No., PO Date with correct item code and item description as mentioned.</p>
+    <p class="f12">03. Invoice shall be raised for each "Ship to Location" separately.</p>
+    <p class="f12">04. Acceptance of the material will be subjected to Company Quality Standards.</p>
+
+    <script src="purchaseOrder.js"></script>
+
+    </div>
+
+</body>
+
+</html>

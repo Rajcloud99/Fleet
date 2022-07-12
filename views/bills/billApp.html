@@ -1,0 +1,308 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width">
+    <title>Service Preview</title>
+
+    <script src="../../node_modules/angular/angular.min.js"></script>
+    <script src="../../node_modules/jquery/dist/jquery.min.js"></script>
+    <script src="../../node_modules/bootstrap/dist/js/bootstrap.min.js"></script>
+    <link href="../../node_modules/bootstrap/dist/css/bootstrap.min.css" rel="stylesheet" type="text/css" />
+
+    <script src="billApp.js"></script>
+  </head>
+  <body>
+    <div ng-app="BillApp">
+      <div ng-controller="BillController">
+        <form role="form"  name="" autocomplete="off" novalidate>
+          <div class="modal-header" style="padding: 10px 26px 0px;    margin-top: 2%;" >
+            <div class="">
+              <div class="pull-left">
+                <img src="{{selectInVoice.client_logo}}" alt="logo" style="width:160px;height:70px;">
+              </div>
+              <div style="margin-right: 13%;">
+                <h4 class="modal-title" align="center">
+                  {{selectInVoice.client_full_name}}</h4>
+                <p align="center" style="margin-bottom: 6px;">{{selectInVoice.client_display_line_1}}</p>
+
+                <p align="center" style="margin-bottom: 6px;">{{selectInVoice.client_display_line_2}}</p>
+
+                <p align="center" style="margin-bottom: 6px;">{{selectInVoice.client_display_line_3}}</p>
+                <p align="center" style="margin-bottom: 6px;margin-left: 10%;">GSTIN No. : {{client_gstin}}</p>
+              </div>
+            </div>
+            <hr>
+            <h5 class="modal-title" align="center" style="margin-left: -5%;"><b>TAX INVOICE</b></h5>
+            <hr>
+          </div>
+          <div class="modal-body">
+            <div class="row" style="margin:15px">
+              <div class="col-md-12">
+                <div class="up_data">
+                  <div class="col-md-5">
+                    <div class="form-group m-b-0">
+                      <label class="col-sm-4 control-label">Billing Party Name:</label>
+                      <div class="col-sm-8">
+                        <label>{{selectInVoice.billing_party_name}}</label>
+                      </div>
+                    </div>
+                    <div class="clearfix"></div>
+                    <div class="form-group m-b-0">
+                      <label class="col-sm-4 control-label">Address of Party:</label>
+                      <div class="col-sm-8">
+                        <label>{{selectInVoice.billing_party_address}}</label>
+                      </div>
+                    </div>
+                    <div class="clearfix"></div>
+                    <div class="form-group m-b-0">
+                      <label class="col-sm-4 control-label">State Code:</label>
+                      <div class="col-sm-8">
+                        <label>{{selectInVoice.gstin_state_code || 'NA'}}</label>
+                      </div>
+                    </div>
+                    <div class="clearfix"></div>
+                  </div>
+                  <div class="col-md-3">
+                    <div class="form-group m-b-0">
+                      <label class="col-sm-8 control-label">GSTIN No./Unique ID of Party:</label>
+                      <div class="col-sm-4">
+                        <label>{{biller_gstin}}</label>
+                      </div>
+                    </div>
+                    <div class="clearfix"></div>
+                    <div class="form-group m-b-0">
+                      <!-- <label class="col-sm-6 control-label">Address of Party:</label> -->
+                      <div class="col-sm-12">
+                        <label>{{selectInVoice.client_display_line_4}}</label>
+                      </div>
+                    </div>
+                    <div class="clearfix"></div>
+                  </div>
+                  <div class="col-md-4">
+                    <div class="form-group m-b-0">
+                      <label class="col-sm-4 control-label">Bill No.:</label>
+                      <div class="col-sm-8">
+                        <label>{{selectInVoice.bill_no}} </label>
+                      </div>
+                    </div>
+                    <div class="clearfix"></div>
+                    <div class="form-group m-b-0">
+                      <label class="col-sm-4 control-label">Date:</label>
+                      <div class="col-sm-8">
+                        <label>{{selectInVoice.billed_date | date:"dd-MM-yyyy"}} </label>
+                      </div>
+                    </div>
+                    <div class="clearfix"></div>
+                    <div class="form-group m-b-0">
+                      <label class="col-sm-4 control-label">Place Of Supply:</label>
+                      <div class="col-sm-8">
+                        <label>{{selectInVoice.gstin_state_code || 'NA'}} </label>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                <div class="clearfix"></div>
+                <br>
+                <div class="detailsList">
+                  <div class="table-responsive">
+                    <table class="table table-bordered">
+                      <thead>
+                        <tr>
+                          <th>S No.</th>
+                          <th>Trip No.</th>
+                          <th>GR Date</th>
+                          <th>GR No</th>
+                          <th>Vehicle No.</th>
+                          <th>Route</th>
+                          <th>Consignor</th>
+                          <th>Consignee</th>
+                          <th>Boe No.</th>
+                          <th>Continer No.</th>
+                          <th>Cont. Size</th>
+                          <th>Weight</th>
+                          <th ng-if="showRate">Rate {{"("+payment_basisValue+")"}}</th>
+                          <th>Freight</th>
+                          <th ng-show="total.loading_charge">Loading Charge</th>
+                          <th ng-show="total.unloading_charge">Unloading Charge</th>
+                          <th ng-show="total.weightman_charges">Weightman Charge</th>
+                          <th ng-show="total.overweight_charges">Overweight Charge</th>
+                          <th ng-show="total.dtn_amt">Detention Charge</th>
+                          <th ng-show="total.other_charge">Other Charge</th>
+                          <th ng-show="total.extra_running">Extra Running</th>
+                          <th>Total Freight</th>
+                          <!-- <th>Remarks</th> -->
+                        </tr>
+                      </thead>
+                      <tbody>
+                        <tr data-ng-repeat="bill in selectInVoice.booking_info" >
+                          <td>{{$index+1}}</td>
+                          <td>{{bill.trip_no}}</td>
+                          <td>{{bill.gr_date | date:"dd-MM-yyyy"}}</td>
+                          <td>{{bill.gr_no || ''}}</td>
+                          <td>{{bill.m_vehicle_no ? bill.m_vehicle_no :  bill.veh_no}}</td>
+                          <td>{{bill.route || ''}}</td>
+                          <td>{{bill.consigner_name || ''}} </td>
+                          <td>{{bill.consignee_name || ''}}</td>
+                          <td>{{(bill.boe_no && bill.boe_no.length>0) ? bill.boe_no.join(', ') : ''}}</td>
+                          <td>{{(bill.container_no && bill.container_no.length>0) ? bill.container_no.join(', ') : ''}}</td>
+                          <td>{{(bill.container_size && bill.container_size.length>0) ? bill.container_size.join(', ') : ''}}</td>
+
+                          <td>{{bill.weight || 0}} &nbsp; {{bill.weight_unit}}</td>
+                          <td ng-if="showRate">{{bill.rate}}</td>
+                          <td>{{bill.freight}}</td>
+                          <td ng-show="total.loading_charge">{{bill.loading_charges}}</td>
+                          <td ng-show="total.unloading_charge">{{bill.unloading_charges}}</td>
+                          <td ng-show="total.weightman_charges">{{bill.weightman_charges}}</td>
+                          <td ng-show="total.overweight_charges">{{bill.ovr_wt_chrgs}}</td>
+                          <td ng-show="total.dtn_amt">{{bill.dtn_amt}}</td>
+                          <td ng-show="total.other_charge">{{(bill.other_charges+bill.fuel_price_hike+bill.gr_charges)}}</td>
+                          <td ng-show="total.extra_running">{{bill.othr_exp}}</td>
+                          <td>{{bill.total}}</td>
+                        </tr>
+                        <tr>
+                            <td colspan="{{colSpanValue}}">Total</td>
+                            <td>{{total.freight}}</td>
+                            <td ng-show="total.loading_charge">{{total.loading_charge}}</td>
+                            <td ng-show="total.unloading_charge">{{total.unloading_charge}}</td>
+                            <td ng-show="total.weightman_charges">{{total.weightman_charges}}</td>
+                            <td ng-show="total.overweight_charges">{{total.overweight_charges}}</td>
+                            <td ng-show="total.dtn_amt">{{total.dtn_amt}}</td>
+                            <td ng-show="total.other_charge">{{total.other_charge}}</td>
+                            <td ng-show="total.extra_running">{{total.extra_running}}</td>
+                            <td>{{total.total_expense}}</td>
+                        </tr>
+                        <tr>
+                            <td colspan="{{colSpanValue}}">CGST @ 2.5%</td>
+                            <td>{{cgst.freight}}</td>
+                            <td ng-show="total.loading_charge">{{cgst.loading_charge}}</td>
+                            <td ng-show="total.unloading_charge">{{cgst.unloading_charge}}</td>
+                            <td ng-show="total.weightman_charges">{{cgst.weightman_charges}}</td>
+                            <td ng-show="total.overweight_charges">{{cgst.overweight_charges}}</td>
+                            <td ng-show="total.dtn_amt">{{cgst.dtn_amt}}</td>
+                            <td ng-show="total.other_charge">{{cgst.other_charge}}</td>
+                            <td ng-show="total.extra_running">{{cgst.extra_running}}</td>
+                            <td>{{cgst.total_expense}}</td>
+                        </tr>
+                        <tr>
+                            <td colspan="{{colSpanValue}}">SGST/UTGST @ 2.5%</td>
+                            <td>{{sgst.freight}}</td>
+                            <td ng-show="total.loading_charge">{{sgst.loading_charge}}</td>
+                            <td ng-show="total.unloading_charge">{{sgst.unloading_charge}}</td>
+                            <td ng-show="total.weightman_charges">{{sgst.weightman_charges}}</td>
+                            <td ng-show="total.overweight_charges">{{sgst.overweight_charges}}</td>
+                            <td ng-show="total.dtn_amt">{{sgst.dtn_amt}}</td>
+                            <td ng-show="total.other_charge">{{sgst.other_charge}}</td>
+                            <td ng-show="total.extra_running">{{sgst.extra_running}}</td>
+                            <td>{{sgst.total_expense}}</td>
+                        </tr>
+                        <tr>
+                            <td colspan="{{colSpanValue}}">IGST @ 5%</td>
+                            <td>{{igst.freight}}</td>
+                            <td ng-show="total.loading_charge">{{igst.loading_charge}}</td>
+                            <td ng-show="total.unloading_charge">{{igst.unloading_charge}}</td>
+                            <td ng-show="total.weightman_charges">{{igst.weightman_charges}}</td>
+                            <td ng-show="total.overweight_charges">{{igst.overweight_charges}}</td>
+                            <td ng-show="total.dtn_amt">{{igst.dtn_amt}}</td>
+                            <td ng-show="total.other_charge">{{igst.other_charge}}</td>
+                            <td ng-show="total.extra_running">{{igst.extra_running}}</td>
+                            <td>{{igst.total_expense}}</td>
+                        </tr>
+                        <tr>
+                            <td colspan="{{colSpanValue}}">Final Invoice Amount</td>
+                            <td>{{totalWithGST.freight}}</td>
+                            <td ng-show="total.loading_charge">{{totalWithGST.loading_charge}}</td>
+                            <td ng-show="total.unloading_charge">{{totalWithGST.unloading_charge}}</td>
+                            <td ng-show="total.weightman_charges">{{totalWithGST.weightman_charges}}</td>
+                            <td ng-show="total.overweight_charges">{{totalWithGST.overweight_charges}}</td>
+                            <td ng-show="total.dtn_amt">{{totalWithGST.dtn_amt}}</td>
+                            <td ng-show="total.other_charge">{{totalWithGST.other_charge}}</td>
+                            <td ng-show="total.extra_running">{{totalWithGST.extra_running}}</td>
+                            <td>{{totalWithGST.total_expense}}</td>
+                        </tr>
+                      </tbody>
+                    </table>
+                  </div>
+                </div>
+                <br>
+                <div class="up_data">
+                  <div class="col-md-3">
+                    <div class="form-group m-b-0">
+                      <label class="col-sm-12 control-label">PAN No. :  {{selectInVoice.client_pan_no}}</label>
+                    </div>
+                  </div>
+                  <div ng-hide="isMarketVehicle" class="col-md-7">
+                    <div class="form-group m-b-0">
+                      <label class="col-sm-12 control-label">Note: Whether Tax Payable Under Reverse Charges by Service Recipient - {{selectInVoice.apply_gst ? 'NO':'YES'}}</label>
+                    </div>
+                  </div>
+                  <!-- <div class="col-md-2">
+                    <div class="form-group m-b-0">
+                      <label class="col-sm-12 control-label">*Other charge includes GR charges and fuel price hike also.</label>
+                    </div>
+                  </div> -->
+                </div>
+                <div class="clearfix"></div>
+                <p>DECLARATION: Clasification of the service : "Transport of goods by Road"</p>
+                <p>ITC:- "We hereby certify that we have not availed credit of duty paid on inputs or capital goods or ITC of GST on input services used for providing such taxable service."</p>
+                <p style="margin-bottom: 5px;">Declare that this invoice shows the actual freight of the goods described that all particulars are true & correct.</p>
+                <p style="margin-bottom: 5px;">Description of the Service Rendered : "Transportation".</p>
+                <p style="margin-bottom: 5px;">Subject to Delhi Jurisdiction only.</p>
+                <p style="margin-bottom: 5px;">Any discrepancy should be intimated in writing with-in seven days from the date of the submission of bill.</p>
+                <p style="margin-bottom: 5px;">Payments delayed beyond agreed credit terms will attract interest @18% Per annum.</p>
+                <p ng-hide="selectInVoice.client_full_name == 'MAPLE LOGISTICS (P) LTD.'" style="margin-bottom: 5px;">Non Payment of bill creates our lien on next consignment.</p>
+                <p ng-hide="selectInVoice.client_full_name == 'MAPLE LOGISTICS (P) LTD.'" style="margin-bottom: 5px;">Please read terms and condition on {{clientData.client_t_n_c}}.</p>
+                <h5>PLEASE PAY BY A/C. PAYEE/ CHEQUE/ D.D. ONLY</h5>
+                <br>
+                <div class="up_data">
+                  <div class="col-md-4">
+                    <div class="form-group m-b-0">
+                      <label class="col-sm-12 bold control-label" style="font-size: 14px;">E. & O.E.</label>
+                    </div>
+                  </div>
+                  <div class="col-md-4">
+                    <div class="form-group m-b-0">
+                      <label class="col-sm-12 bold control-label" style="font-size: 14px;">Checked By</label>
+                    </div>
+                  </div>
+                  <div class="col-md-4">
+                    <div class="form-group m-b-0">
+                      <label class="col-sm-12 bold control-label" style="font-size: 14px;">For {{selectInVoice.client_full_name}}</label>
+                    </div>
+                    <div class="clearfix"></div>
+                    <br>
+                    <br>
+                    <div class="form-group m-b-0">
+                      <label class="col-sm-12 bold control-label">Authorised Signatory</label>
+                    </div>
+                    <div class="clearfix"></div>
+                    <div class="form-group m-b-0">
+                      <label class="col-sm-12 bold control-label">MOB NO.: {{selectInVoice.client_primary_contact_no}}</label>
+                    </div>
+                    <div class="clearfix"></div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </form>
+      </div>
+    </div>
+    <style>
+      html {
+        zoom: 0.68; /*workaround for phantomJS2 rendering pages too large*/
+      }
+      hr {
+        margin-top: 5px;
+        margin-bottom: 2px;
+      }
+      .modal-dialog{width: 80%;}
+      .footAct div div {
+          text-align: center;
+      }
+      .footAct{    margin-top: 91px;}
+      body{font-size: 12px;}
+
+    </style>
+  </body>
+</html>

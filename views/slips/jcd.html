@@ -1,0 +1,280 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width">
+    <title>Job Card Close</title>
+
+    <script src="../../node_modules/angular/angular.min.js"></script>
+    <script src="../../node_modules/jquery/dist/jquery.min.js"></script>
+    <script src="../../node_modules/bootstrap/dist/js/bootstrap.min.js"></script>
+    <link href="../../node_modules/bootstrap/dist/css/bootstrap.min.css" rel="stylesheet" type="text/css" />
+
+    <script src="jcd.js"></script>
+  </head>
+  <body>
+    <div ng-app="JcdApp">
+      <div ng-controller="JcdController">
+        <form role="form"  name="previewPrData" autocomplete="off" novalidate>
+          <div class="modal-header" style="padding: 10px 26px 0px;" >
+            <!-- <button type="button" ng-click="closeModal()" class="close"
+            data-dismiss="modal" aria-label="Close">
+              <span aria-hidden="true">&times;</span>
+            </button> -->
+            <!-- <h4 class="modal-title" align="center">MAPLE LOGISTICS PVT LTD</h4>
+            <hr>
+            <p align="center" style="margin-bottom: 6px;">Material Indent Request Form – Maple Logistics Pvt Ltd</p> -->
+            <h5 class="modal-title" align="center">: MAPLE LOGISTICS PVT. LTD. : </h5><br>
+            <h5 class="modal-title" align="center">: JC CLOSER DETAILS :</h5><br>
+          </div>
+          <div class="modal-body">
+            <div class="row" style="margin:15px">
+              <div class="col-md-5">
+                <div class="form-group m-b-0">
+                  <label class="col-sm-6 control-label">Jobcard No.</label>
+                  <div class="col-sm-6">
+                    <label>{{jcdData.rootData.jobId}}</label>
+                  </div>
+                </div>
+                <div class="form-group m-b-0">
+                  <label class="col-sm-6 control-label">Vehicle No.</label>
+                  <div class="col-sm-6">
+                    <label>{{jcdData.rootData.vehicle_number}}</label>
+                  </div>
+                </div>
+                <div class="form-group m-b-0">
+                  <label class="col-sm-6 control-label">Driver Name</label>
+                  <div class="col-sm-6">
+                    <label>{{jcdData.rootData.driver_name}}</label>
+                  </div>
+                </div>
+                <div class="form-group m-b-0">
+                  <label class="col-sm-6 control-label">Trip No.</label>
+                  <div class="col-sm-6">
+                    <label>{{jcdData.rootData.trip_no}}</label>
+                  </div>
+                </div>
+              </div>
+              <div class="col-md-2"></div>
+              <div class="col-md-5">
+                <div class="form-group m-b-0">
+                  <label class="col-sm-6 control-label">Date & Time</label>
+                  <div class="col-sm-6">
+                    <label>{{jcdData.rootData.created_at | date:'dd-MM-yyyy HH:mm:ss'}}</label>
+                  </div>
+                </div>
+                <div class="form-group m-b-0">
+                  <label class="col-sm-6 control-label">Jobcard Type</label>
+                  <div class="col-sm-6">
+                    <label>{{jcdData.rootData.job_type}}</label>
+                  </div>
+                </div>
+                <div class="form-group m-b-0">
+                  <label class="col-sm-6 control-label">JC Open Date</label>
+                  <div class="col-sm-6">
+                    <label>{{jcdData.rootData.created_at | date:'dd-MM-yyyy HH:mm:ss' || 'NA'}}</label>
+                  </div>
+                </div>
+                <div class="form-group m-b-0">
+                  <label class="col-sm-6 control-label">JC Close Date</label>
+                  <div class="col-sm-6">
+                    <label>{{jcdData.rootData.actual_release_date | date:'dd-MM-yyyy HH:mm:ss' || 'NA'}}</label>
+                  </div>
+                </div>
+                <div class="form-group m-b-0">
+                  <label class="col-sm-6 control-label">Total Time JC</label>
+                  <div class="col-sm-6">
+                    <label>{{jcdData.rootData.total_time}}</label>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!--************** tasks table start ******************-->
+            <div class="row" style="margin:15px" ng-if="jcdData.tasks.length>0">
+              <h5>Task Details:</h5>
+              <table class="table table-bordered unresponsive">
+                <thead>
+                  <tr>
+                    <th>S No.</th>
+                    <th>Task Name</th>
+                    <th>Mechanic Name</th>
+                    <th>Supervisor Name</th>
+                    <th>Task Open</th>
+                    <th>Task Closed</th>
+                    <th>Time Taken (HH:MM)</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr data-ng-repeat="objTask in jcdData.tasks" class="pointer">
+                    <td>{{$index+1}}</td>
+                    <td>{{objTask.task_name || 'NA'}}</td>
+                    <td><span ng-repeat="m in objTask.mechanics_involved">{{m.name}}, &nbsp;</span></td>
+                    <td>{{objTask.supervisor_name || 'NA'}}</td>
+                    <td>{{objTask.start_datetime | date:'dd-MM-yyyy HH:mm:ss' || 'NA'}}</td>
+                    <td>{{objTask.close_datetime | date:'dd-MM-yyyy HH:mm:ss' || 'NA'}}</td>
+                    <td>{{objTask.time_taken || 'NA'}}</td>
+
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+
+            <!--************** spares table start ******************-->
+            <div class="row" style="margin:15px" ng-if="jcdData.issuedSpare.length>0">
+              <h5>Spare Details:</h5>
+              <table class="table table-bordered unresponsive">
+                <thead>
+                  <tr>
+                    <th style="min-width: 37px;">S No.</th>
+                    <th>Spare Name</th>
+                    <th>Quantity Issued</th>
+                    <th>Issue Slip No</th>
+                    <th style="min-width: 37px;">UOM</th>
+                    <th style="min-width: 45px;">Returned Spare Quantity</th>
+                    <th style="min-width: 45px;">Returned Slip No</th>
+                    <th style="min-width: 45px;">Actual Used Quantity</th>
+                    <th>Rate (Qty*Rate)</th>
+                    <th style="min-width: 70px;">Value</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr data-ng-repeat="objTask in jcdData.issuedSpare">
+                    <td>{{$index+1}}</td>
+                    <td>{{objTask.issued_spare.spare_name}}</td>
+                    <td>{{objTask.issued_spare.quantity || 0}}</td>
+                    <td>{{objTask.slip_number}}</td>
+                    <td>{{objTask.issued_spare.uom}}</td>
+                    <td>{{objTask.issued_spare.total_returned || 0}}</td>
+                    <td>{{objTask.issued_spare.returned[0].slip_number || 'NA'}}</td>
+                    <td>{{objTask.used_qty || 0}}</td>
+                    <td>{{objTask.used_qty}}x{{objTask.issued_spare.cost_per_piece}}</td>
+                    <td>{{objTask.value}}</td>
+
+                  </tr>
+                  <tr>
+                    <td colspan="9" class="text-right">Total Amount</td>
+                    <td>{{jcdData.spare_total_amt}}</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+
+			  <!--************** OTHER expense table start ******************-->
+			  <div class="row" style="margin:15px" ng-if="jcdData.oExpense.length>0">
+				  <h5>Other Expense Details:</h5>
+				  <table class="table table-bordered unresponsive">
+					  <thead>
+					  <tr>
+						  <th>S No.</th>
+						  <th>Expense No.</th>
+						  <th>Bill Number</th>
+						  <th>Bill Date</th>
+						  <th>Amount</th>
+						  <th>Remarks</th>
+
+					  </tr>
+					  </thead>
+					  <tbody>
+					  <tr data-ng-repeat="objTask in jcdData.oExpense" class="pointer">
+						  <td>{{$index+1}}</td>
+						  <td>{{objTask.expense_no || 'NA'}}</td>
+						  <td>{{objTask.bill_no || 'NA'}}</td>
+						  <td>{{objTask.bill_date | date:'dd-MM-yyyy'|| 'NA'}}</td>
+						  <td>{{objTask.amount}}</td>
+						  <td>{{objTask.remark || 'NA'}}</td>
+
+					  </tr>
+					  <tr>
+						  <td colspan="4" class="text-right">Total Amount</td>
+						  <td>{{jcdData.oExpense_total_amt}}</td>
+					  </tr>
+					  </tbody>
+				  </table>
+			  </div>
+
+			  <!--************** expense table start ******************-->
+            <div class="row" style="margin:15px" ng-if="jcdData.cExpense.length>0">
+              <h5>Additional Expense Details:</h5>
+              <table class="table table-bordered unresponsive">
+                <thead>
+                  <tr>
+                    <th>S No.</th>
+                    <th>Additional Expense Party Name</th>
+                    <th>Particulars</th>
+                    <th>Bill Number</th>
+                    <th>Amount</th>
+                    <th>Remarks</th>
+
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr data-ng-repeat="objTask in jcdData.cExpense" class="pointer">
+                    <td>{{$index+1}}</td>
+                    <td>{{objTask.contractor_name || 'NA'}}</td>
+                    <td>{{objTask.task_name || 'NA'}}</td>
+                    <td>{{objTask.bill_number || 'NA'}}</td>
+                    <td>{{objTask.amount}}</td>
+                    <td>{{objTask.remark || 'NA'}}</td>
+
+                  </tr>
+                  <tr>
+                    <td colspan="4" class="text-right">Total Amount</td>
+                    <td>{{jcdData.expense_total_amt}}</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+
+            <div class="row" style="margin:15px">
+              <div class="col-sm-8"></div>
+              <div class="col-sm-4">
+                <table class="table table-bordered unresponsive">
+                  <thead>
+                    <tr>
+                      <th>Gross Amount</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr>
+                      <td>{{jcdData.gross_amt}}</td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+            <div class="row" style="margin:15px">
+              <label>Verified By: </label>
+            </div>
+
+
+          </div>
+        </form>
+      </div>
+    </div>
+
+    <style>
+  hr {
+    margin-top: 5px;
+    margin-bottom: 2px;
+  }
+  .modal-dialog{width: 70%;}
+
+  .table-bordered > thead > tr > th, .table-bordered > tbody > tr > th, .table-bordered > tfoot > tr > th, .table-bordered > thead > tr > td, .table-bordered > tbody > tr > td, .table-bordered > tfoot > tr > td {
+    border: 1px solid #3b3b3b;
+        font-size: 11px;
+  }
+  .table-bordered {
+    border: 1px solid #3b3b3b;
+    border-bottom: : 1px solid #3b3b3b;
+  }
+  .table > thead > tr > th:first-child, .table > tbody > tr > th:first-child, .table > tfoot > tr > th:first-child, .table > thead > tr > td:first-child, .table > tbody > tr > td:first-child, .table > tfoot > tr > td:first-child {
+    padding-left: 0;
+  }
+  .table > thead > tr > th:last-child, .table > tbody > tr > th:last-child, .table > tfoot > tr > th:last-child, .table > thead > tr > td:last-child, .table > tbody > tr > td:last-child, .table > tfoot > tr > td:last-child {
+    padding-right: 0;
+  }
+
+</style>
+  </body>
+</html>

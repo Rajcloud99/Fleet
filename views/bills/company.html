@@ -1,0 +1,63 @@
+<!-- <!DOCTYPE html>
+<html>
+<head>
+	<script src="../../node_modules/angular/angular.min.js"></script> -->
+	<style type="text/css">
+	* {margin: 0; padding: 0;}
+	#blank {height:80px}
+	#container {width:100%; font-size: 0;}
+	#left, #middle, #right {display: inline-block; *display: inline; zoom: 1; vertical-align: top; font-size: 12px; font-family:Verdana}
+	#left {width: 15%;}
+	#middle {width: 65%; text-align:center}
+	#right {width: 20%; text-align:center;}
+	#title {font-size: 14px; font-weight: bold}
+	#iso {font-size: 9px; font-weight: bold}
+	#subtitle {font-size: 10px; }
+	#addr {font-size: 9px; }
+	#heading {text-align:center; font-weight: bold}
+	.num {font-size: 9px;}
+	.bold { font-weight: bold }
+	</style>
+<!-- </head> -->
+<!-- <body ng-app="company" ng-controller="companyCtrl"> -->
+<div>
+	<div id="blank">
+	</div>
+	<div id="container">
+	    <div id="left">
+			<img src="logo.jpg" alt="logo" style="width:90px;height:70px;">
+		</div>
+	    <div id="middle" >
+			<p id="title" class="editable">{{client_full_name}}</p>
+			<p id="iso" class="editable">{{client_iso}}</p>
+			<p id="subtitle" class="editable">{{client_subtitle}}</p>
+			<p id="addr" class="editable">{{client_address}}</p>
+	    </div>
+	    <div id="right">
+			<table style="padding-left:5px">
+				<tr>
+					<td class="num bold" >Office : </td>
+					<td class="num editable" >{{client_primary_contact_no}}</td>
+				</tr>
+				<tr>
+					<td class="num bold" >Fax : </td>
+					<td class="num editable" >{{client_fax}}</td>
+				</tr>
+				<tr>
+					<td class="num bold" >PAN : </td>
+					<td class="num editable" >{{client_pan_no}}</td>
+				</tr>
+			</table>
+		</div>
+	</div>
+	<!-- <script src="company.js"></script> -->
+	<script>
+		function toggleEdit(editable){
+			var editables = document.getElementsByClassName("editable");
+			for(var i=0; i<editables.length; i++)
+				editables[i].setAttribute("contentEditable", editable);
+		}
+	</script>
+</div>
+<!-- </body>
+</html> -->

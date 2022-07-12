@@ -1,0 +1,15 @@
+{
+    "customerCount": 1877,
+    "userCount": 1573,
+    "regVehicleCount": 10199,
+    "driverCount": 19454,
+    "vendorCourierCount": 50,
+    "contractCount": 2026,
+    "shippingLineCount": 32,
+    "routeDataCount": 2306,
+    "routeCount": 18892,
+    "vendorFuelCount": 222,
+    "vendorMaintenanceCount": 0,
+    "vendorTransportCount": null,
+    "bookingCount": 14
+}

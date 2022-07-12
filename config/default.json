@@ -1,0 +1,989 @@
+{
+	"serverName":"backend",
+	"http_host": "localhost",
+	"http_port": 3002,
+    "api_port":3006,
+    "gpsApiEnabled":false,
+    "lmsAppEnabled":true,
+    "downloadEnabled":false,
+    "tracking_port":3012,
+	"download_host": "localhost",
+	"download_port": 7652,
+    "enable_scheduler":false,
+	"mongoDB": {
+		"host": "localhost",
+		"port": 27017,
+		"user": "lmsdb",
+		"password": "ups20210212",
+		"db": "lmsDB"
+	 },
+    "fastag_host":"https://fastaglogin.icicibank.com/ISRCUSTAPI/",
+    "user_pass_key": "secretKey@Made_*17*09*2022*ByKamal_",
+  "app_secret": "mysecretKey20220712",
+  "debug": false,
+  "company_name": "MAPLE",
+  "company_short_name": "MAP",
+  "secure_admin_key": "ft_prime_kamal_admin",
+  "secure_admin_key_encrypted": "0618a0812e51f24b6f0aa7a528bfebce5d935731db180418b546b465c04db02c",
+  "super_admin_id": "000000",
+  "super_admin_role_name": "super_admin",
+  "super_client_role_name": "super_client",
+  "approve_Admin_for_Booking": "approve_admin",
+  "super_admin_name": "Super Admin",
+  "client_init_count": 100000,
+  "super_admin_theme_color": "#000000",
+  "super_admin_apps_visible": [
+	"client_management",
+	"user_management"
+  ],
+  "super_client_apps_visible": [
+	"user_management",
+	"branch"
+  ],
+  "all_apps": [
+	"masters",
+	"booking",
+	"billing",
+	"reports",
+	"masters_maintenance",
+	"MRP",
+	"masters_tyre_management",
+	"process",
+	"client_management",
+	"user_management"
+  ],
+  "super_admin_role_data": {
+	"client_management": [
+	  "read"
+	],
+	"user_management": [
+	  "read"
+	],
+	"department": [
+	  "read",
+	  "add",
+	  "edit",
+	  "approve",
+	  "remove"
+	],
+	"role": [
+	  "read",
+	  "add",
+	  "edit",
+	  "approve",
+	  "remove"
+	],
+	"user": [
+	  "read",
+	  "add",
+	  "edit",
+	  "approve",
+	  "remove"
+	],
+	"client": [
+	  "read",
+	  "add",
+	  "edit",
+	  "approve",
+	  "remove"
+	],
+	"material": [
+	  "read",
+	  "add",
+	  "edit",
+	  "approve",
+	  "remove"
+	],
+	"vehicle": [
+	  "read",
+	  "add",
+	  "edit",
+	  "approve",
+	  "remove"
+	],
+	"icd": [
+	  "read",
+	  "add",
+	  "edit",
+	  "approve",
+	  "remove"
+	]
+  },
+  "super_client_role_data": {
+	"masters": [
+	  "read"
+	],
+	"branch": [
+	  "read",
+	  "add",
+	  "edit",
+	  "approve",
+	  "remove"
+	],
+	"transportVendor": [
+	  "read",
+	  "add",
+	  "edit",
+	  "approve",
+	  "remove"
+	],
+	"driver": [
+	  "read",
+	  "add",
+	  "edit",
+	  "approve",
+	  "remove"
+	],
+	"regvehicle": [
+	  "read",
+	  "add",
+	  "edit",
+	  "approve",
+	  "remove"
+	],
+	"route": [
+	  "read",
+	  "add",
+	  "edit",
+	  "approve",
+	  "remove"
+	],
+	"customer": [
+	  "read",
+	  "add",
+	  "edit",
+	  "approve",
+	  "remove"
+	],
+	"grMaster": [
+	  "read",
+	  "add",
+	  "edit",
+	  "approve",
+	  "remove"
+	],
+	"sendTripLoc": [
+	  "read",
+	  "add",
+	  "edit",
+	  "approve",
+	  "remove"
+	],
+	"courierVendor": [
+	  "read",
+	  "add",
+	  "edit",
+	  "approve",
+	  "remove"
+	],
+	"fuelVendor": [
+	  "read",
+	  "add",
+	  "edit",
+	  "approve",
+	  "remove"
+	],
+	"sldo": [
+	  "read",
+	  "add",
+	  "edit",
+	  "approve",
+	  "remove"
+	],
+	"booking": [
+	  "read"
+	],
+	"bookings": [
+	  "read",
+	  "add",
+	  "edit",
+	  "approve",
+	  "remove"
+	],
+	"vehicleAllocation": [
+	  "read",
+	  "add",
+	  "edit",
+	  "approve",
+	  "remove"
+	],
+	"trip": [
+	  "read",
+	  "add",
+	  "edit",
+	  "approve",
+	  "remove"
+	],
+	"gr": [
+	  "read",
+	  "add",
+	  "edit",
+	  "approve",
+	  "remove"
+	],
+	"pendingGr": [
+	  "read",
+	  "add",
+	  "edit",
+	  "approve",
+	  "remove"
+	],
+	"diesel": [
+	  "read",
+	  "add",
+	  "edit",
+	  "approve",
+	  "remove"
+	],
+	"grAcknowledge": [
+	  "read",
+	  "add",
+	  "edit",
+	  "approve",
+	  "remove"
+	],
+	"billing": [
+	  "read"
+	],
+	"savePrintBill": [
+	  "read",
+	  "add",
+	  "edit",
+	  "approve",
+	  "remove"
+	],
+	"generatedBills": [
+	  "read",
+	  "add",
+	  "edit",
+	  "approve",
+	  "remove"
+	],
+	"tripExpense": [
+	  "read",
+	  "add",
+	  "edit",
+	  "approve",
+	  "remove"
+	],
+	"billDispatch": [
+	  "read",
+	  "add",
+	  "edit",
+	  "approve",
+	  "remove"
+	],
+	"customerPayment": [
+	  "read",
+	  "add",
+	  "edit",
+	  "approve",
+	  "remove"
+	],
+	"vendorPayment": [
+	  "read",
+	  "add",
+	  "edit",
+	  "approve",
+	  "remove"
+	],
+	"reports": [
+	  "read"
+	],
+	"billReport": [
+	  "read",
+	  "add",
+	  "edit",
+	  "approve",
+	  "remove"
+	],
+	"costing": [
+	  "read",
+	  "add",
+	  "edit",
+	  "approve",
+	  "remove"
+	],
+	"profit": [
+	  "read",
+	  "add",
+	  "edit",
+	  "approve",
+	  "remove"
+	],
+	"trips": [
+	  "read",
+	  "add",
+	  "edit",
+	  "approve",
+	  "remove"
+	],
+	"vehicles": [
+	  "read",
+	  "add",
+	  "edit",
+	  "approve",
+	  "remove"
+	],
+	"others": [
+	  "read",
+	  "add",
+	  "edit",
+	  "approve",
+	  "remove"
+	],
+	"masters_maintenance": [
+	  "read"
+	],
+	"masters_tyre_management": [
+	  "read"
+	],
+	"partCategory": [
+	  "read",
+	  "add",
+	  "edit",
+	  "approve",
+	  "remove"
+	],
+	"mechanic": [
+	  "read",
+	  "add",
+	  "edit",
+	  "approve",
+	  "remove"
+	],
+	"maintenanceVendor_": [
+	  "read",
+	  "add",
+	  "edit",
+	  "approve",
+	  "remove"
+	],
+	"taskMaster": [
+	  "read",
+	  "add",
+	  "edit",
+	  "approve",
+	  "remove"
+	],
+	"spares": [
+	  "read",
+	  "add",
+	  "edit",
+	  "approve",
+	  "remove"
+	],
+	"inventory": [
+	  "read",
+	  "add",
+	  "edit",
+	  "approve",
+	  "remove"
+	],
+	"toolMaster": [
+	  "read",
+	  "add",
+	  "edit",
+	  "approve",
+	  "remove"
+	],
+	"otherExpenses": [
+	  "read",
+	  "add",
+	  "edit",
+	  "approve",
+	  "remove"
+	],
+	"printSlips": [
+	  "read",
+	  "add",
+	  "edit",
+	  "approve",
+	  "remove"
+	],
+	"MRP": [
+	  "read"
+	],
+	"pr": [
+	  "read",
+	  "add",
+	  "edit",
+	  "approve",
+	  "remove"
+	],
+	"PrPo": [
+	  "read",
+	  "add",
+	  "edit",
+	  "approve",
+	  "remove"
+	],
+	"prAdd": [
+	  "read",
+	  "add",
+	  "edit",
+	  "approve",
+	  "remove"
+	],
+	"POdetail": [
+	  "read",
+	  "add",
+	  "edit",
+	  "approve",
+	  "remove"
+	],
+	"POrelease": [
+	  "read",
+	  "add",
+	  "edit",
+	  "approve",
+	  "remove"
+	],
+	"maintenance_process": [
+	  "read"
+	],
+	"jobCard": [
+	  "read",
+	  "add",
+	  "edit",
+	  "approve",
+	  "remove"
+	],
+	"masters_tyre_management": [
+	  "read"
+	],
+	"tyre_master": [
+	  "read",
+	  "add",
+	  "edit",
+	  "approve",
+	  "remove"
+	],
+	"trailer_master": [
+	  "read",
+	  "add",
+	  "edit",
+	  "approve",
+	  "remove"
+	],
+	"structure_master": [
+	  "read",
+	  "add",
+	  "edit",
+	  "approve",
+	  "remove"
+	],
+	"prime_mover_trailer_association": [
+	  "read",
+	  "add",
+	  "edit",
+	  "approve",
+	  "remove"
+	],
+	"user_management": [
+	  "read"
+	],
+	"department": [
+	  "read",
+	  "add",
+	  "edit",
+	  "approve",
+	  "remove"
+	],
+	"role": [
+	  "read",
+	  "add",
+	  "edit",
+	  "approve",
+	  "remove"
+	],
+	"user": [
+	  "read",
+	  "add",
+	  "edit",
+	  "approve",
+	  "remove"
+	]
+  },
+  "complete_role_data": {
+	"masters": [
+	  "read"
+	],
+	"branch": [
+	  "read",
+	  "add",
+	  "edit",
+	  "approve",
+	  "remove"
+	],
+	"transportVendor": [
+	  "read",
+	  "add",
+	  "edit",
+	  "approve",
+	  "remove"
+	],
+	"driver": [
+	  "read",
+	  "add",
+	  "edit",
+	  "approve",
+	  "remove"
+	],
+	"regvehicle": [
+	  "read",
+	  "add",
+	  "edit",
+	  "approve",
+	  "remove"
+	],
+	"route": [
+	  "read",
+	  "add",
+	  "edit",
+	  "approve",
+	  "remove"
+	],
+	"customer": [
+	  "read",
+	  "add",
+	  "edit",
+	  "approve",
+	  "remove"
+	],
+	"grMaster": [
+	  "read",
+	  "add",
+	  "edit",
+	  "approve",
+	  "remove"
+	],
+	"sendTripLoc": [
+	  "read",
+	  "add",
+	  "edit",
+	  "approve",
+	  "remove"
+	],
+	"courierVendor": [
+	  "read",
+	  "add",
+	  "edit",
+	  "approve",
+	  "remove"
+	],
+	"fuelVendor": [
+	  "read",
+	  "add",
+	  "edit",
+	  "approve",
+	  "remove"
+	],
+	"sldo": [
+	  "read",
+	  "add",
+	  "edit",
+	  "approve",
+	  "remove"
+	],
+	"booking": [
+	  "read"
+	],
+	"bookings": [
+	  "read",
+	  "add",
+	  "edit",
+	  "approve",
+	  "remove"
+	],
+	"vehicleAllocation": [
+	  "read",
+	  "add",
+	  "edit",
+	  "approve",
+	  "remove"
+	],
+	"trip": [
+	  "read",
+	  "add",
+	  "edit",
+	  "approve",
+	  "remove"
+	],
+	"gr": [
+	  "read",
+	  "add",
+	  "edit",
+	  "approve",
+	  "remove"
+	],
+	"pendingGr": [
+	  "read",
+	  "add",
+	  "edit",
+	  "approve",
+	  "remove"
+	],
+	"diesel": [
+	  "read",
+	  "add",
+	  "edit",
+	  "approve",
+	  "remove"
+	],
+	"grAcknowledge": [
+	  "read",
+	  "add",
+	  "edit",
+	  "approve",
+	  "remove"
+	],
+	"billing": [
+	  "read"
+	],
+	"savePrintBill": [
+	  "read",
+	  "add",
+	  "edit",
+	  "approve",
+	  "remove"
+	],
+	"generatedBills": [
+	  "read",
+	  "add",
+	  "edit",
+	  "approve",
+	  "remove"
+	],
+	"tripExpense": [
+	  "read",
+	  "add",
+	  "edit",
+	  "approve",
+	  "remove"
+	],
+	"billDispatch": [
+	  "read",
+	  "add",
+	  "edit",
+	  "approve",
+	  "remove"
+	],
+	"customerPayment": [
+	  "read",
+	  "add",
+	  "edit",
+	  "approve",
+	  "remove"
+	],
+	"vendorPayment": [
+	  "read",
+	  "add",
+	  "edit",
+	  "approve",
+	  "remove"
+	],
+	"reports": [
+	  "read"
+	],
+	"billReport": [
+	  "read",
+	  "add",
+	  "edit",
+	  "approve",
+	  "remove"
+	],
+	"costing": [
+	  "read",
+	  "add",
+	  "edit",
+	  "approve",
+	  "remove"
+	],
+	"profit": [
+	  "read",
+	  "add",
+	  "edit",
+	  "approve",
+	  "remove"
+	],
+	"trips": [
+	  "read",
+	  "add",
+	  "edit",
+	  "approve",
+	  "remove"
+	],
+	"vehicles": [
+	  "read",
+	  "add",
+	  "edit",
+	  "approve",
+	  "remove"
+	],
+	"others": [
+	  "read",
+	  "add",
+	  "edit",
+	  "approve",
+	  "remove"
+	],
+	"masters_maintenance": [
+	  "read"
+	],
+	"masters_tyre_management": [
+	  "read"
+	],
+	"partCategory": [
+	  "read",
+	  "add",
+	  "edit",
+	  "approve",
+	  "remove"
+	],
+	"mechanic": [
+	  "read",
+	  "add",
+	  "edit",
+	  "approve",
+	  "remove"
+	],
+	"maintenanceVendor_": [
+	  "read",
+	  "add",
+	  "edit",
+	  "approve",
+	  "remove"
+	],
+	"taskMaster": [
+	  "read",
+	  "add",
+	  "edit",
+	  "approve",
+	  "remove"
+	],
+	"spares": [
+	  "read",
+	  "add",
+	  "edit",
+	  "approve",
+	  "remove"
+	],
+	"inventory": [
+	  "read",
+	  "add",
+	  "edit",
+	  "approve",
+	  "remove"
+	],
+	"toolMaster": [
+	  "read",
+	  "add",
+	  "edit",
+	  "approve",
+	  "remove"
+	],
+	"otherExpenses": [
+	  "read",
+	  "add",
+	  "edit",
+	  "approve",
+	  "remove"
+	],
+	"printSlips": [
+	  "read",
+	  "add",
+	  "edit",
+	  "approve",
+	  "remove"
+	],
+	"MRP": [
+	  "read"
+	],
+	"pr": [
+	  "read",
+	  "add",
+	  "edit",
+	  "approve",
+	  "remove"
+	],
+	"PrPo": [
+	  "read",
+	  "add",
+	  "edit",
+	  "approve",
+	  "remove"
+	],
+	"prAdd": [
+	  "read",
+	  "add",
+	  "edit",
+	  "approve",
+	  "remove"
+	],
+	"POdetail": [
+	  "read",
+	  "add",
+	  "edit",
+	  "approve",
+	  "remove"
+	],
+	"POrelease": [
+	  "read",
+	  "add",
+	  "edit",
+	  "approve",
+	  "remove"
+	],
+	"maintenance_process": [
+	  "read"
+	],
+	"jobCard": [
+	  "read",
+	  "add",
+	  "edit",
+	  "approve",
+	  "remove"
+	],
+	"masters_tyre_management": [
+	  "read"
+	],
+	"tyre_master": [
+	  "read",
+	  "add",
+	  "edit",
+	  "approve",
+	  "remove"
+	],
+	"trailer_master": [
+	  "read",
+	  "add",
+	  "edit",
+	  "approve",
+	  "remove"
+	],
+	"structure_master": [
+	  "read",
+	  "add",
+	  "edit",
+	  "approve",
+	  "remove"
+	],
+	"prime_mover_trailer_association": [
+	  "read",
+	  "add",
+	  "edit",
+	  "approve",
+	  "remove"
+	],
+	"user_management": [
+	  "read"
+	],
+	"department": [
+	  "read",
+	  "add",
+	  "edit",
+	  "approve",
+	  "remove"
+	],
+	"role": [
+	  "read",
+	  "add",
+	  "edit",
+	  "approve",
+	  "remove"
+	],
+	"user": [
+	  "read",
+	  "add",
+	  "edit",
+	  "approve",
+	  "remove"
+	]
+  },
+  "app_main_sub_map": {
+	"masters": [
+	  "branch",
+	  "driver",
+	  "route",
+	  "sldo",
+	  "transportVendor",
+	  "maintenanceVendor",
+	  "courierVendor",
+	  "fuelVendor",
+	  "customer",
+	  "regvehicle",
+	  "sendTripLoc",
+	  "grMaster"
+	],
+	"booking": [
+	  "bookings",
+	  "vehicleAllocation",
+	  "gr",
+	  "diesel",
+	  "trip",
+	  "grAcknowledge",
+	  "pendingGr"
+	],
+	"billing": [
+	  "boewise",
+	  "savePrintBill"
+	],
+	"reports": [
+	  "billReport",
+	  "costing",
+	  "profit"
+	],
+	"masters_maintenance": [
+	  "manufacturer",
+	  "partCategory",
+	  "taskMaster",
+	  "maintenanceVendor_",
+	  "inventory"
+	],
+	"masters_tyre_management": [
+	  "tyre_master",
+	  "trailer_master",
+	  "structure_master"
+	],
+	"maintenance_process": [
+	  "jobCard"
+	],
+	"MRP": [
+	  "pr",
+	  "prAdd",
+	  "PrPo",
+	  "POdetail",
+	  "POrelease"
+	],
+	"pr": [
+	  "pr",
+	  "prAdd",
+	  "PrPo",
+	  "POdetail",
+	  "POrelease"
+	],
+	"client_management": [
+	  "client",
+	  "material",
+	  "vehicle",
+	  "icd"
+	],
+	"user_management": [
+	  "department",
+	  "role",
+	  "user"
+	]
+  },
+  "gpsServer": "http://localhost:8081",
+  "gpsServerDetail": {
+	"port": 5007,
+	"ip": "localhost"
+  },
+  "_cacheVehicle":{
+		"interval":500,
+		"time":"8-20",
+		"runOnInit": false
+
+  }
+}

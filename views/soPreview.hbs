@@ -1,0 +1,205 @@
+<div class="modal-header" style="padding: 10px 26px 0px;">
+	<div class="row">
+		<div class="col-md-12">
+			<button type="button" ng-click="closeModal()" class="close" data-dismiss="modal" aria-label="Close">
+				<span aria-hidden="true">×</span>
+			</button>
+			<button ng-click="printDiv('soPrev')" class="btn btn-primary glyphicon glyphicon-print" style="margin-bottom: 12px;"> PRINT</button>
+		</div>
+	</div>
+</div>
+<div class="modal-body" id="soPrev">
+	<div class="row">
+		<div class="col-md-12">
+			<h4 class="modal-title" align="center">{{so.customer.name}}</h4>
+			{{!-- <h5 class="modal-title" align="center">{{prLocalData.client_address}}</h5> --}}
+			<hr>
+			<p align="center" style="margin-bottom: 6px;">Sales Order – {{so.customer.name}}</p>
+			<hr>
+		</div>
+	</div>
+	<div class="row" style="margin:15px">
+		<div class="col-md-12">
+			<div class="">
+				<label>To,</label>
+				<br>
+				<label> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Officer in Charge, Sales Division, For</label>
+			</div>
+			<div class="up_data">
+				<p>
+					<b>Details:</b>
+				</p>
+				<div class="col-md-3" style="display:inline-block;width:24%">
+					<div class="form-group m-b-0">
+						<label class="col-sm-3 control-label">No:</label>
+						<div class="col-sm-6">
+							<label>{{so.so_number}}</label>
+						</div>
+					</div>
+				</div>
+				<div class="col-md-3" style="display:inline-block;width:24%">
+					<div class="form-group m-b-0">
+						<label class="col-sm-6 control-label">Created Date:</label>
+						<div class="col-sm-6">
+							<label>{{date so.created_at}}</label>
+						</div>
+					</div>
+				</div>
+				<div class="col-md-3" style="display:inline-block;width:24%">
+					<div class="form-group m-b-0">
+						<label class="col-sm-6 control-label">SO Date:</label>
+						<div class="col-sm-6">
+							<label>{{date so.so_date}} </label>
+						</div>
+					</div>
+				</div>
+				<div class="col-md-3" style="display:inline-block;width:24%">
+					<div class="form-group m-b-0">
+						<label class="col-sm-4 control-label">Status:</label>
+						<div class="col-sm-6">
+							<label>{{so.status}}</label>
+						</div>
+					</div>
+				</div>
+			</div>
+			<div class="clearfix"></div>
+			<br>
+			<div>
+				<p>
+					<b>Item Wise Detail of Required Material;</b>
+				</p>
+				<table class="table table-bordered">
+					<thead>
+						<tr>
+							<th style="padding-left:3px;min-width: 47px;word-break: break-all">SL No.</th>
+							<th style="min-width: 120px;">Item / Code</th>
+							<th>Item Type</th>
+							<th>Category</th>
+							<th>Quantity</th>
+							<th>UOM</th>
+							<th style="min-width: 75px;word-break: break-all">Price/Unit</th>
+							<th>Tax %</th>
+							<th style="min-width: 75px;word-break: break-all">Disc. %</th>
+							<th style="min-width: 60px;word-break: break-all">Total</th>
+						</tr>
+					</thead>
+					<tbody>
+						{{#each so.items}}
+						<tr class="pointer">
+							<td style="padding-left:3px">{{inc @index}}</td>
+							<td>{{this.item_ref.name}} / {{this.item_ref.code}}</td>
+							<td>{{this.item}}</td>
+							<td>{{this.item_ref.category_name}}</td>
+							<td>{{this.quantity}}</td>
+							<td>{{this.item_ref.uom}}</td>
+							<td>{{this.price_per_unit}}</td>
+							<td>{{this.tax_percent}}</td>
+							<td>{{this.discount_percent}}</td>
+							<td>{{this.total}}</td>
+						</tr>
+						{{/each}}
+					</tbody>
+				</table>
+			</div>
+			<div class="footAct">
+				<div class="row">
+					<div class="col-sm-4" style="display:inline-block;width:33%;text-align:center;">
+						<div>
+							<div>
+								<b>Requested By</b>
+							</div>
+						</div>
+					</div>
+					<div class="col-sm-4" style="display:inline-block;width:33%;text-align:center;">
+						<div>
+							<div>
+								<b>Checked By</b>
+							</div>
+						</div>
+					</div>
+					<div class="col-sm-4" style="display:inline-block;width:33%;text-align:center;">
+						<div>
+							<div>
+								<b>Approved By</b>
+							</div>
+						</div>
+					</div>
+					<div class="clearfix"></div>
+				</div>
+				<div class="row">
+					<div class="col-sm-4" style="display:inline-block;width:33%;text-align:center;">
+						<div>
+							<div>({{so.created_by.full_name}})</div>
+						</div>
+					</div>
+					<div class="col-sm-4" style="display:inline-block;width:33%;text-align:center;">
+						<div>
+							<div>(Works Manager/AVP Tech )</div>
+						</div>
+					</div>
+					<div class="col-sm-4" style="display:inline-block;width:33%;text-align:center;">
+						<div>
+							<div>({{so.approver.full_name}})</div>
+						</div>
+					</div>
+					<div class="clearfix"></div>
+				</div>
+
+			</div>
+
+		</div>
+	</div>
+
+</div>
+
+<style>
+	hr {
+		margin-top: 5px;
+		margin-bottom: 2px;
+	}
+
+	.modal-dialog {
+		width: 70%;
+	}
+
+	.footAct div div {
+		text-align: center;
+	}
+
+	.footAct {
+		margin-top: 91px;
+	}
+
+	.table-bordered>thead>tr>th,
+	.table-bordered>tbody>tr>th,
+	.table-bordered>tfoot>tr>th,
+	.table-bordered>thead>tr>td,
+	.table-bordered>tbody>tr>td,
+	.table-bordered>tfoot>tr>td {
+		border: 1px solid #3b3b3b;
+		font-size: 11px;
+	}
+
+	.table-bordered {
+		border: 1px solid #3b3b3b;
+		border-bottom: : 1px solid #3b3b3b;
+	}
+
+	.table>thead>tr>th:first-child,
+	.table>tbody>tr>th:first-child,
+	.table>tfoot>tr>th:first-child,
+	.table>thead>tr>td:first-child,
+	.table>tbody>tr>td:first-child,
+	.table>tfoot>tr>td:first-child {
+		padding-left: 0;
+	}
+
+	.table>thead>tr>th:last-child,
+	.table>tbody>tr>th:last-child,
+	.table>tfoot>tr>th:last-child,
+	.table>thead>tr>td:last-child,
+	.table>tbody>tr>td:last-child,
+	.table>tfoot>tr>td:last-child {
+		padding-right: 0;
+	}
+</style>

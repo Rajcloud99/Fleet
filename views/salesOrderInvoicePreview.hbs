@@ -1,0 +1,313 @@
+<div class="modal-header" style="padding: 10px 26px 0px;">
+	<div class="row">
+		<div class="col-md-12">
+			<button type="button" ng-click="closeModal()" class="close" data-dismiss="modal" aria-label="Close">
+				<span aria-hidden="true">×</span>
+			</button>
+			<button ng-click="printDiv('soPrev')" class="btn btn-primary glyphicon glyphicon-print"
+					style="margin-bottom: 12px;"> PRINT
+			</button>
+		</div>
+	</div>
+</div>
+<div class="modal-body" id="soPrev">
+	<div style="border: 0px solid #000;padding: 5px;font-size: 12px;">
+		<div class="container">
+			<div>
+				<div style="float: left; width: 20%;">
+					<img style="width: 100%" src="http://futuretrucks.in/img/final-logo.jpg" class="img-responsive"
+						 alt="Future Trucks">
+				</div>
+				<div style="float: left;text-align: center;margin-left:5%;">
+					<h4 style="margin:0;">FUTURE TRUCKS PVT. LTD.</h4>
+					<p style="font-size: 15px;margin: 0px;">
+						F35/3 2nd Floor, Pocket D, Okhla Phase II, New Delhi, Delhi 110020
+					</p>
+				</div>
+				<div style="clear: both"></div>
+			</div>
+			<div style="clear: both"></div>
+			<div style="margin-top: 20px">
+				<h5 style="text-align: center;">
+					{{#if (showProvisional templateBillData.type)}}
+						<p style="font-size: 14px;margin: 0px; text-transform: uppercase">Provisional Bill</p>
+					{{else}}
+						Retail Invoice
+					{{/if}}
+					<span style="text-align: center;float: right"></span>
+				</h5>
+			</div>
+			<div style="width:100%;line-height:10px;font-size:12px;border:1px solid #666;border-bottom:none;">
+				<div style="float: left;width:50%;">
+					<div style="padding: 5px;">
+						<h5 style="margin: 0px;margin-bottom: 5px">{{clientData.client_full_name}}</h5>
+						<p style="margin: 0px;margin-bottom: 5px">{{clientData.client_address.line1}}</p>
+						<p style="margin: 0px;margin-bottom: 5px">{{clientData.client_address.line2}}</p>
+						<p style="margin: 0px;margin-bottom: 5px">{{clientData.client_address.city}}
+							, {{clientData.client_address.state}}, {{clientData.client_address.country}}</p>
+						<p style="margin: 0px;margin-bottom: 5px">GSTIN/UIN : {{clientData.gstin_no}}</p>
+						<p style="margin: 0px;margin-bottom: 5px">E-Mail : {{invoice.created_by.email}}</p>
+					</div>
+					<div style="border-top:1px solid black;padding:5px;">
+						<p style="margin: 0px;margin-bottom: 5px">Billing Party:</p>
+						<h5 style="margin: 0px;margin-bottom: 5px">{{invoice.customer.name}}</h5>
+						<p style="margin: 0px;margin-bottom: 5px">{{parseAddress invoice.customer.address}}</p>
+						<div style="float: left">
+							<p style="margin: 0px;margin-bottom: 5px">GSTIN/UIN</p>
+							<p style="margin: 0px;margin-bottom: 5px">State Name</p>
+							<p style="margin: 0px;margin-bottom: 5px">Place of Supply</p>
+						</div>
+						<div style="float: left">
+							<p style="margin: 0px;margin-bottom: 5px"> : {{invoice.customer.gstin_no}}</p>
+							<p style="margin: 0px;margin-bottom: 5px"> : {{invoice.customer.address.state}}
+								({{invoice.customer.address.pincode}})</p>
+							<p style="margin: 0px;margin-bottom: 5px"> : {{invoice.customer.address.state}}</p>
+						</div>
+						<div style="clear: both"></div>
+					</div>
+				</div>
+				<div style="float:right;width:50%;border-left:1px solid black;">
+
+					<div class="table-responsive" style="font-size: 11px;">
+						<table style="width: 100%;max-width: 100%;">
+							<tbody>
+							<tr style="border-bottom:1px solid black;">
+								<td style="padding:3px;border-right:1px solid black;">
+									<span>Invoice No.</span><br>
+									<span style="display:inline-block;margin-top:5px;"><strong>{{invoice.invoice_no}}</strong></span>
+								</td>
+								<td style="padding: 3px;">
+									<span>Dated</span><br>
+									<span style="display:inline-block;margin-top:5px;"><strong>{{date
+											invoice.invoice_date}}</strong></span>
+								</td>
+							</tr>
+							<tr style="border-bottom:1px solid black;">
+								<td style="padding:3px;border-right:1px solid black;">
+									<span>Delivery Note</span><br>
+									<span style="display:inline-block;margin-top:5px;"><strong>note</strong></span>
+								</td>
+								<td style="padding:3px;">
+									<span>Mode/Terms of Payment</span><br>
+									<span style="display:inline-block;margin-top:5px;"><strong>100% Advance before delivery</strong></span>
+								</td>
+							</tr>
+							<tr style="border-bottom:1px solid black;">
+								<td style="padding:3px;border-right:1px solid black;">
+									<span>Supplier's Ref</span><br>
+									<span style="display:inline-block;margin-top:5px;"><strong>supp</strong></span>
+								</td>
+								<td style="padding:3px;">
+									<span>Other Reference(s)</span><br>
+									<span style="display:inline-block;margin-top:5px;"><strong>ref</strong></span>
+								</td>
+							</tr>
+							<tr style="border-bottom:1px solid black;">
+								<td style="padding:3px;border-right:1px solid black;">
+									<span>Buyer's Order No.</span><br>
+									<span style="display:inline-block;margin-top:5px;"><strong>order</strong></span>
+								</td>
+								<td style="padding:3px;">
+									<span>Dated</span><br>
+									<span style="display:inline-block;margin-top:5px;"><strong>{{date
+											invoice.invoice_date}}</strong></span>
+								</td>
+							</tr>
+							<tr style="border-bottom:1px solid black;">
+								<td style="padding:3px;border-right:1px solid black;">
+									<span>Despatch Document No.</span><br>
+									<span style="display:inline-block;margin-top:5px;"><strong>doc</strong></span>
+								</td>
+								<td style="padding:3px;">
+									<span>Delivery Note Date</span><br>
+									<span style="display:inline-block;margin-top:5px;"><strong>del</strong></span>
+								</td>
+							</tr>
+							<tr style="border-bottom:1px solid black;">
+								<td style="padding:3px;border-right:1px solid black;">
+									<span>Despatched through</span><br>
+									<span style="display:inline-block;margin-top:5px;"><strong>des</strong></span>
+								</td>
+								<td style="padding:3px;">
+									<span>Destination</span><br>
+									<span style="display:inline-block;margin-top:5px;"><strong>dest</strong></span>
+								</td>
+							</tr>
+							<tr>
+								<td colspan="2" style="padding:5px;">
+									<p style="margin:0;margin-bottom:10px;">Terms of Delivery</p>
+									<p style="margin:0;"><b>10 Working Days After Payment. Also Depends Upon Courier
+										Services at Outstation Destination.</b></p>
+								</td>
+							</tr>
+							</tbody>
+						</table>
+					</div>
+
+				</div>
+				<div style="clear: both"></div>
+			</div>
+			<div style="clear: both"></div>
+
+			<div>
+				<div class="table-responsive">
+					<table style="width:100%;border-top:1px solid black;">
+						<tbody>
+						<tr class="text-center"
+							style="border-bottom:1px solid black;border-left:1px solid black;border-right:1px solid black;">
+							<td style="width:6%;">Sl No.</td>
+							<td style="width:40%;">Description of Goods</td>
+							<td>HSN/SAC</td>
+							<td>Quantity</td>
+							<td>Rate</td>
+							<td>Per</td>
+							<td>Disc %</td>
+							<td>Tax %</td>
+							<td>Amount</td>
+						</tr>
+						{{#each invoice.items}}
+							<tr style="border-bottom:1px solid black;border-left:1px solid black;border-right:1px solid black;">
+								<td style="padding:0 3px;text-align:center;border:1px solid black;">{{inc @index}}</td>
+								<td style="padding:0 3px;border: 1px solid black;">
+									<p style="margin-bottom: 0px"><b>{{this.item_ref.name}} / {{this.item_ref.code}}</b></p>
+								</td>
+								<td style="padding:0 3px;border: 1px solid black;" class="text-center">996519</td>
+								<td style="padding:0 3px;border: 1px solid black;" class="text-center">{{this.quantity}} Nos.</td>
+								<td style="padding:0 3px;border: 1px solid black;" class="text-center">{{this.price_per_unit}}</td>
+								<td style="padding:0 3px;border: 1px solid black;" class="text-center">{{this.item_ref.uom}}</td>
+								<td style="padding:0 3px;border: 1px solid black;" class="text-center">{{this.discount_percent}}%</td>
+								<td style="padding:0 3px;border: 1px solid black;" class="text-center">
+									{{#if this.igst_percent}} {{this.igst_percent}} {{else}} {{add this.sgst_percent
+																								   this.cgst_percent}} {{/if}}
+									%
+								</td>
+								<td class="text-center">{{this.total}}</td>
+							</tr>
+						{{/each}}
+						<tr style="border-bottom:1px solid black;border-left:1px solid black;border-right:1px solid black;">
+							<td colspan="8" class="text-center"><b>Total</b></td>
+							<td class="text-center">{{invoice.subtotal2}}</td>
+						</tr>
+						<tr style="border-bottom:1px solid black;border-left:1px solid black;border-right:1px solid black;">
+							<td colspan="9">
+								<p class="pull-left m-b-0">
+									Amount Chargeable (in words) <br>
+									<b>INR {{inWords invoice.subtotal2}} Only</b>
+								</p>
+								<p class="pull-right">E. & O.E</p>
+							</td>
+						</tr>
+						<!-- <tr>
+						<td colspan="5" class="text-center">HSN/SAC</td>
+						<td colspan="4">Taxable Value</td>
+					</tr>
+					<tr>
+						<td colspan="5">996519</td>
+						<td colspan="4">{{invoice.subtotal2}}</td>
+					</tr>
+					<tr>
+						<td colspan="5" class="text-right"><b>TOTAL</b></td>
+						<td colspan="4"><b>{{invoice.subtotal2}}</b></td>
+					</tr> -->
+						</tbody>
+					</table>
+				</div>
+			</div>
+
+			<div style="font-size: 12px;border: 1px solid black; border-top:none;">
+				<div>
+					<p style="margin: 0px">Tax Amount (in words) : <b>NIL</b></p>
+				</div>
+				<br>
+				<div>
+					<p style="margin: 0px">Company's Bank Details</p>
+					<table>
+						<tbody>
+						<tr>
+							<td>Bank Name</td>
+							<td><strong> : YES BANK LTD.</strong></td>
+						</tr>
+						<tr>
+							<td>A/c No.</td>
+							<td><strong> : 004781300000671</strong></td>
+						</tr>
+						<tr>
+							<td>Branch & IFS Code</td>
+							<td><strong> : MAIN ROAD RAIPUR & YESB0000047</strong></td>
+						</tr>
+						</tbody>
+					</table>
+				</div>
+			</div>
+			<!-- <div style="clear: both"></div> -->
+
+			<div style="font-size: 12px;border: 1px solid black; border-top:none;text-align: right;">
+				<strong>for {{clientData.client_full_name}}</strong><br><br>
+				<span>Authorised Signatory</span>
+			</div>
+
+			<div class="text-center">
+				<p class="m-b-5">SUBJECT TO DELHI JURISDICTION</p>
+				<p>This is a Computer Generated Invoice</p>
+			</div>
+
+		</div>
+	</div>
+
+	<div style="width:96%;margin:0 auto;page-break-before:always;">
+		<div style="margin-top: 20px">
+			<h5 style="text-align: center;">
+				Item Details
+			</h5>
+		</div>
+		<div class="table-responsive">
+			<table style="width:100%;border-top:1px solid black;">
+				<tbody>
+				<tr class="text-center" style="border-bottom:1px solid black;border-left:1px solid black;border-right:1px solid black;">
+					<td style="padding:0 3px;border:1px solid black;width:2%;">Sl No.</td>
+					<td style="padding:0 3px;border:1px solid black;width:40%;">Description of Goods with IMEI</td>
+				</tr>
+				{{#each invoice.items}}
+					<tr style="border-bottom:1px solid black;border-left:1px solid black;border-right:1px solid black;">
+						<td style="padding:0 3px;border:1px solid black;text-align: center">{{inc @index}}</td>
+						<td style="padding:0 3px;border:1px solid black;">
+							<p style="margin-bottom:0;"><b>{{this.item_ref.name}} / {{this.item_ref.code}}</b></p>
+							{{#each this.imei_list}}
+								<span style="margin-bottom:0">#{{this}}, </span>
+							{{/each}}
+						</td>
+					</tr>
+				{{/each}}
+				</tbody>
+			</table>
+		</div>
+	</div>
+
+</div>
+
+<style>
+	.modal-dialog {
+		width: 75%;
+	}
+	.modal-content {
+		padding: 5px;
+	}
+	.ja-table {
+		border: 0px solid #000000;
+		border-spacing: 0px;
+	}
+	.text-center {
+		text-align: center;
+	}
+	.ja-table > tbody > tr > td {
+		border: 1px solid #000000;
+		padding: 2px 5px !important;
+		border-spacing: 0px;
+	}
+	.fs-10 {
+		font-size: 10px;
+	}
+	.valign {
+		vertical-align: middle !important;
+	}
+</style>

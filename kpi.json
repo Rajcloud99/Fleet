@@ -1,0 +1,20 @@
+{
+	"Revenue": {
+		"Read": true
+	},
+	"Trip": {
+		"Read": true
+	},
+	"Trip Expenses": {
+		"Read": true
+	},
+	"Vehicle": {
+		"Read": true
+	},
+	"Booking": {
+		"Read": true
+	},
+	"Profit": {
+		"Read": true
+	}
+}

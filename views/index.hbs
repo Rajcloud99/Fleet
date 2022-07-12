@@ -1,0 +1,53 @@
+<h1>Welcome to {{title}}</h1>
+<p> http://localhost:3000 will be replaced by our API domain name </p>
+<div class="container">
+    <div ui-view>
+        <h2>{{title}} APIs</h2>
+        <table class="table table-striped">
+            <thead><tr><th>Type</th><th>GET APIs</th></tr></thead>
+            <tbody>
+                <tr>
+                    <th>Get all Users </th>
+                    <td>http://localhost:3000/users?filters=<var> filter </var></td>
+                </tr>
+                 </tbody>
+        </table>
+         <table class="table table-striped">
+            <thead><tr><th>Type</th><th>POST APIs</th><th>Payload</th></tr></thead>
+            <tbody>
+                <tr>
+                    <th>create a user</th>
+                    <td>http://localhost:3000/users</td>
+                    <td>{fields: {
+                        username : "<var>userName </var> <var> mandatory </var>",
+                        password: "<var>userName </var> <var> mandatory </var>",
+                        name: "name",
+                        company: "companyName"}
+                     </td>
+                </tr>
+               <tr>
+                    <th>login</th>
+                    <td>http://localhost:3000/login</td>
+                    <td>{fields: {
+                        username : "<var>userName </var> <var> mandatory </var>",
+                        password: "<var>userName </var> <var> mandatory </var>"}
+                     </td>
+                </tr>
+            </tbody>
+        </table>
+        <table class="table table-striped">
+            <thead><tr><th>Type</th><th>PUT APIs</th><th>Payload</th></tr></thead>
+            <tbody>
+                <tr>
+                    <th>Update Users</th>
+                    <td>http://localhost:3000/users</td>
+                    <td>{user_id: "userId",fields:  username : "<var>userName </var> <var> mandatory </var>",
+                        password: "<var>userName </var> <var> mandatory </var>",
+                        name: "name",
+                        company: "companyName"}
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+</div>
