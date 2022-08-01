@@ -217,7 +217,10 @@ module.exports.searchClient = function(reqQuery, next) {
             client_full_name: 1,
             client_display_name: 1,
             clientId: 1,
-			gstin_no:1
+			gstin_no:1,
+			gpsId:1,
+			gpsPwd:1,
+			gpsgaadi_token:1
         };
         aggrFilter.push({ $project: projection });
     }

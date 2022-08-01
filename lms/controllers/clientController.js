@@ -479,8 +479,16 @@ router.post("/add",
 								}
 							}
 						},
-						"vendorDeal": {},
-						"formula": {},
+						"vendorDeal": {
+							"multiPayment" : true,
+							"accountCr" : "vendor",
+							"paymentRef" : false,
+							"pmt" : true,
+							"payRefNo" : true
+						},
+						"formula": {
+							"Total With Munshiyana" : " total_expense + munshiyana "
+						},
 						"client_allowed": [
 							{
 								"_woAccName": "Advance",
@@ -505,6 +513,12 @@ router.post("/add",
 							"name": req.body.client_full_name
 						},
 						"driverPayments": {
+							"branch" : {
+
+							},
+							"cashbook" : {
+
+							},
 							"aDriverPaymentType": [
 								{
 									"toGroup": [
@@ -588,7 +602,7 @@ router.post("/add",
 						],
 						"clientR": [],
 						"GR": {
-
+							"manualGr" : true,
 							"maxAllowedFreight": Number(3000000),
 							"config": {
 								"branch": {
@@ -1667,8 +1681,32 @@ router.post("/add",
 							},
 						},
 						"Bill": {
+							"driverPreview" : [
+								{
+									"key" : "driverPreview",
+									"name" : "Profile"
+								}
+							],
+							"tripAdvBill" : [
+								{
+									"key" : "TripAdvDefault",
+									"name" : "TripAdvDefault"
+								}
+							],
+							"salesAccount" : true,
+							"mRTemplate" : [
+								{
+									"key" : "defaultMr_KSN",
+									"name" : "MR Preview"
+								}
+							],
 
-							"Bill Templates": [],
+							"Bill Templates": [
+								{
+									"key" : "KSN_default",
+									"name" : "Default"
+								}
+							],
 
 							"Payment": {
 								"PaymentType": [
@@ -1714,7 +1752,11 @@ router.post("/add",
 							},
 
 						},
-						"vehAlloc": {},
+						"vehAlloc": {"deviceAttach" : true,
+							"skipBooking" : true,
+							"vendor" : {
+
+							}},
 						"master": {
 							"settlementObj": [
 								{
@@ -1845,14 +1887,92 @@ router.post("/add",
 								}
 							],
 
-							"driver": {},
-							"billingParty": {},
+							"driver" : {
+								"showProof" : true,
+								"idProofRequired" : true,
+								"idNumberRequired" : true
+							},
+							"regVehicle" : {
+								"groupRequired" : true,
+								"typeRequired" : true,
+								"segmentRequired" : true
+							},
+							"vendor" : {
+								"showFactor" : true
+							},
+							"aSegmentType" : [
+								"MARKET"
+							],
+							"billingParty" : {
+								"multiTasking" : true,
+								"defaultBillBook" : true
+							},
 							"consignorConsignee": {},
-							"aSegmentType": [],
-							"customer": {},
-							"showAccount": true,
+							"stationaryRpt" : true,
+							"showAccount" : false,
+							"customer" : {
+								"custType" : true
+							},
 
-							"TransportRoute": {},
+							"TransportRoute" : {
+								"addressBook" : true,
+								"tatDetails" : true
+							},
+							"expenseObj" : [
+								{
+									"name" : "Driver Cash",
+									"a1" : [
+										"Office",
+										"Vendor"
+									],
+									"a2" : [
+										"$driver",
+										"Driver",
+										"Toll tax"
+									],
+									"a3" : null,
+									"c" : "n",
+									"oType" : "Associate",
+									"settle" : {
+										"dont" : true
+									}
+								},
+								{
+									"name" : "Diesel",
+									"a1" : "$fvendor",
+									"a2" : "$vehicle",
+									"a3" : null,
+									"c" : "n"
+								},
+								{
+									"name" : "Happay",
+									"a1" : "Happay Master",
+									"a2" : [
+										"$vehicle",
+										"$vendor",
+										"Cashbook"
+									],
+									"a3" : null,
+									"c" : "n"
+								},
+								{
+									"name" : "Fastag",
+									"a1" : "$fastagAcc",
+									"a2" : "$vehicle",
+									"a3" : null,
+									"c" : "n"
+								},
+								{
+									"name" : "M.OIL",
+									"a1" : "Vendor",
+									"a2" : [
+										"$vehicle"
+									],
+									"a3" : null,
+									"c" : "n",
+									"gr" : false
+								}
+							],
 							"aServiceType": [
 								"Standard",
 								"Express",
@@ -1860,21 +1980,88 @@ router.post("/add",
 								"Ferry/Empty"
 							]
 						},
-						"tripAdv": {},
+						"tripAdv": {
+							"hideCentRefBtn" : false,
+							"showTripSecOnAdv" : true,
+							"maxDieselAmt" : 80000,
+							"automap" : true,
+							"editRate" : true,
+							"accounts" : {
+								"_ftAcc" : {
+									"name" : "ICICI BANK FAST TAG",
+									"_id" : "604b2d03ce2e34307cebeb09"
+								}
+							}
+						},
 						"account": {},
-						"voucher": {},
+						"voucher": {
+							"allowCRAutoBook" : true,
+							"hideAutoRefBtn" : true
+						},
 						"purBill": {},
 						"UnBilledGr": {},
 						"creditNote": {},
 						"moneyReceipt": {},
 						"booking": {},
-						"tripMemo": {},
-						"trips": {},
+						"tripMemo": {"show" : true},
+						"trips": {
+							"tripEndRmkReq" : true,
+							"alertData" : true,
+							"playBackData" : true
+						},
 						"eWay": {},
 						"tripSettlement": {
+							"addKMlimit" : 2000,
+							"isOwnOnly" : true,
 							"tripExpenseAmt": Number(1000000),
 						},
-						"branchAccessCtl": true,
+						"tracking" : {
+							"aReportTypes" : [
+								{
+									"scope" : "report_parking",
+									"name" : "Halt Report"
+								},
+								{
+									"scope" : "report_overspeed",
+									"name" : "Overspeed Report"
+								},
+								{
+									"scope" : "report_activity",
+									"name" : "Activity Report"
+								},
+								{
+									"scope" : "report_mileage2",
+									"name" : "Kilometer Report (DayWise)"
+								},
+								{
+									"scope" : "report_idealing",
+									"name" : "Idle Report (Single Vehicle)"
+								},
+								{
+									"scope" : "report_driver_activity",
+									"name" : "Trip Overview Report"
+								},
+								{
+									"scope" : "report_driver_activity_single",
+									"name" : "Trip Overview Report(Single)"
+								},
+								{
+									"scope" : "details_analysis",
+									"name" : "Details Analysis"
+								},
+								{
+									"scope" : "exception_report",
+									"name" : "Exception Report"
+								},
+								{
+									"scope" : "vehicle_exceptions",
+									"name" : "Vehicle Exception"
+								}
+							]
+						},
+						"tripStatusCheck" : true,
+						"branchAccessCtl" : true,
+						"driveRptFiltr" : true,
 						"_port": "",
 						"_domain": ""
 					}

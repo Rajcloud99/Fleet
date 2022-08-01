@@ -39,7 +39,8 @@ module.exports = {
 	getParticularTrialBalances,
 	getProfitAndLoss,
 	createWorkSheet,
-	dailyCostCenterReport
+	dailyCostCenterReport,
+	getTrialBalances1
 };
 
 function costCenterFilter(body) {
@@ -650,6 +651,11 @@ async function updateAccountById(id, body, req, next) {
 		foundAcnt = await Accounts.findById(id).lean();
 	}
 	let parentAc, ancestors;
+	if(!req.body.isGroup){
+		if(foundAcnt && foundAcnt.children && foundAcnt.children[0]){
+			return next(new Error('Firstly remove Sub ledgers'), null);
+		}
+	}
 
 	if (body.deleted) {
 		if (foundAcnt.linkedTo && foundAcnt.linkedTo.name) {
@@ -1067,6 +1073,195 @@ async function getTrialBalances(req, res) {
 			message: 'Trial balance report found',
 			data: data,
 		};
+	}
+}
+
+async function getTrialBalances1(req, res) {
+	let skip = (req.body.all) ? 1 : req.body.skip ? req.body.skip : 1;
+	let no_of_docs = req.body.all ? Number.MAX_SAFE_INTEGER : req.body.no_of_docs ? +req.body.no_of_docs : 10;
+
+	req.body.branchDetail = req.body.branch;
+	req.body.groupType = req.body.type;
+	let ofill = constructFiltersTrialBal(req.body)
+	let oAccFil,oResProf,oLvlPr=[],oLvlLs=[],oPrLmap = [],oLossLmap = [];
+	for(let p=0;p<req.body.oPLConf.config.trial_bal.length;p++){
+		oAccFil = ofill || JSON.parse(JSON.stringify(ofill));
+		oAccFil._id = mongoose.Types.ObjectId(req.body.oPLConf.config.trial_bal[p]._id);
+		oResProf = await getBalancesForTrial1(oAccFil,0,oLvlPr,oPrLmap);
+	}
+	//calculate total of profit and loss profit side
+	for(let a=oPrLmap.length-1;a>0;a--){
+		let aLed = oPrLmap[a];
+		for (let [key, oLed] of Object.entries(aLed)) {
+			if(!oPrLmap[oLed.l-1][oLed.type._id].bal){
+				oPrLmap[oLed.l-1][oLed.type._id].bal = {ob:0,cb:0,cr:0,dr:0};
+
+				if(!oLed.bal){
+					oLed.bal = {ob:0,cb:0,cr:0,dr:0,info:'gen'};
+				}
+				oPrLmap[oLed.l-1][oLed.type._id].bal.ob = oPrLmap[oLed.l-1][oLed.type._id].bal.ob + oLed.bal.ob;
+				oPrLmap[oLed.l-1][oLed.type._id].bal.cb = oPrLmap[oLed.l-1][oLed.type._id].bal.cb + oLed.bal.cb;
+				oPrLmap[oLed.l-1][oLed.type._id].bal.cr = oPrLmap[oLed.l-1][oLed.type._id].bal.cr + oLed.bal.cr;
+				oPrLmap[oLed.l-1][oLed.type._id].bal.dr = oPrLmap[oLed.l-1][oLed.type._id].bal.dr + oLed.bal.dr;
+			}
+		}
+	}
+	if (req.body.download === 'trialBalanceDetail' || req.body.download) {
+		let finalResp = {
+			data:oPrLmap,
+			config:req.body.oPLConf.config.trial_bal
+		};
+		ReportExelService.reportTrialBalRep1(finalResp, req.body.clientId, req.body.to, {}, function (data) {
+			return res.status(200).json({
+				"status": "OK",
+				"message": "Trial balance report download available.",
+				"url": data.url
+			});
+		});
+	} else {
+		return {
+			status: 'SUCCESS',
+			message: 'Trial balance report found',
+			data: data,
+		};
+	}
+}
+
+async function getBalancesForTrial1(oFilters,lvl,oLvl,lMap) {
+	if(lvl>7){
+		console.error(lvl,' lvl exceeded ',oFilters.name,oFilters.group,lvl);
+		return oFilters;
+	}
+	let oAcc = await Accounts.findOne({_id:oFilters._id},{_id:1,lvl:1,children:1,name:1,isGroup:1,'type':1}).lean();
+	console.log(lvl,oFilters.name,oFilters.group,oFilters.lvl,oAcc.isGroup);
+	//oLvl[lvl] = oAcc;
+
+	oAcc.l = lvl;
+	oAcc.group = oFilters.group;
+	let aggrQuery;
+	let oFil = {date:oFilters.date,clientId:oFilters.clientId};
+	if(oAcc.isGroup && oAcc.children && oAcc.children.length){
+		let aChild = [];
+		let allChild = [];
+		for(let i=0;i<oAcc.children.length;i++){
+			if(oAcc.children[i]._id){
+				aChild.push(oAcc.children[i]._id);
+				//children account if group
+				let oChildrenAcc = await Accounts.findOne({_id:oAcc.children[i]._id},{_id:1,lvl:1,children:1,name:1,isGroup:1,'type':1}).lean();
+				if( oChildrenAcc && oChildrenAcc.isGroup && oChildrenAcc.children && oChildrenAcc.children.length){
+					for(let j=0;j<oChildrenAcc.children.length;j++){
+						if(oChildrenAcc.children[j]._id){
+							allChild.push(oChildrenAcc.children[j]._id);
+							allChild = [...allChild,...aChild];
+							//inner children if group
+							let oInnerChildrenAcc = await Accounts.findOne({_id:oChildrenAcc.children[j]._id},{_id:1,lvl:1,children:1,name:1,isGroup:1,'type':1}).lean();
+							if(oInnerChildrenAcc && oInnerChildrenAcc.isGroup && oInnerChildrenAcc.children && oInnerChildrenAcc.children.length){
+								for(let k=0;k<oInnerChildrenAcc.children.length;k++){
+									if(oInnerChildrenAcc.children[k]._id){
+										allChild.push(oInnerChildrenAcc.children[k]._id);
+										//second children group 4th level
+										let oSecondChildrenAcc = await Accounts.findOne({_id:oInnerChildrenAcc.children[k]._id},{_id:1,lvl:1,children:1,name:1,isGroup:1,'type':1}).lean();
+										if(oSecondChildrenAcc && oSecondChildrenAcc.isGroup && oSecondChildrenAcc.children && oSecondChildrenAcc.children.length){
+											for(let h=0;h<oSecondChildrenAcc.children.length;h++){
+												if(oSecondChildrenAcc.children[h]._id){
+													allChild.push(oSecondChildrenAcc.children[h]._id);
+													//third children group 4th level
+													let oThirdChildrenAcc = await Accounts.findOne({_id:oSecondChildrenAcc.children[h]._id},{_id:1,lvl:1,children:1,name:1,isGroup:1,'type':1}).lean();
+													if(oThirdChildrenAcc && oThirdChildrenAcc.isGroup && oThirdChildrenAcc.children && oThirdChildrenAcc.children.length){
+														for(let s=0;s<oThirdChildrenAcc.children.length;s++){
+															if(oThirdChildrenAcc.children[s]._id){
+																allChild.push(oThirdChildrenAcc.children[s]._id);
+															}else{
+																console.error('child node id not found for',oThirdChildrenAcc.name);
+															}
+														}
+													}
+												}else{
+													console.error('child node id not found for',oSecondChildrenAcc.name);
+												}
+											}
+										}
+									}else{
+										console.error('child node id not found for',oInnerChildrenAcc.name);
+									}
+								}
+							}
+						}else{
+							console.error('child node id not found for',oChildrenAcc.name);
+						}
+					}
+				}
+			}else{
+				console.error('child node id not found for',oAcc.name);
+			}
+		}
+		// console.log(aChild);
+		let filterData = (allChild && allChild[0] && allChild.length > 0) ? allChild : aChild;
+		oFil.account = {$in: filterData};
+		aggrQuery = [{$match:oFil},
+			{$sort:{date:1}},
+			{
+				$group: {
+					_id: null,
+					ob: { $first: '$ob' },
+					cb: { $last: '$cb' },
+					dr: { $sum: '$dr' },
+					cr: { $sum: '$cr' }
+				}
+			}];
+		let oQuery = {aggQuery: aggrQuery, no_of_docs: 20000};
+		let data = await serverSidePage.requestData(AcBal, oQuery);
+		oAcc.bal = data && data[0];
+		if(!oLvl[lvl]){
+			oLvl[lvl] = [];
+		}
+		if(!lMap[lvl]){
+			lMap[lvl] = {};
+		}
+		delete oAcc.children;
+		lMap[lvl][oAcc._id] = oAcc;
+		oLvl[lvl].push(oAcc);
+		let oFilCh = {_id:{$in:aChild}};
+		if(lvl>0){
+			oFilCh.isGroup = true;
+		}
+	}else if(!oAcc.isGroup){//may be direct ledger
+		oFil.account = oFilters._id;
+		aggrQuery = [{$match:oFil},
+			{$sort:{date:1}},
+			{
+				$group: {
+					_id: null,
+					ob: { $first: '$ob' },
+					cb: { $last: '$cb' },
+					dr: { $sum: '$dr' },
+					cr: { $sum: '$cr' }
+				}
+			}];
+		let oQuery = {aggQuery: aggrQuery, no_of_docs: 20000};
+		let data = await serverSidePage.requestData(AcBal, oQuery);
+		oAcc.bal = data && data[0];
+
+		if(!oLvl[lvl]){
+			oLvl[lvl] = [];
+		}
+		if(!lMap[lvl]){
+			lMap[lvl] = {};
+		}
+		lMap[lvl][oAcc._id] = oAcc;
+		oLvl[lvl].push(oAcc);
+	}else{
+		console.error(' group without ledger');
+		if(!oLvl[lvl]){
+			oLvl[lvl] = [];
+		}
+		if(!lMap[lvl]){
+			lMap[lvl] = {};
+		}
+		oAcc.info = 'group without ledger';
+		lMap[lvl][oAcc._id] = oAcc;
+		oLvl[lvl].push(oAcc);
+		//oLvl[lvl].push({bal : {ob:0,cb:0,dr:0,cr:0,e:1}});
 	}
 }
 

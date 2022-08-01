@@ -1083,9 +1083,16 @@ router.put('/update/:_id', async function (req, res, next) {
 				}
 			});
 
+			let key = [bookKey] + "." + 'ref'.toString();
+			let key1 = [bookKey] + "." + 'name'.toString();
+
 			branchQuery.push(...req.body.branch.map(oBranch => ({
 				updateOne: {
-					filter: {_id: oBranch.ref},
+					filter: {
+						_id: oBranch.ref,
+						[key] : {$ne:billBook._id},
+						[key1]: {$ne:billBook.name}
+					},
 					update: {
 						$addToSet: {
 							[bookKey]: {
@@ -1097,7 +1104,6 @@ router.put('/update/:_id', async function (req, res, next) {
 					upsert: false
 				}
 			})));
-
 			if (req.body.branch.length)
 				req.body.isLinked = true;
 			else

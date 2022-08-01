@@ -18,8 +18,8 @@
 		"db": "lmsDB"
 	 },
     "fastag_host":"https://fastaglogin.icicibank.com/ISRCUSTAPI/",
-    "user_pass_key": "secretKey@Made_*17*09*2022*ByKamal_",
-  "app_secret": "mysecretKey20220712",
+	"user_pass_key": "secretKey@Made_*15*09*2016*ByPraTik_",
+	"app_secret": "AllForOneNOneForAll~Brook",
   "debug": false,
   "company_name": "MAPLE",
   "company_short_name": "MAP",

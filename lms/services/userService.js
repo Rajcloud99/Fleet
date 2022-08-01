@@ -277,16 +277,18 @@ function createUserAggrFilter(req){
 				// obj = {};
 				let index = key === "mechanic" ? 3 : 1;
 				if(oQuery[key] === 'true'){
-
-					oFilter[key].$or = oFilter[key].$or ? oFilter[key].$or : [];
-					oFilter[key].$or.push({user_type:constant.user_type[index]});
-					delete oQuery[key];
+                      if(oFilter[key]) {
+						  oFilter[key].$or = oFilter[key].$or ? oFilter[key].$or : [];
+						  oFilter[key].$or.push({user_type: constant.user_type[index]});
+						  delete oQuery[key];
+					  }
 
 				}else if (oQuery[key] === 'false'){
-
-					oFilter[key].$and = oFilter[key].$and ? oFilter[key].$and : [];
-					oFilter[key].$and.push({user_type:{$ne:constant.user_type[index]}});
-					delete oQuery[key];
+                       if(oFilter[key]) {
+						   oFilter[key].$and = oFilter[key].$and ? oFilter[key].$and : [];
+						   oFilter[key].$and.push({user_type: {$ne: constant.user_type[index]}});
+						   delete oQuery[key];
+					   }
 
 				}
 

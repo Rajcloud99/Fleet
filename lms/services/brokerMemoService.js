@@ -1,6 +1,7 @@
 'use strict';
 let GR = commonUtil.getModel('tripGr');
 const BillStationary = commonUtil.getModel('billStationary');
+let VoucherServiceV2 = commonUtil.getService('voucher');
 const billStationaryService = commonUtil.getService('billStationary');
 const datamgntService = commonUtil.getService('datamanagements');
 let mongoose = require('mongoose');
@@ -343,7 +344,7 @@ async function get(req, res, next) {
 				}
 			},
 			{$project:{bMemo:1,acknowledge:1,clientId:1,trip:1,trip_no:1,status:1,vehicle_no:1,'customer.name':1,'customer._id':1, stationaryId:1, grNumber:1,grDate:1,basicFreight:1,totalFreight: 1,charges:1, deduction:1, totalCharges:1, totalDeduction:1,created_by_full_name:1,created_at:1,payment_type:1, last_modified_at: 1, tMemoReceipt: 1,
-					payment_basis:1,remarks:1,'vehicle.veh_type_name':1,'vehicle.veh_type':1,'vehicle._id':1, 'branch.name':1,'branch._id':1,'branch.grBook':1, 'branch.tripMemoBook': 1, 'billingParty.name':1,'billingParty._id':1,'billingParty.account.name':1,'billingParty.account._id':1,
+					payment_basis:1,remarks:1,'vehicle.veh_type_name':1,'vehicle.veh_type':1,'vehicle._id':1, 'branch.name':1,'branch._id':1,'branch.grBook':1, 'branch.tripMemoBook': 1,'branch.brokerMemoBook': 1,'billingParty.name':1,'billingParty._id':1,'billingParty.account.name':1,'billingParty.account._id':1,
 					'bill.billNo': 1,provisionalBill: 1 , supplementaryBillRef:1, 'booking._id': 1,'booking.ld': 1, 'booking.uld': 1, "booking.booking_no": 1,'pod':1,
 					"booking.imd": 1, //intermed
 					"booking.sr": 1,
@@ -542,7 +543,611 @@ async function update(id, body) {
 	}
 }
 
+const multiPaymentAdd = async (req, res, next) => {
+	try {
+		let aBrokerMemo = JSON.parse(JSON.stringify(req.body));
+		let stationaryId = aBrokerMemo[0].stationaryId;
+
+		//start vch
+		let oVch = {ledgers: []}, ledger = {}, crAmt = 0, drAmt = 0;
+
+		for (let i = 0; i < aBrokerMemo.length; i++) {
+			if (i == 0) {//extract voucher level info
+				oVch.refNo = aBrokerMemo[i].refNo;
+				oVch.date = aBrokerMemo[i].paymentDate;
+				oVch.type = 'Receipt';
+				oVch.vT = 'Broker Memo Receipt';
+				oVch.clientId = req.user.clientId;
+				oVch.stationaryId = aBrokerMemo[i].stationaryId;
+				oVch.isEditable = false;
+				oVch.narration = aBrokerMemo[i].narration;
+				oVch.branch = aBrokerMemo[i].branch;
+				oVch.createdBy = req.user.full_name || req.user.user_full_name;
+				oVch.paymentMode = aBrokerMemo[i].paymentMode;
+				oVch.paymentRef = aBrokerMemo[i].paymentRef;
+			}
+
+			if (ledger[aBrokerMemo[i].account_data.from]) {
+				ledger[aBrokerMemo[i].account_data.from].amount = ledger[aBrokerMemo[i].account_data.from].amount + aBrokerMemo[i].amount;
+				crAmt = crAmt + aBrokerMemo[i].amount;
+				// if (aTrip[i].vendorPayment.paymentMode && ['Diesel', 'Broker'].indexOf(aTrip[i].vendorPayment.paymentMode) + 1) {
+				// 	let oBill = {
+				// 		billNo: aTrip[i].reference_no,
+				// 		billType: 'New Ref',
+				// 		amount: aTrip[i].amount,
+				// 		remAmt: aTrip[i].amount
+				// 	};
+				// 	ledger[aTrip[i].account_data.from]["bills"].push(oBill);
+				// }
+			} else {
+				ledger[aBrokerMemo[i].account_data.from] = {
+					account: aBrokerMemo[i].account_data.from,
+					amount: aBrokerMemo[i].amount,
+					cRdR: "CR",
+					lName: aBrokerMemo[i].account_data.fromName,
+					bills: []
+				};
+				ledger[aBrokerMemo[i].account_data.from].amount = aBrokerMemo[i].amount;
+				crAmt = crAmt + aBrokerMemo[i].amount;
+				// if (aTripMemo[i].vendorPayment.paymentMode && ['Diesel', 'Broker'].indexOf(aTripMemo[i].vendorPayment.paymentMode) + 1) {
+				// 	let oBill = {
+				// 		billNo: aTripMemo[i].reference_no,
+				// 		billType: 'New Ref',
+				// 		amount: aTripMemo[i].amount,
+				// 		remAmt: aTripMemo[i].amount
+				// 	};
+				// 	ledger[aTrip[i].account_data.from]["bills"].push(oBill);
+				// }
+			}
+			if (ledger[aBrokerMemo[i].account_data.to]) {
+				ledger[aBrokerMemo[i].account_data.to].amount = ledger[aBrokerMemo[i].account_data.to].amount + aBrokerMemo[i].amount;
+				drAmt = drAmt + aBrokerMemo[i].amount;
+				if (aBrokerMemo[i].billNo) {
+					let oBill = {
+						billNo: aBrokerMemo[i].billNo,
+						billType: aBrokerMemo[i].billType,
+						amount: aBrokerMemo[i].amount,
+						remAmt: aBrokerMemo[i].billType == "New Ref" ? aBrokerMemo[i].amount : 0
+					};
+					ledger[aBrokerMemo[i].account_data.to]["bills"].push(oBill);
+				}
+			} else {
+				ledger[aBrokerMemo[i].account_data.to] = {
+					account: aBrokerMemo[i].account_data.to,
+					amount: aBrokerMemo[i].amount,
+					cRdR: "DR",
+					lName: aBrokerMemo[i].account_data.toName,
+					bills: []
+				};
+				ledger[aBrokerMemo[i].account_data.to].amount = aBrokerMemo[i].amount;
+				drAmt = drAmt + aBrokerMemo[i].amount;
+				if (aBrokerMemo[i].billNo) {
+					let oBill = {
+						billNo: aBrokerMemo[i].billNo,
+						billType: aBrokerMemo[i].billType,
+						amount: aBrokerMemo[i].amount,
+						remAmt: aBrokerMemo[i].billType == "New Ref" ? aBrokerMemo[i].amount : 0
+					};
+					ledger[aBrokerMemo[i].account_data.to]["bills"].push(oBill);
+				}
+			}
+		}
+
+		if (crAmt !== drAmt) {
+			return res.status(500).json({
+				status: 'ERROR',
+				message: 'Total of CR and DR amount not matched'
+			});
+		}
+
+		for (let le in ledger) {
+			oVch.ledgers.push(ledger[le]);
+		}
+
+		let aVch = await VoucherServiceV2.addVoucherAsync(oVch);
+
+		if (stationaryId) {
+			await billStationaryService.updateStatus({
+				userName: req.user.full_name,
+				modelName: 'tripGr',
+				stationaryId: stationaryId,
+			}, 'used');
+		}
+
+		let tripUpd = await GR.bulkWrite(aBrokerMemo.map((oGr, index) => {
+			let oReceipt = {
+				clientId: req.user.clientId,
+				vT: 'Broker Memo Receipt',
+				refNo: oGr.refNo,
+				stationaryId: oGr.stationaryId,
+				amount: oGr.amount,
+				remainingAmount: oGr.remainingAmount,
+				trip_no: oGr.trip_no,
+				grNumber: oGr.grNumber,
+				bMemoNo: oGr.billNo,
+				vehicle_no: oGr.vehicle_no,
+				fromAccount: oGr.account_data.from,
+				fromName: oGr.account_data.fromName,
+				toAccount: oGr.account_data.to,
+				toName: oGr.account_data.toName,
+				branch: oGr.branch,
+				paymentMode : oGr.paymentMode,
+				paymentRef : oGr.paymentRef,
+				paymentDate : oGr.paymentDate,
+				remark: oGr.remark,
+				vAdv: oGr.vAdv,
+				created_at: new Date(),
+				created_by: req.user.full_name,
+				voucher: aVch && aVch[0] && aVch[0].voucher._id
+			};
+
+			return {
+				updateOne: {
+					filter: {_id: otherUtil.arrString2ObjectId(oGr.gr)},
+					update: {
+						$addToSet: {
+							bMemoReceipt: oReceipt
+						}
+					},
+					upsert: false
+				}
+			}
+		}));
+
+		for(let row of req.body){
+			let foundGr = await GR.findOne({
+				'_id': row.gr,
+				clientId: req.user.clientId,
+				bill: {$exists: true}
+			}, {bill: 1})
+				.populate("bill", "receiving items.gr")
+				.lean();
+
+			// if(foundGr && foundGr.bill){
+			// 	const mr = foundGr.bill.receiving
+			// 		&& Array.isArray(foundGr.bill.receiving.moneyReceipt)
+			// 		&& foundGr.bill.receiving.moneyReceipt
+			// 		|| [];
+			//
+			// 	const refPtr = mr.find(o => o.bmRefNo === row.refNo);
+			//
+			// 	if(refPtr) {
+			// 		const grPtr = refPtr.grs.find(o => o.bMemo === row.billNo);
+			// 		if (grPtr) {
+			// 			grPtr.amount = row.amount;
+			// 		}else{
+			// 			refPtr.grs.push({
+			// 				grRef: row.gr,
+			// 				bMemo: row.billNo,
+			// 				amount: row.amount,
+			// 			});
+			// 		}
+			// 		refPtr.amount = refPtr.grs.reduce((acc, oGr) => acc + oGr.amount, 0);
+			// 	}else{
+			// 		mr.push({
+			// 			bmRef: aVch && aVch[0] && aVch[0].voucher._id,
+			// 			bmRefNo: row.refNo,
+			// 			grs: [{
+			// 				grRef: row.gr,
+			// 				bMemo: row.billNo,
+			// 				amount: row.amount,
+			// 			}],
+			// 			amount: row.amount,
+			// 		});
+			// 	}
+			//
+			// 	await Bill.updateOne({_id: foundGr.bill._id}, {
+			// 		$set: {
+			// 			receiving: foundGr.bill.receiving
+			// 		}
+			// 	});
+			// }
+		}
+
+		return res.status(200).json({
+			status: 'OK',
+			message: 'Done',
+		});
+	} catch (e) {
+		winston.error(e.message || e.toString());
+		return res.status(500).json({
+			status: 'ERROR',
+			message: e.toString(),
+		});
+	}
+};
+
+const multiPaymentEdit = async (req, res, next) => {
+	try {
+
+		let aBrokerMemo = JSON.parse(JSON.stringify(req.body.aBrokerMemo));
+		let updateManyGrQuery = [];
+		let refNo = req.body.refNo;
+
+		let foundAccountVch = await VoucherServiceV2.findVoucherByQueryAsync({
+			refNo: new RegExp('^' + refNo + '$'),
+			clientId: req.user.clientId,
+			deleted: false
+		}, {_id: 1, acImp: 1});
+
+		if (foundAccountVch.find(o => o.acImp.st))
+			throw new Error('Edit not possible. Some or All Voucher are Imported to Account');
+
+		let newStationaryId = aBrokerMemo[0].stationaryId;
+		let unsetQuery = {};
+		let setQuery = {};
+
+		if (newStationaryId) {
+			setQuery.stationaryId = newStationaryId;
+		} else {
+			unsetQuery = {
+				$unset: {
+					stationaryId: 1
+				}
+			};
+		}
+
+		//start vch
+		let oVch = {ledgers: []}, ledger = {}, crAmt = 0, drAmt = 0;
+		for (let i = 0; i < aBrokerMemo.length; i++) {
+			if (i == 0) {
+				oVch.refNo = aBrokerMemo[i].refNo;
+				oVch.date = aBrokerMemo[i].paymentDate;
+				oVch.type = 'Receipt';
+				oVch.vT = 'Broker Memo Receipt';
+				oVch.clientId = req.user.clientId;
+				oVch.stationaryId = aBrokerMemo[i].stationaryId;
+				oVch.isEditable = false;
+				oVch.narration = aBrokerMemo[i].narration;
+				oVch.branch = aBrokerMemo[i].branch;
+				oVch.createdBy = req.user.full_name || req.user.user_full_name;
+				oVch.paymentMode = aBrokerMemo[i].paymentMode;
+				oVch.paymentRef = aBrokerMemo[i].paymentRef;
+				oVch.paymentDate = aBrokerMemo[i].paymentDate;
+			}
+			if (ledger[aBrokerMemo[i].account_data.from]) {
+				ledger[aBrokerMemo[i].account_data.from].amount = ledger[aBrokerMemo[i].account_data.from].amount + aBrokerMemo[i].amount;
+				crAmt = crAmt + aBrokerMemo[i].amount;
+
+			} else {
+				ledger[aBrokerMemo[i].account_data.from] = {
+					account: aBrokerMemo[i].account_data.from,
+					amount: aBrokerMemo[i].amount,
+					cRdR: "CR",
+					lName: aBrokerMemo[i].account_data.fromName,
+					bills: []
+				};
+				ledger[aBrokerMemo[i].account_data.from].amount = aBrokerMemo[i].amount;
+				crAmt = crAmt + aBrokerMemo[i].amount;
+			}
+			if (ledger[aBrokerMemo[i].account_data.to]) {
+				ledger[aBrokerMemo[i].account_data.to].amount = ledger[aBrokerMemo[i].account_data.to].amount + aBrokerMemo[i].amount;
+				drAmt = drAmt + aBrokerMemo[i].amount;
+				if (aBrokerMemo[i].billNo) {
+					let oBill = {
+						billNo: aBrokerMemo[i].billNo,
+						billType: aBrokerMemo[i].billType,
+						amount: aBrokerMemo[i].amount,
+						remAmt: aBrokerMemo[i].billType == "New Ref" ? aBrokerMemo[i].amount : 0
+					};
+					ledger[aBrokerMemo[i].account_data.to]["bills"].push(oBill);
+				}
+			} else {
+				ledger[aBrokerMemo[i].account_data.to] = {
+					account: aBrokerMemo[i].account_data.to,
+					amount: aBrokerMemo[i].amount,
+					cRdR: "DR",
+					lName: aBrokerMemo[i].account_data.toName,
+					bills: []
+				};
+				ledger[aBrokerMemo[i].account_data.to].amount = aBrokerMemo[i].amount;
+				drAmt = drAmt + aBrokerMemo[i].amount;
+				if (aBrokerMemo[i].billNo) {
+					let oBill = {
+						billNo: aBrokerMemo[i].billNo,
+						billType: aBrokerMemo[i].billType,
+						amount: aBrokerMemo[i].amount,
+						remAmt: aBrokerMemo[i].billType == "New Ref" ? aBrokerMemo[i].amount : 0
+					};
+					ledger[aBrokerMemo[i].account_data.to]["bills"].push(oBill);
+				}
+			}
+		}
+		if (crAmt !== drAmt) {
+			return res.status(500).json({
+				status: 'ERROR',
+				message: 'Total of CR and DR amount not matched'
+			});
+		}
+
+		for (let le in ledger) {
+			oVch.ledgers.push(ledger[le]);
+		}
+		if (foundAccountVch && foundAccountVch[0]) {
+			oVch._id = foundAccountVch && foundAccountVch[0] && foundAccountVch[0]._id;
+			let aVch = await VoucherServiceV2.editVoucher(oVch);
+		} else {
+			throw new Error('No Voucher found');
+		}
+
+		//vch work done
+
+		let foundGr = await GR.find({
+			'bMemoReceipt.voucher': oVch._id,
+			clientId: req.user.clientId,
+		}).lean();
+
+		for (let i = 0; i < foundGr.length; i++) {
+			let oGr = foundGr[i];
+			let matchIndex = aBrokerMemo.findIndex(o => o.gr === oGr._id.toString());
+			if (matchIndex + 1) {
+				let matchGr = aBrokerMemo[matchIndex];
+				aBrokerMemo.splice(matchIndex, 1);
+
+				let oReceipt = {
+					clientId: req.user.clientId,
+					vT: "Broker Memo Receipt",
+					refNo: matchGr.refNo,
+					stationaryId: matchGr.stationaryId,
+					amount: matchGr.amount,
+					remainingAmount: matchGr.remainingAmount,
+					trip_no: matchGr.trip_no,
+					grNumber: matchGr.grNumber,
+					bMemoNo: matchGr.billNo,
+					vehicle_no: matchGr.vehicle_no,
+					fromAccount: matchGr.account_data.from,
+					fromName: matchGr.account_data.fromName,
+					toAccount: matchGr.account_data.to,
+					toName: matchGr.account_data.toName,
+					branch: matchGr.branch,
+					vAdv: matchGr.vAdv,
+					paymentMode : matchGr.paymentMode,
+					paymentRef : matchGr.paymentRef,
+					paymentDate : matchGr.paymentDate,
+					remark: matchGr.remark,
+					voucher: oVch._id
+				};
+				updateManyGrQuery.push({
+					updateOne: {
+						filter: {
+							_id: matchGr.gr,
+							'bMemoReceipt.voucher': oVch._id,
+						},
+						update: {
+							$set: {
+								"bMemoReceipt.$": oReceipt
+							}
+						}
+					}
+				});
+
+			} else {
+				let fdGR = await GR.findOne({
+					'bMemoReceipt.voucher': oVch._id,
+				}, {
+					'bMemoReceipt.$': 1,
+					"_id": 1
+				}).lean();
+
+				if (fdGR)
+					updateManyGrQuery.push({
+						updateOne: {
+							filter: {
+								_id: fdGR._id,
+								'bMemoReceipt.voucher': oVch._id,
+							},
+							update: {
+								$pull: {
+									'bMemoReceipt.voucher': {
+										voucher: oVch._id
+									}
+								}
+							}
+						}
+					});
+			}
+		}
+
+		for (let i = 0; i < aBrokerMemo.length; i++) { // vch to add
+			let oGr = aBrokerMemo[i];
+
+			let oReceipt = {
+				clientId: req.user.clientId,
+				vT: 'Broker Memo Receipt',
+				refNo: oGr.refNo,
+				stationaryId: oGr.stationaryId,
+				amount: oGr.amount,
+				remainingAmount: oGr.remainingAmount,
+				trip_no: oGr.trip_no,
+				grNumber: oGr.grNumber,
+				bMemoNo: oGr.billNo,
+				vehicle_no: oGr.vehicle_no,
+				fromAccount: oGr.account_data.from,
+				fromName: oGr.account_data.fromName,
+				toAccount: oGr.account_data.to,
+				toName: oGr.account_data.toName,
+				branch: oGr.branch,
+				vAdv: oGr.vAdv,
+				paymentMode : oGr.paymentMode,
+				paymentRef : oGr.paymentRef,
+				paymentDate : oGr.paymentDate,
+				remark: oGr.remark,
+				voucher: oVch._id
+			};
+
+			updateManyGrQuery.push({
+				updateOne: {
+					filter: {
+						_id: oGr.gr
+					},
+					update: {
+						$push: {
+							"bMemoReceipt": oReceipt
+						}
+					}
+				}
+			});
+		}
+
+		updateManyGrQuery.length && await GR.bulkWrite(updateManyGrQuery);
+
+		for(let row of req.body.aBrokerMemo){
+			let foundGr = await GR.findOne({
+				'_id': row.gr,
+				clientId: req.user.clientId,
+				bill: {$exists: true}
+			}, {bill: 1})
+				.populate("bill", "receiving items.gr")
+				.lean();
+
+			// if(foundGr && foundGr.bill){
+			// 	const mr = foundGr.bill.receiving
+			// 		&& Array.isArray(foundGr.bill.receiving.moneyReceipt)
+			// 		&& foundGr.bill.receiving.moneyReceipt
+			// 		|| [];
+			//
+			// 	const refPtr = mr.find(o => o.bmRefNo === row.refNo);
+			//
+			// 	if(refPtr) {
+			// 		const grPtr = refPtr.grs.find(o => o.bMemo === row.billNo);
+			// 		if (grPtr) {
+			// 			grPtr.amount = row.amount;
+			// 		}else{
+			// 			refPtr.grs.push({
+			// 				grRef: row.gr,
+			// 				bMemo: row.billNo,
+			// 				amount: row.amount,
+			// 			});
+			// 		}
+			// 		refPtr.amount = refPtr.grs.reduce((acc, oGr) => acc + oGr.amount, 0);
+			// 	}else{
+			// 		mr.push({
+			// 			bmRef: foundAccountVch && foundAccountVch[0] && foundAccountVch[0]._id,
+			// 			bmRefNo: row.refNo,
+			// 			grs: [{
+			// 				grRef: row.gr,
+			// 				bMemo: row.billNo,
+			// 				amount: row.amount,
+			// 			}],
+			// 			amount: row.amount,
+			// 		});
+			// 	}
+			//
+			// 	await Bill.updateOne({_id: foundGr.bill._id}, {
+			// 		$set: {
+			// 			receiving: foundGr.bill.receiving
+			// 		}
+			// 	});
+			// }
+		}
+
+		return res.status(200).json({
+			status: 'OK',
+			message: 'Done',
+		});
+
+	} catch (e) {
+		winston.error(e.message || e.toString());
+		return res.status(500).json({
+			status: 'ERROR',
+			message: e.toString(),
+			data: e,
+		});
+	}
+};
+
+const multiPaymentDel = async (req, res, next) => {
+	try {
+
+		let refNo = req.body.refNo;
+		let clientId = req.user.clientId;
+
+		// fetching the voucher and validating them before deletion
+		let foundVch = await VoucherServiceV2.findVoucherByQueryAsync({
+			refNo: new RegExp('^' + refNo + '$'),
+			clientId: req.user.clientId,
+			deleted: false
+		}, {_id: 1, acImp: 1});
+
+		if (foundVch.find(o => o.acImp.st))
+			throw new Error('Vouchers are already Imported to A/c');
+
+		// fetching the Trip GR and validating them before Receipt deletion
+		let foundGr = await GR.find({
+			'bMemoReceipt.voucher': foundVch[0]._id,
+			clientId: req.user.clientId,
+		},{_id: 1, bMemo:1, bill: 1, provisionalBill: 1, supplementaryBillRef: 1}).lean();
+
+		if(!foundGr.length)
+			throw new Error('Gr Not Found');
+		else{
+			for(let oGr of foundGr){
+
+				if(oGr.bill)
+					throw new Error(`Can not Delete Bill Already Generated of TripMemo no.: ${oGr.bMemo.bmNo}`);
+
+				if(oGr.supplementaryBillRef && oGr.supplementaryBillRef.length)
+					throw new Error(`Can not Delete supplementaryBill Already Generated of TripMemo no.: ${oGr.bMemo.bmNo}`);
+
+				if(oGr.provisionalBill && oGr.provisionalBill.length)
+					throw new Error(`Can not Delete provisionalBill Already Generated of TripMemo no.: ${oGr.bMemo.bmNo}`);
+
+			}
+		}
+
+		// Deletion code start
+
+		// 1) freeing the stationary
+
+		let foundStationary = await billStationaryService.findByRefAndType({
+			bookNo: refNo,
+			type: 'Ref No',
+			clientId
+		},{_id: 1});
+
+		if (foundStationary) {
+			await billStationaryService.updateStatus({
+				userName: req.user.full_name,
+				modelName: 'tripGr',
+				stationaryId: foundStationary._id,
+			}, 'cancelled');
+		}
+
+		// 2) removing the voucher
+		foundVch[0] && await VoucherServiceV2.removeVoucher({_id: foundVch[0]._id, clientId});
+
+		// 3) pulling the Receipt from the linked Gr
+
+		await GR.updateMany({'bMemoReceipt.voucher':foundVch[0]._id}, {
+			$pull: {
+				bMemoReceipt: {
+					voucher: foundVch[0]._id
+				}
+			},
+			$set: {
+				last_modified_at: new Date(),
+			}
+		});
+
+
+		return res.status(200).json({
+			status: 'OK',
+			message: 'Deleted Successfully.',
+		});
+	} catch (e) {
+		winston.error(e.message || e.toString());
+		return res.status(500).json({
+			status: 'ERROR',
+			message: e.toString(),
+		});
+	}
+
+};
+
 module.exports = {
 	get,
 	update,
+	multiPaymentAdd,
+	multiPaymentEdit,
+	multiPaymentDel,
 };

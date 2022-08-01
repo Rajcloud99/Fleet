@@ -11,11 +11,13 @@ var RoleService = Promise.promisifyAll(commonUtil.getService('roles'));
 var acService = promise.promisifyAll(commonUtil.getService('accessControl'));
 let CustomerService = commonUtil.getService('customer');
 var acccountsServiceV2 = commonUtil.getService('accounts');
+var Client = promise.promisifyAll(commonUtil.getModel('client'));
 var UserModel = Promise.promisifyAll(commonUtil.getModel('user'));
 let billingPartyModel = commonUtil.getModel('billingparty');
 let customerModel = commonUtil.getModel('customer');
 let accountModel = commonUtil.getModel('accounts');
 const logsService = commonUtil.getService('logs');
+
 
 function prepareUserResponse(user){
 	var userResponse =JSON.parse(JSON.stringify(user));
@@ -147,38 +149,41 @@ router.post('/add',
 
 	async function(req,res,next) {
 		try {
-			let custFilter = {
-				created_at: req.body.created_at,
-				clientId: req.body.clientId,
-				name: req.body.bmBillName,
-			};
 
-			let aCustomer = await CustomerService.addCustomerV2(custFilter);
+			if(req.body.bmBillName) {
+				let custFilter = {
+					created_at: req.body.created_at,
+					clientId: req.body.clientId,
+					name: req.body.bmBillName,
+				};
 
-			let oFilter = {
-				clientId: req.user.clientId,
-				name: req.body.bmBillName,
-			};
+				let aCustomer = await CustomerService.addCustomerV2(custFilter);
 
-			let bpbody = {
-				created_at : Date.now(),
-				clientId :  req.user.clientId,
-				name: req.body.bmBillName,
-				account: req.body.accountV2._id,
-				customer: aCustomer._id,
-				billName: req.body.bmBillName,
-			}
+				let oFilter = {
+					clientId: req.user.clientId,
+					name: req.body.bmBillName,
+				};
 
-			let aBillingParty = await billingPartyModel.findOneAndUpdate(oFilter, {$set: bpbody}, {
-				new: true,
-				upsert: true
-			});
+				let bpbody = {
+					created_at: Date.now(),
+					clientId: req.user.clientId,
+					name: req.body.bmBillName,
+					account: req.body.accountV2._id,
+					customer: aCustomer._id,
+					billName: req.body.bmBillName,
+				}
+
+				let aBillingParty = await billingPartyModel.findOneAndUpdate(oFilter, {$set: bpbody}, {
+					new: true,
+					upsert: true
+				});
 
 				// await billingPartyModel.updateOne({_id: billingParty._id},{$set:{customer:customer._id}});
-			req.body.brokerCustomer = aCustomer._id;
-			req.body.brokerCustName = aCustomer.name;
-			req.body.brokerbp = aBillingParty._id;
-			req.body.brokerbpName = aBillingParty.name;
+				req.body.brokerCustomer = aCustomer._id;
+				req.body.brokerCustName = aCustomer.name;
+				req.body.brokerbp = aBillingParty._id;
+				req.body.brokerbpName = aBillingParty.name;
+			}
 
 			return next();
 
@@ -507,5 +512,105 @@ router.delete('/delete/:_id',
     });
 
   });
+
+router.post('/updateUserNotifId/:_id', async function (req, res, next) {
+
+	try {
+
+		await UserModel.updateOne({
+			_id: req.params._id
+		},{
+			$set: {
+				notifId: req.body.notifId
+			},
+		});
+
+		return res.status(200).json({
+			'status': 'OK',
+			'message': 'Updated Successfully'
+		});
+
+	} catch (e) {
+		throw e;
+	}
+});
+
+router.post('/getUsertrim/', async function (req, res, next) {
+
+	try {
+
+		const aFoundUser = await UserModel.find({
+			'notifId': req.body.notifId,
+			'_id': {$ne: mongoose.Types.ObjectId(req.body._id)},
+		},{_id:1, userId:1,clientId:1,notifId:1}).lean();
+
+
+		if(aFoundUser && aFoundUser.length)
+			for(var i in aFoundUser) {
+				if(aFoundUser[i].clientId && aFoundUser[i].clientId[0]){
+					const aFoundData = await Client.findOne({
+						"clientId": aFoundUser[i].clientId[0],
+					},{_id:1, gpsId:1}).lean();
+					if(aFoundData){
+						aFoundUser[i].gpsId = aFoundData.gpsId;
+					}
+				}
+			}
+
+
+		return res.status(200).json({
+			'status': 'OK',
+			'message': 'Data Found',
+			data: aFoundUser
+		});
+
+	} catch (e) {
+		throw e;
+	}
+});
+
+router.post('/updateUserNotifId/:_id', async function (req, res, next) {
+
+	try {
+
+		await UserModel.updateOne({
+			_id: req.params._id
+		},{
+			$set: {
+				notifId: req.body.notifId
+			},
+		});
+
+		return res.status(200).json({
+			'status': 'OK',
+			'message': 'Updated Successfully'
+		});
+
+	} catch (e) {
+		throw e;
+	}
+});
+
+router.post('/removeUserNotifId/', async function (req, res, next) {
+
+	try {
+
+		await UserModel.updateMany({
+			_id: {$in: req.body._id}
+		},{
+			$set: {
+				notifId:1
+			},
+		});
+
+		return res.status(200).json({
+			'status': 'OK',
+			'message': 'Updated Successfully'
+		});
+
+	} catch (e) {
+		throw e;
+	}
+});
 
 module.exports = router;

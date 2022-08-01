@@ -164,9 +164,13 @@ function createVendorTransportAggrFilter(reqQuery) {
 			}else if (key === "name" || key === "email" || key === "contact_person_name" || key === "remark" || key === "area") {
                 fFilter[key] = { $regex: reqQuery[key].replace(' ','.+'), $options: 'i' };
             }
-			else if (key === "pan_no" || key === "ownershipType" || key === "category") {
+			else if (key === "pan_no" || key === "ownershipType" || (key === "category" && typeof reqQuery[key] !=='object')) {
 				fFilter[key] = { $regex: reqQuery[key].replace(' ','.+'), $options: 'i' };
 			}
+			else if (key === "category" && typeof reqQuery[key] =='object') {
+				fFilter[key] = reqQuery[key];
+			}
+
             /*else if (key === "prim_contact_no") {
 				fFilter[key] = { $regex: "/" + reqQuery[key] + "$/" };
             }*/

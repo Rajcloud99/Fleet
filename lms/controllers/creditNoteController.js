@@ -419,10 +419,12 @@ router.post('/creditNoteReport', async function (req, res, next) {
 		startDate.setSeconds(0);
 		startDate.setHours(0);
 		startDate.setMinutes(0);
+		startDate.setMilliseconds(0);
 		let nextDay = new Date(req.body.end_date);
 		nextDay.setHours(23);
 		nextDay.setMinutes(59);
 		nextDay.setSeconds(59);
+		nextDay.setMilliseconds(999);
 		const aggQuery1 = [{
 			$match:{billDate:{$gte:startDate,$lte:nextDay},
 				clientId:req.user.clientId,
@@ -519,6 +521,7 @@ router.post('/creditNoteReport', async function (req, res, next) {
 		]
 		let CreditData = await CreditNote.aggregate(aggQuery);
 		let BillData = await BillNew.aggregate(aggQuery1);
+
 		if(CreditData && CreditData[0]){
 			CreditData[0].totalApprovedBill = BillData[0].totalApprovedBill;
 			CreditData[0].totalWithoutGSTBill = BillData[0].totalWithoutGSTBill;
@@ -536,7 +539,7 @@ router.post('/creditNoteReport', async function (req, res, next) {
 			CreditData[0].count = BillData[0].count;
 		}
 		if (req.body.download) {
-			ReportExelService.creditNoteWise(CreditData[0].data, req.body.end_date, req.body.start_date, req.user.clientId, function (d) {
+			ReportExelService.creditNoteWise(CreditData[0] ? CreditData[0].data: [], req.body.end_date, req.body.start_date, req.user.clientId, function (d) {
 				return res.status(200).json({
 						'status': 'OK',
 						'message': 'report download available.',

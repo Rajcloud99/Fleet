@@ -3865,7 +3865,7 @@ router.post('/billingPartyWise', async function (req, res) {
 		]
 		let BillData = await Bill.aggregate(aggQuery);
 		if (req.body.download) {
-			ReportExelService.billingPartyWise(BillData[0].data, req.body.end_date, req.body.start_date, req.user.clientId, function (d) {
+			ReportExelService.billingPartyWise(BillData[0] && BillData[0].data, req.body.end_date, req.body.start_date, req.user.clientId, function (d) {
 				return res.status(200).json({
 						'status': 'OK',
 						'message': 'report download available.',

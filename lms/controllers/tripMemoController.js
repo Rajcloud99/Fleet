@@ -210,7 +210,7 @@ router.route('/custPaymentReceiptEdit').post(async function (req, res, next) {
 
 		if (nRefNo != oRefNo) {
 
-			let usedVoucher = await TripAdvances.findOne({
+			let usedVoucher = await Voucher.findOne({
 				refNo: refNo,
 				clientId: req.user.clientId,
 				deleted: {

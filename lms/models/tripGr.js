@@ -524,6 +524,11 @@ var tripGrSchema = new mongoose.Schema({
 			'dalaComission': Number,
 			'tds': Number,
 			'mamul': Number,
+			'dala_labour_challan': Number,
+			'other_expense': Number,
+			'driver_advance': Number,
+			'builty': Number,
+			'comission': Number
 		},
 		nbCharges: {                                //non-billable charges
 			'grCharges': Number,
@@ -761,11 +766,49 @@ var tripGrSchema = new mongoose.Schema({
 			payment_type: String,
 			weight_type: String,
 		},
+		tMemoReceipt: [{
+			voucher: {
+				type: mongoose.Schema.Types.ObjectId,
+				ref: 'Voucher'
+			},
+			branch: {
+				type: mongoose.Schema.Types.ObjectId,
+				ref: 'Branch',
+			},
+			fromAccount: {
+				type: mongoose.Schema.Types.ObjectId,
+				ref: 'accounts',
+			},
+			fromName: String,
+			toAccount: {
+				type: mongoose.Schema.Types.ObjectId,
+				ref: 'accounts'
+			},
+			toName: String,
+			trip_no: Number,
+			vehicle_no: String,
+			refNo: String,
+			stationaryId: {type: mongoose.Schema.Types.ObjectId, ref: 'billStationary'},
+			amount: Number,
+			remainingAmount: Number,
+			remark: String,
+			paymentDate: Date,
+			paymentMode: String,
+			paymentRef: String,
+			vT: String,
+			vAdv: String,      // all, advance, balance
+			grNumber: String,
+			tMemoNo: String,
+			created_by: String,
+			created_at: Date,
+		}],
 		bMemo: {                             // broker MEMO
 			vendor: {                  // Transport Vendor
 				type: mongoose.Schema.Types.ObjectId,
 				ref: 'VendorTransport'
 			},
+			vendorName: String,
+			podCustomer: String,
 			created_by: String,
 			createdAt: Date,
 			lastModifiedBy: String,
@@ -794,7 +837,7 @@ var tripGrSchema = new mongoose.Schema({
 			payment_type: String,
 			weight_type: String,
 		},
-		tMemoReceipt: [{
+		bMemoReceipt: [{
 			voucher: {
 				type: mongoose.Schema.Types.ObjectId,
 				ref: 'Voucher'
@@ -804,13 +847,13 @@ var tripGrSchema = new mongoose.Schema({
 				ref: 'Branch',
 			},
 			fromAccount: {
-					type: mongoose.Schema.Types.ObjectId,
-					ref: 'accounts',
+				type: mongoose.Schema.Types.ObjectId,
+				ref: 'accounts',
 			},
 			fromName: String,
 			toAccount: {
-					type: mongoose.Schema.Types.ObjectId,
-					ref: 'accounts'
+				type: mongoose.Schema.Types.ObjectId,
+				ref: 'accounts'
 			},
 			toName: String,
 			trip_no: Number,
@@ -826,7 +869,7 @@ var tripGrSchema = new mongoose.Schema({
 			vT: String,
 			vAdv: String,      // all, advance, balance
 			grNumber: String,
-			tMemoNo: String,
+			bMemoNo: String,
 			created_by: String,
 			created_at: Date,
 		}],
@@ -1354,7 +1397,7 @@ tripGrSchema.statics.paginate = async function (query) {
 	};
 
 
-	if (Object.keys(query.queryFilter).length < 3 && !query.bClientId && Object.keys(companyFilter).length == 0 &&
+	if (Object.keys(query.queryFilter).length < 4 && !query.bClientId && Object.keys(companyFilter).length == 0 &&
 		Object.keys(trip_query).length == 0 && Object.keys(bill_query).length == 0 && Object.keys(vehicle_query).length == 0) {
 		let nDays = 1;
 		let toDate = new Date();
@@ -1367,7 +1410,6 @@ tripGrSchema.statics.paginate = async function (query) {
 		};
 
 	}
-
 	let grAggQ = [
 		{$match: query.queryFilter},
 		/*
@@ -1566,7 +1608,7 @@ tripGrSchema.statics.paginate = async function (query) {
 		// SKIP
 		{$skip: ((query.no_of_docs * query.skip) - query.no_of_docs)},
 		// LIMIT
-		{$limit: query.no_of_docs},
+		{$limit: (query.no_of_docs || 10)},
 		// OTHER
 
 

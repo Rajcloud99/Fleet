@@ -646,6 +646,86 @@ router.route('/adm_update/:_id').put(validate(paramValidation.update_status), as
 		}
 		oRes.data = await oTrip.set(setObj).save();
 
+		//gps_km and gps_status
+		if( oTrip.statuses.filter(st => st.status === 'Trip ended') ){
+
+			let tripEndDate = req.body.updated_status && req.body.updated_status.date;
+			let tripStartDate = oTrip.statuses.filter(st => st.status === 'Trip started');
+			let grEndDate = oTrip.gr && oTrip.gr.statuses && oTrip.gr.statuses.filter(st => st.status === 'Loading Ended');
+			let tat_in_ms = ( (oTrip.vehicle && oTrip.vehicle.trip && oTrip.vehicle.trip.tat_hr ? oTrip.vehicle.trip.tat_hr : 0 ) * 3600000);
+			let tat_speed;
+			if(oTrip.vehicle && oTrip.vehicle.trip && oTrip.vehicle.trip.tat_hr > 1){
+				tat_speed = oTrip.vehicle && oTrip.vehicle.route && oTrip.vehicle.route.route_distance / ( ( oTrip.vehicle && oTrip.vehicle.trip && oTrip.vehicle.trip.tat_hr ? oTrip.vehicle.trip.tat_hr : null) * 3600000 )
+			}else{
+				tat_speed = null;
+			}
+			// let tripEndDate = oTrip.gr && oTrip.gr.loading_ended_status && oTrip.gr.loading_ended_status.date;
+			let delay_in_ms = ( oTrip.route ? (oTrip.route.route_distance/400) * 86400000 : 0 );
+			let distance_travelled;
+			if(oTrip.vehicle && oTrip.vehicle.trip && oTrip.vehicle.trip.trip_start_status && oTrip.vehicle.trip.trip_start_status.gpsData && oTrip.vehicle.trip.trip_start_status.gpsData.odo){
+				distance_travelled = [( oTrip.vehicle && oTrip.vehicle.gr && oTrip.vehicle.gr.vehicle_arrived_for_unloading_status && oTrip.vehicle.gr.vehicle_arrived_for_unloading_status.gpsData && oTrip.vehicle.gr.vehicle_arrived_for_unloading_status.gpsData.odo ?
+						oTrip.vehicle && oTrip.vehicle.gr && oTrip.vehicle.gr.vehicle_arrived_for_unloading_status && oTrip.vehicle.gr.vehicle_arrived_for_unloading_status.gpsData && oTrip.vehicle.gr.vehicle_arrived_for_unloading_status.gpsData.odo :
+						oTrip.vehicle && oTrip.vehicle.gpsData && oTrip.vehicle.gpsData.odo ) / 1000] -
+					[
+						oTrip.vehicle && oTrip.vehicle.trip && oTrip.vehicle.trip.trip_start_status && oTrip.vehicle.trip.trip_start_status.gpsData && oTrip.vehicle.trip.trip_start_status.gpsData.odo / 1000 || 1
+					]
+			}else{
+				distance_travelled = 0;
+			}
+			let expected_eta = ( new Date((grEndDate ? grEndDate : tripStartDate[0].date)).getTime() +
+				(tat_in_ms ? tat_in_ms : delay_in_ms) );
+			let current_eta; //no use yet
+			let current_delay_in_ms = (( (oTrip.vehicle && oTrip.vehicle.route && oTrip.vehicle.route.route_distance - distance_travelled) / 400) * 86400000);
+			let tat_delay_in_ms ;
+			if(tat_speed){
+				tat_delay_in_ms = (oTrip.vehicle && oTrip.vehicle.route && oTrip.vehicle.route.route_distance - distance_travelled) / tat_speed ;
+			}else{
+				tat_delay_in_ms = (oTrip.vehicle && oTrip.vehicle.route && oTrip.vehicle.route.route_distance - distance_travelled) /400;
+			}
+
+			if(new Date(tripEndDate).getTime() > expected_eta){
+				oTrip.v_status = 'Delay';
+				oTrip.live_status.delay = new Date(tripEndDate) - expected_eta ;
+			}
+			else if(new Date(tripEndDate).getTime() < expected_eta){
+				oTrip.v_status = 'Early';
+				oTrip.live_status.early = expected_eta - new Date(tripEndDate);
+			}
+			else if(new Date(tripEndDate).getTime() === expected_eta){
+				oTrip.v_status = 'On Time';
+			}
+			let gpsObj = {};
+			gpsObj.v_status = oTrip.v_status;
+			gpsObj.live_status = oTrip.live_status;
+
+			// await oTrip.set(gpsObj).save();
+			// await oTrip.set(gpsObj).save();
+
+			//distance_covered
+			// let grUnloadEnd = oTrip.gr && oTrip.gr.statuses && oTrip.gr.statuses.filter(st => st.status === 'Unloading Ended') || 0;
+			// let grUnloadingStarted = oTrip.gr && oTrip.gr.statuses && oTrip.gr.statuses.filter(st => st.status === 'Unloading Started') || 0;
+			// let grLoadingEnd = oTrip.gr && oTrip.gr.statuses && oTrip.gr.statuses.filter(st => st.status === 'Loading Ended') || 0;
+			// let grLoadingStarted = oTrip.gr && oTrip.gr.statuses && oTrip.gr.statuses.filter(st => st.status === 'Loading Started') || 0;
+			// let tripStarted = oTrip.statuses && oTrip.statuses.filter(st => st.status === 'Trip started');
+			// let tripEnded = oTrip.statuses && oTrip.statuses.filter(st => st.status === 'Trip Ended');
+			//
+			// oTrip.gpsKM =  [(grUnloadEnd[0] && grUnloadEnd[0].gpsData && grUnloadEnd[0].gpsData.odo ? grUnloadEnd[0] && grUnloadEnd[0].gpsData && grUnloadEnd[0].gpsData.odo :
+			// 		(grUnloadingStarted[0] && grUnloadingStarted[0].gpsData && grUnloadingStarted[0].gpsData.odo? grUnloadingStarted[0] && grUnloadingStarted[0].gpsData && grUnloadingStarted[0].gpsData.odo :
+			// 			tripEnded[0] && tripEnded[0].gpsData && tripEnded[0].gpsData.odo ))/1000 || 0 ] -
+			// 	[ (grLoadingEnd[0] && grLoadingEnd[0].gpsData && grLoadingEnd[0].gpsData.odo ?
+			// 		grLoadingEnd[0] && grLoadingEnd[0].gpsData && grLoadingEnd[0].gpsData.odo :
+			// 		(grLoadingStarted[0] && grLoadingStarted[0].gpsData && grLoadingStarted[0].gpsData.odo ?
+			// 			grLoadingStarted[0] && grLoadingStarted[0].gpsData && grLoadingStarted[0].gpsData.odo :
+			// 			tripStarted[0] && tripStarted[0].gpsData && tripStarted[0].gpsData.odo ) )/1000 || 0];
+			//
+			//
+			//
+			// if( oTrip.gpsKM < 0){
+			// 	gpsObj.gpsKM = oTrip.gpsKM * -1;
+			// }
+
+			await oTrip.set(gpsObj).save();
+		}
 		//send response
 		res.status(200).json(oRes);
 	} catch (err) {
@@ -4346,21 +4426,5 @@ function getDurationFromSecsInMinutes (dur) {
 	return mins;
 };
 
-function getDurationFromSecsWithColon (dur) {
-	if (dur < 60) return 0;
-	//let days = parseInt(dur / (60 * 60 * 24));
-	let hours = parseInt(dur / (60 * 60));
-	let mins = parseInt((dur % (60 * 60)) / 60);
-	let secs = parseInt(dur % 60);
-	//days = days > 0 ? days + ':' : '0:';
-	hours = hours > 0 ? hours + ':' : '0:';
-	mins = mins > 0 ? mins +':' : '0:';
-	secs = secs > 0 ? secs  : '0';
-
-	return hours + mins + secs;
-};
 module.exports = router;
 
-// module.exports = {
-// 	formatReportData
-// };

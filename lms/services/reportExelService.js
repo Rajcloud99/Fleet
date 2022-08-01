@@ -238,6 +238,20 @@ function saveFileAndReturnCallback(workbook, clientId, folderType, reportname, c
 	});
 }
 
+function saveFileAndReturnCallback1(workbook, clientId, folderType, reportname, callback) {
+	let dir = 'reports/' + clientId + '/' + folderType + '/';
+	filename = reportname + '_' + moment(new Date()).format("DD-MM-YYYY") + '.xlsx';
+	mkdirp.sync('../files/' + dir);
+	workbook.xlsx.writeFile('../files/' + dir + filename).then(function () {
+		callback({
+			url: 'http://' + commonUtil.getConfig('download_host') + ':' +
+				commonUtil.getConfig('download_port') + '/' + dir + filename,
+			dir: dir,
+			filename: filename
+		});
+	});
+}
+
 module.exports.generatePostProfitabilityExcel = function (data, clientData, callback) {
 	let workbook = new Excel.Workbook();
 	let ws = workbook.addWorksheet('Profitability Report');
@@ -1350,7 +1364,7 @@ module.exports.bankReconciliationledger = function (aData, from, to, clientId, c
 	setVal(ws1,'G',rowNum,'',{fill:'ccccff'});
 	setVal(ws1,'H',rowNum,'Balance as per Bank:',{fill:'ccccff'});
 	setVal(ws1,'I',rowNum,'',{fill:'ccccff'});
-	setVal(ws1,'J',rowNum++,(aData && aData.summary && ((aData.summary.cb - aData.summary.ob) - (aData.summary.tNclDr - aData.summary.tNclCr))  || 0),{fill:'ccccff'});
+	setVal(ws1,'J',rowNum++,(aData && aData.summary && ((aData.summary.cb - aData.summary.ob) + (aData.summary.tNclDr - aData.summary.tNclCr))  || 0),{fill:'ccccff'});
 	setVal(ws1,'A',rowNum,'',{fill:'ccccff'});
 	setVal(ws1,'B',rowNum,'',{fill:'ccccff'});
 	setVal(ws1,'C',rowNum,'',{fill:'ccccff'});
@@ -2838,7 +2852,7 @@ module.exports.generateGrExcel = function (aData, clientId, callback) {
 			row["GR ACKNOWLEDGE DATE"] = aData.data[i].acknowledge && moment(aData.data[i].acknowledge.systemDate).format("DD-MM-YYYY") || "NA";
 
 			row["PENDING REMARK"] = pendingRemark.join(' next ');
-			row["BILL NO"] = aData.data[i].billNo && aData.data[i].billNo[0] || "NA";
+			row["BILL NO"] = aData.data[i].billNo && aData.data[i].billNo || "NA";
 			row["BILL DATE"] = aData.data[i].billDate ? moment(aData.data[i].billDate).format("DD-MM-YYYY") : "NA";
 			//row["ADVANCE"] = aData.data[i].bill ? addInArrayOnKey(aData.data[i].bill.items, 'charges.advance') || 0 : 0;
 			row["ADVANCE"] = (aData.data[i] && aData.data[i].charges && aData.data[i].charges.advance) || 0;
@@ -6300,8 +6314,8 @@ module.exports.commonTripReportsAdvance = function (aData, req, callback) {
 	let workbook = new Excel.Workbook();
 	let ws1 = workbook.addWorksheet('Trip Advance');
 	//"Type","Driver No.","Source City","Destination City","Profit Margin","Actual Expense","Actual Profit"
-	let headers = ["S.No", "Vehicle No.", "vehicle Type","GR No","Trip Start", "HIRE SLIP No","Trip No.", "Customer","Route", "Deal Total",
-		"Revenue","Profit",'Fleet',"Bill No", "Bill Date","Source", "Destination", "Segment",  "Customer Category", "Kilometer",
+	let headers = ["S.No", "Vehicle No.", "vehicle Type","Foreman Name", "GR No","Trip Start", "HIRE SLIP No","Trip No.", "Customer","Route", "Deal Total",
+		"Revenue","Profit",'Fleet',"Bill No", "Bill Date","Source", "Destination", "Segment",  "Customer Category", "Kilometer","GPS KM",
 		"Internal Profit","Vendor Deal", "Cash Adv", "Total Advance/Paid", "Vendor Charges", "Vendor Deduction",
 		"TDS Amount", "TDS PERCENTAGE", "TDS Amt(Extra)", "Adv/KM", "TMemo Total", "Trip Type","Intermittent Stop", "Driver",
 		"Vendor Name","PAN CARD NO", "Trip Status", "Category", "Trip End", "Loading Ended", "Unloading Date", "Rate", "Basic Freight",
@@ -6346,7 +6360,7 @@ module.exports.commonTripReportsAdvance = function (aData, req, callback) {
 	headers.push("Closing balance");
 	let rowNum = 5;
 	formatTitle(ws1, headers.length, "Trip Hire Report");
-	formatColumnHeaders(ws1, 4, headers, [5, 15, 15,12, 15, 13, 13, 13, 13, 20, 15, 15, 15, 15, 20,20, 12, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 17, 15, 15, 10, 12, 20, 15, 20, 25, 25, 25,25, 25, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15]);
+	formatColumnHeaders(ws1, 4, headers, [5, 15, 15,15,12, 15, 13, 13, 13, 13, 20, 15, 15, 15, 15, 20,20, 12, 15, 15,15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 17, 15, 15, 10, 12, 20, 15, 20, 25, 25, 25,25, 25, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15]);
 
 	let cnt = 1;
 	aData.forEach(obj => {
@@ -6357,6 +6371,7 @@ module.exports.commonTripReportsAdvance = function (aData, req, callback) {
 		row["S.No"] = (cnt || 0);
 		row["Vehicle No."] = obj.vehicle_no || 'NA';
 		row["vehicle Type"] = obj.vehicle && obj.vehicle.veh_type_name || 'NA';
+		row["Foreman Name"] = obj.vehicle && obj.vehicle.owner_group || 'NA';
 		row["GR No"] = (obj.gr && obj.gr.map(o => o.grNumber).join(' , '))|| 'NA';
 		row["Trip Start"] = obj.trip_start_status ? moment(new Date(obj.trip_start_status.date)).format("DD-MM-YYYY") : 'NA';
 		row["HIRE SLIP No"] = obj.vendorDeal && obj.vendorDeal.loading_slip || 'NA';
@@ -6383,6 +6398,7 @@ module.exports.commonTripReportsAdvance = function (aData, req, callback) {
 		row["Segment"] = obj.segment_type || 'NA';
 		row["Customer Category"] = (obj.gr && obj.gr.map(o => o.customer && o.customer.category).join(' , ')) || 'NA';
 		row["Kilometer"] = obj.totalKm || 'NA';
+		row["GPS KM"] = parseFloat(obj && obj.playBack && (obj.playBack.tot_dist/1000).toFixed(2)) || 0;
 		row["Internal Profit"] = (row["Deal Total"] || 0) - (obj.vendorDeal && obj.vendorDeal.internalFreight || 0);
 		row['Vendor Deal'] = (obj.vendorDeal && obj.vendorDeal.totWithMunshiyana && parseFloat(obj.vendorDeal.totWithMunshiyana.toFixed(2) || 0));
 		row['Cash Adv'] = obj.totalCash && parseFloat(obj.totalCash.toFixed(2) || 0);
@@ -6563,6 +6579,41 @@ module.exports.reportTrialBalRep = function (aData, user, toDate, configs, callb
 	setVal(ws1,'D',rowNum,parseFloat((aData.obj.cr).toFixed(2)),{fill:'ccccff'});
 	setVal(ws1,'E',rowNum,parseFloat((aData.obj.dr).toFixed(2)),{fill:'ccccff'});
 	setVal(ws1,'F',rowNum,parseFloat((aData.obj.cb).toFixed(2)),{fill:'ccccff'});
+	saveFileAndReturnCallback(workbook, user, 'trialBal', 'trialBalanceReport', callback);
+};
+
+module.exports.reportTrialBalRep1 = function (aData, user, toDate, configs, callback) {
+	let workbook = new Excel.Workbook();
+	let ws1 = workbook.addWorksheet('Trial Balance Report');
+	formatTitle(ws1, 6,"Trial Balance As on Date : "+ moment(new Date(toDate)).format("DD-MM-YYYY"));
+	let headers = ['SrNo','Account','Credit','Debit'];
+
+	let rowNum = 5;
+	let obj = {
+		cr:0,
+		dr:0
+	}
+	formatColumnHeaders(ws1, 4, headers, [5, 30, 15,15]);
+	let cnt = 1;
+	for(let i= 0;i< aData.config.length;i++){
+		let data = aData.data[0][aData.config[i]._id.toString()]
+		if(!data.bal){
+			data.bal = {cr:0, dr:0 };
+		}
+		let row = {};
+		row['SrNo'] = (cnt || 0);
+		row['Account'] = (data && data.name) || 'NA';
+		row['Credit'] = parseFloat(data && data.bal && data.bal.cr && data.bal.cr.toFixed(2) || 0);
+		row['Debit'] = parseFloat(data && data.bal && data.bal.dr && data.bal.dr.toFixed(2) || 0);
+		obj.cr += (data.bal.cr || 0);
+		obj.dr += (data.bal.dr || 0);
+		addWorkbookRow(row, ws1, headers, (rowNum++));
+		cnt++;
+	}
+	setVal(ws1,'A',rowNum,'',{fill:'ccccff'});
+	setVal(ws1,'B',rowNum,'GRAND TOTAL',{fill:'ccccff'});
+	setVal(ws1,'C',rowNum,parseFloat((obj.cr).toFixed(2)),{fill:'ccccff'});
+	setVal(ws1,'D',rowNum,parseFloat((obj.dr).toFixed(2)),{fill:'ccccff'});
 	saveFileAndReturnCallback(workbook, user, 'trialBal', 'trialBalanceReport', callback);
 };
 
@@ -14010,7 +14061,7 @@ module.exports.creditNoteWise = function (aData, to, from, clientId, callback) {
 	saveFileAndReturnCallback(workbook, clientId, 'Credit Note Report', 'Credit Note Report', callback);
 };
 
-module.exports.rtGrossProfit = function (aData, from, to , clientId, callback) {
+module.exports.rtGrossProfit = function (aData, from, to , config, clientId, callback) {
 	let workbook = new Excel.Workbook();
 	let ws1 = workbook.addWorksheet('RT Gross Profit Report');
 	let fromDate = moment(from).format("DD-MM-YYYY");
@@ -14041,9 +14092,12 @@ module.exports.rtGrossProfit = function (aData, from, to , clientId, callback) {
 	};
 	let rowNum = 7;
 	formatColumnHeaders(ws1, 6, headers, [15,22, 20, 25, 15, 20, 22, 20, 20, 20,20,20,20]);
-	headerTopMerged(ws1, 'A1', 'C1', 'Caravan Project Logistics(Delhi)', option);
-	headerTopMerged(ws1, 'A2', 'C2', 'Ag-28, Sanjay Gandhi Transport Nagar', options);
-	headerTopMerged(ws1, 'A3', 'C3', 'Near G.T. Karnal Road Badli', options);
+    if(config) {
+		headerTopMerged(ws1, 'A1', 'C1', config.name, option);
+		headerTopMerged(ws1, 'A2', 'C2', config.address, options);
+		headerTopMerged(ws1, 'A3', 'C3', config.address2, options);
+	}
+
 	headerTopMerged(ws1, 'A4', 'C4', 'RT GROSS PROFIT REPORT' , option);
 	headerTopMerged(ws1, 'A5', 'C5', fromDate + ' ' + 'TO' + ' ' +  toDate , options);
 	let totalObj = {
@@ -14202,7 +14256,6 @@ module.exports.dailyMISreport = function (aData, clientData, clientId, callback)
 		"City Name",
 		"GR NO.",
 		"Cases",
-		"GR NO.",
 		"Gate out Date",
 		"REPORTING DATE",
 		"Delivery Status",
@@ -14388,7 +14441,7 @@ module.exports.jobOrderReport = function(aData, reqBody, clientId, callback){
 			row["Remaining Km To Next Point"] = oData.remainKM || 0;
 			row["Expected Time Of Arrival"] = oData.expectedArrival || "NA";
 			row["Predicated Time Of Arrival"] = oData.predecteArrival || "NA";
-			row["Predicted Delay"] = oData.predectedDelay ; // not clear by rajat
+			row["Predicted Delay"] = oData.predectedDelay; // not clear by rajat
 			row["TAT"] = (oData.tat_hr || "00") + " : " + (oData.tat_min || "00");
 			row["Actual TAT(Hrs)"] = oData.actualTAT || 0;
 			row["Package Count At Start Location"] = " ";
@@ -14404,7 +14457,12 @@ module.exports.jobOrderReport = function(aData, reqBody, clientId, callback){
 	}catch (e) {
 		throw e;
 	}
-	saveFileAndReturnCallback(workbook, clientId, 'JobOrder', 'JobOrderReport', callback);
+	if(reqBody.excel){
+		saveFileAndReturnCallback1(workbook, clientId, 'JobOrder', 'JobOrderReport', callback);
+	}else{
+		saveFileAndReturnCallback(workbook, clientId, 'JobOrder', 'JobOrderReport', callback);
+	}
+
 }
 
 module.exports.jobOrderRiskyReport = function(aData, reqBody, clientId, callback){
@@ -14550,3 +14608,4 @@ function numberToAlphabet(index) {
 
 	return (alpha[q] ? alpha[q] : '') + (alpha[r] ? alpha[r] : '');
 }
+

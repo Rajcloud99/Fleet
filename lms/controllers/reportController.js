@@ -2037,7 +2037,6 @@ router.get("/gr/aggregate", async function (req, res, next) {
 		let sort = {};
 		sort.sort = {};
 		sort.sort[req.query.aggregateBy] = 1;
-
 		const aggQuery = [
 			{$match: queryFilters},
 			// {$sort: {_id: -1}},
@@ -2050,7 +2049,7 @@ router.get("/gr/aggregate", async function (req, res, next) {
 				}
 			},
 			{
-				$unwind: {path: '$bills', preserveNullAndEmptyArrays: true}
+				$unwind: {path: '$bill', preserveNullAndEmptyArrays: true}
 
 			},
 			{
@@ -5247,7 +5246,15 @@ let constructFilters = function (query, allowedFilter) {
 		if (isAllowedFilter(i, allowedFilter)) {
 			if (i === 'start_date' && query.end_date) {
 				let startDate = new Date(query[i]);
+				startDate.setSeconds(0);
+				startDate.setHours(0);
+				startDate.setMinutes(0);
+				startDate.setMilliseconds(0);
 				let nextDay = new Date(query.end_date);
+				nextDay.setSeconds(59);
+				nextDay.setHours(23);
+				nextDay.setMinutes(59);
+				nextDay.setMilliseconds(999);
 				fFilter[dateKey] = {
 					"$gte": startDate,
 					"$lt": nextDay
@@ -6551,7 +6558,8 @@ router.post("/rtGrossProfit", async (req, res, next) => {
 
 		let data = await TripV2.aggregate(aggrQuery);
 		if (data.length) {
-				ReportExelService.rtGrossProfit(data,req.body.from,req.body.to, req.body.clientId, async function(d) {
+			let config = req.clientConfig && req.clientConfig.config && req.clientConfig.config.client_allowed && req.clientConfig.config.client_allowed[0]
+				ReportExelService.rtGrossProfit(data,req.body.from,req.body.to, config, req.body.clientId, async function(d) {
 					if(hasTimeoutExecuted){
 						await logsService.addLog('RTP Report', {
 							uif: "RTGrossProfit_" + moment().format('DD-MM-YYYY hh:mm'),

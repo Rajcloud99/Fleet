@@ -61,6 +61,7 @@ helpers = {
 	gt,
 	lte,
 	gte,
+	dashDate,
 	and,
 	assign,
 	or,
@@ -269,6 +270,11 @@ function checkLen(value) {
 	else {
 		return " "
 	}
+}
+
+function dashDate(date){
+	// date should  be in iso format
+	return (date) ? moment(date).utcOffset('+0530').format('DD-MM-YYYY') : "";
 }
 
 function add(v1, v2) {
@@ -888,7 +894,8 @@ function multiGrItem(oBill, applyCharges = true) {
 		oBill.aggTotFreight += oGr.totFreight;
 		oBill.totDetention += (oGr.detentionCharges || 0);
 		oBill.totOtherCharges += (oGr.otherCharges || 0);
-
+		let lastInv=oGr && oGr.gr && oGr.gr.invoices && oGr.gr.invoices.length-1;
+		oGr.gr.invoices[lastInv].grTotal=oGr.gr.totalFreight;
 		oBill.totalInvoice = oGr.gr.invoices.length;
 		oBill.source = oGr.gr.acknowledge.source;
 		oBill.destination = oGr.gr.acknowledge.destination;
@@ -970,7 +977,7 @@ function multiGrHero(oBill) {
 			oGr.ltapc=oGr.gr.standardTime;
 			oGr.delayedDays=oGr.alt-oGr.ltapc;
 			oGr.station=lowerToUpperFirstLetterOfWord(oGr.gr.acknowledge.destination);
-			oGr.dph=oGr.rate*((oGr.gr && oGr.gr.invoices && oGr.gr.invoices[0] && oGr.gr.invoices[0].dphRate||1)/100) ||  0;
+			oGr.dph=oGr.rate*((oGr.gr && oGr.gr.invoices && oGr.gr.invoices[0] && oGr.gr.invoices[0].dphRate||0)/100) ||  0;
 			oGr.capacity=oGr.gr && oGr.gr.invoices && oGr.gr.invoices[0] && oGr.gr.invoices[0].baseValueLabel;
 			oGr.igst=(oGr.rate+oGr.dph)*12/100 ||0;
 			oGr.totalAmount=oGr.rate+oGr.dph+oGr.igst ||0;
@@ -1755,6 +1762,7 @@ function tripMultiGr(billObj){
 			tripTotal+=oGr.gr.totalFreight;
 		});
 		oTrip[oTrip.length-1].tripTotAmt=tripTotal;
+		oTrip[oTrip.length-1].line=tripCount;
 	});
 }
 
@@ -1961,6 +1969,8 @@ function carvCalWithCharg(billObj) {
 	billObj.totalAmtSum = 0, billObj.igstAmountSum = 0, billObj.cgstAmountSum = 0, billObj.sgstAmountSum = 0 , billObj.grandTotalAmtSum = 0;
 	billObj.totalBags = 0;
 	billObj.totalWT = 0;
+	billObj.declaration2 = "We have taken registration under the CGST Act 2017and have exercised the option to pay tax on services of GTA in relation to transport of goods supplied by us during the financial year 2022-23 under forward charge.";
+    billObj.declaration1 =" We hereby declare that though our aggregate turnover in any preceding financial year from 2017-18 onwards is more than the aggregate turnover notified under sub rule (4) of rule 48,we are not required to prepare an invoice in terms of the provisions of the said sub-rule."
 	billObj.totalActualwtWT = 0;
 	billObj.cShortageAmtSum = 0;
 	billObj.cbasicFreightAmtSum = 0;

@@ -337,6 +337,7 @@ var UserSchema   = new mongoose.Schema(
 			ref: 'Customer'
 		},
 		brokerCustName :String,
+		notifId :String,           // notification id or user id
 	},
 	constant.timeStamps
 );

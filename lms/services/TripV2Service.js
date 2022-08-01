@@ -121,17 +121,17 @@ async function calculateOCBalance(body) {
 		let summary;
 		let date = body.rtDate || new Date();
 
-		if (!body.vehicle)
+		if (!body.driver)
 			throw new Error('vehicle  required.');
 
 		const foundTrips = await Trip.find({
 			clientId: body.clientId,
-			vehicle: body.vehicle,
+			driver: mongoose.Types.ObjectId(body.driver),
 			'advSettled.isCompletelySettled': true,
-			'markSettle.date': {
+			'end_date': {
 				$lte: new Date(date)
 			}
-		}).populate("payments").sort({'markSettle.date': -1}).lean();
+		}).populate("payments").sort({'end_date': -1}).lean();
 
 		let oTrip = [], rtNo;
 		if (Array.isArray(foundTrips) && foundTrips.length > 0) {
@@ -159,20 +159,20 @@ async function updateOCBalance(body) {
 		if (!body.rtDate)
 			throw new Error('Rt Date required.');
 
-		if (!body.vehicle)
-			throw new Error('vehicle  required.');
+		if (!body.driver)
+			throw new Error('Driver  required.');
 
 		let date = body.rtDate || new Date();
 
 		const aFoundRT = await Trip.find({
 			clientId: body.clientId,
-			vehicle: body.vehicle,
+			driver: mongoose.Types.ObjectId(body.driver),
 			'advSettled.isCompletelySettled': true,
 			'advSettled.tsNo': {$ne: body.tsNo},
-			'markSettle.date': {
+			'end_date': {
 				$gte: new Date(date),
 			}
-		}).sort({'markSettle.date': 1}).lean();
+		}).sort({'end_date': 1}).lean();
 
 		if (Array.isArray(aFoundRT) && !aFoundRT.length)
 			return true;
@@ -192,7 +192,8 @@ async function updateOCBalance(body) {
 						_id: aFoundRT[i]._id
 					},
 					{
-						$inc: {"advSettled.openingBal": -delta}
+						$inc: {"advSettled.openingBal": -delta,
+							   "advSettled.closingBal": -delta}
 					});
 			}
 		}
@@ -3653,6 +3654,7 @@ const tripReport = async (req, res, next) => {
 			'created_at': true,
 			'clientId': true,
 			'trip_no': true,
+			'playBack':true,
 			'documents': true,
 			'status': true,
 			'last_modified_at': true,
@@ -6556,6 +6558,84 @@ async function update_status(req, res, next) {
 			}
 		}
 
+		//gps_km and gps_status
+		if(req.body.status === 'Trip ended'){
+
+			let tripEndDate = req.body.date;
+			let tripStartDate = oTrip.statuses.filter(st => st.status === 'Trip started');
+			let grEndDate = oTrip.gr && oTrip.gr.statuses && oTrip.gr.statuses.filter(st => st.status === 'Loading Ended');
+			let tat_in_ms = ( (oTrip.vehicle && oTrip.vehicle.trip && oTrip.vehicle.trip.tat_hr ? oTrip.vehicle.trip.tat_hr : 0 ) * 3600000);
+			let tat_speed;
+			if(oTrip.vehicle && oTrip.vehicle.trip && oTrip.vehicle.trip.tat_hr > 1){
+				tat_speed = oTrip.vehicle && oTrip.vehicle.route && oTrip.vehicle.route.route_distance / ( ( oTrip.vehicle && oTrip.vehicle.trip && oTrip.vehicle.trip.tat_hr ? oTrip.vehicle.trip.tat_hr : null) * 3600000 )
+			}else{
+				tat_speed = null;
+			}
+			// let tripEndDate = oTrip.gr && oTrip.gr.loading_ended_status && oTrip.gr.loading_ended_status.date;
+			let delay_in_ms = ( oTrip.route ? (oTrip.route.route_distance/400) * 86400000 : 0 );
+			let distance_travelled;
+			if(oTrip.vehicle && oTrip.vehicle.trip && oTrip.vehicle.trip.trip_start_status && oTrip.vehicle.trip.trip_start_status.gpsData && oTrip.vehicle.trip.trip_start_status.gpsData.odo){
+				distance_travelled = [( oTrip.vehicle && oTrip.vehicle.gr && oTrip.vehicle.gr.vehicle_arrived_for_unloading_status && oTrip.vehicle.gr.vehicle_arrived_for_unloading_status.gpsData && oTrip.vehicle.gr.vehicle_arrived_for_unloading_status.gpsData.odo ?
+						oTrip.vehicle && oTrip.vehicle.gr && oTrip.vehicle.gr.vehicle_arrived_for_unloading_status && oTrip.vehicle.gr.vehicle_arrived_for_unloading_status.gpsData && oTrip.vehicle.gr.vehicle_arrived_for_unloading_status.gpsData.odo :
+						oTrip.vehicle && oTrip.vehicle.gpsData && oTrip.vehicle.gpsData.odo ) / 1000] -
+					[
+						oTrip.vehicle && oTrip.vehicle.trip && oTrip.vehicle.trip.trip_start_status && oTrip.vehicle.trip.trip_start_status.gpsData && oTrip.vehicle.trip.trip_start_status.gpsData.odo / 1000 || 1
+					]
+			}else{
+				distance_travelled = 0;
+			}
+			let expected_eta = ( new Date((grEndDate ? grEndDate : tripStartDate[0].date)).getTime() +
+				(tat_in_ms ? tat_in_ms : delay_in_ms) );
+			let current_eta; //no use yet
+			let current_delay_in_ms = (( (oTrip.vehicle && oTrip.vehicle.route && oTrip.vehicle.route.route_distance - distance_travelled) / 400) * 86400000);
+			let tat_delay_in_ms ;
+			if(tat_speed){
+				tat_delay_in_ms = (oTrip.vehicle && oTrip.vehicle.route && oTrip.vehicle.route.route_distance - distance_travelled) / tat_speed ;
+			}else{
+				tat_delay_in_ms = (oTrip.vehicle && oTrip.vehicle.route && oTrip.vehicle.route.route_distance - distance_travelled) /400;
+			}
+
+			if(new Date(tripEndDate).getTime() > expected_eta){
+				oTrip.v_status = 'Delay';
+				oTrip.live_status.delay = new Date(tripEndDate) - expected_eta ;
+			}
+			else if(new Date(tripEndDate).getTime() < expected_eta){
+				oTrip.v_status = 'Early';
+				oTrip.live_status.early = expected_eta - new Date(tripEndDate);
+			}
+			else if(new Date(tripEndDate).getTime() === expected_eta){
+				oTrip.v_status = 'On Time';
+			}
+			let gpsObj = {};
+			gpsObj.v_status = oTrip.v_status;
+			gpsObj.live_status = oTrip.live_status;
+
+			// await oTrip.set(oTrip.v_status).save();
+			// await oTrip.set(oTrip.live_status).save();
+
+			//distance_covered
+			// let grUnloadEnd = oTrip.gr && oTrip.gr.statuses && oTrip.gr.statuses.filter(st => st.status === 'Unloading Ended') || 0;
+			// let grUnloadingStarted = oTrip.gr && oTrip.gr.statuses && oTrip.gr.statuses.filter(st => st.status === 'Unloading Started') || 0;
+			// let grLoadingEnd = oTrip.gr && oTrip.gr.statuses && oTrip.gr.statuses.filter(st => st.status === 'Loading Ended') || 0;
+			// let grLoadingStarted = oTrip.gr && oTrip.gr.statuses && oTrip.gr.statuses.filter(st => st.status === 'Loading Started') || 0;
+			// let tripStarted = oTrip.statuses && oTrip.statuses.filter(st => st.status === 'Trip started');
+			// let tripEnded = oTrip.statuses && oTrip.statuses.filter(st => st.status === 'Trip Ended');
+			//
+			// oTrip.gpsKM =  [(grUnloadEnd[0] && grUnloadEnd[0].gpsData && grUnloadEnd[0].gpsData.odo ? grUnloadEnd[0] && grUnloadEnd[0].gpsData && grUnloadEnd[0].gpsData.odo :
+			// 	(grUnloadingStarted[0] && grUnloadingStarted[0].gpsData && grUnloadingStarted[0].gpsData.odo? grUnloadingStarted[0] && grUnloadingStarted[0].gpsData && grUnloadingStarted[0].gpsData.odo :
+			// 		tripEnded[0] && tripEnded[0].gpsData && tripEnded[0].gpsData.odo ))/1000 || 0 ] -
+			// 	[ (grLoadingEnd[0] && grLoadingEnd[0].gpsData && grLoadingEnd[0].gpsData.odo ?
+			// 		grLoadingEnd[0] && grLoadingEnd[0].gpsData && grLoadingEnd[0].gpsData.odo :
+			// 		(grLoadingStarted[0] && grLoadingStarted[0].gpsData && grLoadingStarted[0].gpsData.odo ?
+			// 			grLoadingStarted[0] && grLoadingStarted[0].gpsData && grLoadingStarted[0].gpsData.odo :
+			// 			tripStarted[0] && tripStarted[0].gpsData && tripStarted[0].gpsData.odo ) )/1000 || 0];
+			//
+			//
+			// if( oTrip.gpsKM < 0)
+			// 	gpsObj.gpsKM = oTrip.gpsKM * -1;
+			await oTrip.set(gpsObj).save();
+		}
+
 		//send response
 		res.status(200).json(oRes);
 		if(oTrip && oTrip.device && oTrip.device.imei){
@@ -7125,6 +7205,14 @@ async function addAdvance(req, res, next) {
 
 			if (oTrip && oTrip.markSettle && oTrip.markSettle.isSettled)
 				throw new Error(`Trip Advance Cannot be added. Because Trip no ${oTrip.trip_no} is Marked Settled`);
+
+			if (req.clientConfig.config && req.clientConfig.config.tripAdv && req.clientConfig.config.tripAdv.tripSusnotAllow) {
+				let date = new Date(oTrip.start_date);
+				date.setHours(0,0,0,0);
+				if (oTrip.start_date && !(new Date(date) <= new Date(req.body.date) && (oTrip.end_date ? new Date(oTrip.end_date): new Date()) > new Date(req.body.date))) {
+					throw new Error(`Trip Advance Cannot be added. Because Trip no ${oTrip.trip_no} is not exist in this date`);
+				}
+			}
 		}
 
 		if (prepareAdvanceObj.advanceType === 'Diesel') {
@@ -7753,6 +7841,8 @@ async function revertSettleCompletely(req, res, next) {
 			'advSettled.tsNo': req.body.tsNo
 		}).lean();
 
+		let last_trip_end_date = aFoundTrips[aFoundTrips.length - 1].end_date;
+
 		let voucherId;
 		let aVoucherVal = [];
 		// Delete Voucher
@@ -7788,6 +7878,7 @@ async function revertSettleCompletely(req, res, next) {
 			$set:{'advSettled.isCompletelySettled': false,'onUpdDate':new Date()},
 			$unset: {
 				'advSettled.openingBal': 1,
+				'advSettled.closingBal': 1,
 				'advSettled.date': 1,
 				'advSettled.systemDate': 1,
 				'advSettled.aVoucher': 1,
@@ -7800,8 +7891,8 @@ async function revertSettleCompletely(req, res, next) {
 		});
 
 		await updateOCBalance({
-			rtDate: aFoundTrips[0].markSettle.date,
-			vehicle: aFoundTrips[0].vehicle._id,
+			rtDate: last_trip_end_date,
+			driver: aFoundTrips[0].driver && aFoundTrips[0].driver._id || aFoundTrips[0].driver,
 			clientId: req.user.clientId,
 			'tsNo': req.body.tsNo
 		});
@@ -7859,36 +7950,32 @@ async function settleCompletely(req, res, next) {
 			message: 'Trip Completely Settled Successfully'
 		};
 
-		let aFoundTrips,foundSettleTrip, summaryData, openingBal;
+		let aFoundTrips, summaryData, openingBal, closingBal;
 
-		try {
-			aFoundTrips = await Trip.find(
-				{
-					clientId: req.user.clientId,
-					'advSettled.tsNo': req.body.tsNo
-				}).populate([
-				{
-					path: 'payments',
-					model: Voucher
-				}
-			]);
+		let oTripFil = {
+			clientId: req.user.clientId,
+			'advSettled.tsNo': req.body.tsNo
+		};
+		let aggrPipe = [
+			{$match:oTripFil},
+			{$sort:{end_date:1}},
+			{$project:{_id:1,advSettled:1,markSettle:1,vehicle:1,driver:1,end_date:1}}
+		];
+		 aFoundTrips = await Trip.aggregate(aggrPipe);
 
-		} catch (e) {
-			res.status(400).json({
-				status: "Error",
-				message: e,
-				error: true,
-				data: 'No Trip found'
-			});
-			return;
-		}
 		if(!aFoundTrips.length)
 			throw new Error('No Trip found');
 
+		if(aFoundTrips[0].advSettled.isCompletelySettled) {
+			throw new Error(`Trips of RT-${req.body.tsNo} Already Settled`);
+		}
+		// creating voucher for advance and settlement
+		let last_trip_end_date = aFoundTrips[aFoundTrips.length - 1].end_date;
+
 		let calOCBalance = {
 			clientId: req.user.clientId,
-			vehicle: req.body.vehicle,
-			rtDate: aFoundTrips[0].markSettle.date || new Date(),
+			driver: req.body.driver && req.body.driver._id || req.body.driver || aFoundTrips[0].driver,
+			rtDate: last_trip_end_date || aFoundTrips[0].markSettle.date || new Date(),
 			tsNo: req.body.tsNo
 		};
 
@@ -7935,7 +8022,7 @@ async function settleCompletely(req, res, next) {
 						// stationaryId: obj.stationaryId,
 						isEditable: false,
 						narration: ptr.narration,
-						date: new Date(req.body.date),
+						date: last_trip_end_date || new Date(req.body.date),
 						// branch: obj.branch,
 						createdBy: req.body.created_by_name,
 
@@ -7948,20 +8035,39 @@ async function settleCompletely(req, res, next) {
 					aVoucher.push(_id);
 				}
 
-				for (let k in aFoundTrips)
-					if (aFoundTrips.hasOwnProperty(k)) {
-						let o = aFoundTrips[k];
-						o.set({
-							'advSettled.openingBal': openingBal || req.body.openingBal,
-							'advSettled.isCompletelySettled': true,
-							'advSettled.date': new Date(req.body.date),
-							'advSettled.systemDate': new Date(),
-							'advSettled.aVoucher': aVoucher,
-							'advSettled.remark': req.body.remark,
-							'advSettled.user_full_name': req.user.full_name
-						});
-						await o.save();
-					}
+				let aRts = [];
+				for(let t=0;t<aFoundTrips.length;t++){
+					aRts.push(aFoundTrips[t]._id);
+				}
+				let oUps = {
+					'advSettled.openingBal': openingBal || req.body.openingBal,
+					'advSettled.closingBal': closingBal || req.body.closingBal,
+					'advSettled.isCompletelySettled': true,
+					'advSettled.date': new Date(req.body.date),
+					'advSettled.systemDate': new Date(),
+					'onUpdDate':new Date(),
+					'advSettled.aVoucher': aVoucher,
+					'advSettled.remark': req.body.remark,
+					'advSettled.user_full_name': req.user.full_name
+				};
+				let oResT = await Trip.updateMany({_id:{$in:aRts}},{$set:oUps});
+				res.status(200).json(oRes);
+
+				// for (let k in aFoundTrips)
+				// 	if (aFoundTrips.hasOwnProperty(k)) {
+				// 		let o = aFoundTrips[k];
+				// 		o.set({
+				// 			'advSettled.openingBal': openingBal || req.body.openingBal,
+				// 			'advSettled.closingBal': closingBal || req.body.closingBal,
+				// 			'advSettled.isCompletelySettled': true,
+				// 			'advSettled.date': new Date(req.body.date),
+				// 			'advSettled.systemDate': new Date(),
+				// 			'advSettled.aVoucher': aVoucher,
+				// 			'advSettled.remark': req.body.remark,
+				// 			'advSettled.user_full_name': req.user.full_name
+				// 		});
+				// 		await o.save();
+				// 	}
 
 				if (req.body.date) {
 					try {
@@ -7981,8 +8087,8 @@ async function settleCompletely(req, res, next) {
 				let aVch = await VoucherServiceV2.importAccounts(req, res, next);
 
 
-				oRes.data =  Trip.eachTripSummary(aFoundTrips);
-				oRes.summary = await Trip.tripSummary(oRes.data);
+				// oRes.data =  Trip.eachTripSummary(aFoundTrips);
+				// oRes.summary = await Trip.tripSummary(oRes.data);
 				res.status(200).json(oRes);
 
 			} else {
@@ -8198,11 +8304,12 @@ const findByAdvanceDate = async (req, res, next) => {
 			message: 'Provide vehicle_no and advanceDate both in body',
 		});
 	}
+	let proj = req.body.project ||{};
 	let tripOnThatVehicle = await Trip.findByAdvanceDate({
 		clientId: req.user.clientId,
 		vehicle_no: req.body.vehicle_no,
 		advanceDate: req.body.advanceDate,
-	});
+	},proj);
 	return res.status(200).json({
 		status: 'SUCCESS',
 		message: 'Trip found',
@@ -9555,6 +9662,173 @@ async function tripsheetSummary(req, res, next){
 	}
 }
 
+async function formatReportData(tripData){
+	for(let i=0;i<tripData.length;i++){
+		let oData = tripData[i];
+		if (oData.geofence_points && oData.geofence_points.length) {//reomove fence id so that unique point created for each geofence
+			let findSource = oData.geofence_points.find((item) => item.type === "Source");
+			let findDestination = oData.geofence_points.find((item) => item.type === "Destination");
+			if(findSource && findSource.events && findSource.events.length){
+				for (let x = findSource.events.length-1; x > -1; x--) {
+					if(findSource.events[x].entry ==  true){
+						var sourceEntryDate = findSource.events[x].datetime;
+						tripData[i].sourceEntryDate = sourceEntryDate;
+						break;
+					}
+				}
+				for (let x = findSource.events.length-1; x > -1; x--) {
+					if(findSource.events[x].entry ==  false){
+						var sourceExitDate = findSource.events[x].datetime;
+						tripData[i].sourceExitDate = sourceExitDate;
+						break;
+					}
+				}
+			}
+			if(findDestination && findDestination.events && findDestination.events.length){
+				for (let x = findDestination.events.length-1; x > -1; x--) {
+					if(findDestination.events[x].entry ==  true){
+						var destEntryDate = findDestination.events[x].datetime;
+						tripData[i].destEntryDate = destEntryDate;
+						break;
+					}
+				}
+				for (let x = findDestination.events.length-1; x > -1; x--) {
+					if(findDestination.events[x].entry ==  false){
+						var destExitDate = findDestination.events[x].datetime;
+						tripData[i].destExitDate = destExitDate;
+						break;
+					}
+				}
+			}
+		}
+		if(oData.alert && oData.alert.length){
+			tripData[i].ha = oData.alert.find((item) => item.code === "ha");
+			tripData[i].hb = oData.alert.find((item) => item.code === "hb");
+			tripData[i].over_speed = oData.alert.find((item) => item.code === "over_speed");
+		}
+		tripData[i].currentLocation = oData.currentLocation ? oData.currentLocation : oData.vehicle && oData.vehicle.gpsData && oData.vehicle.gpsData.address || "NA";
+		tripData[i].currentStatus = oData.currentStatus ? oData.currentStatus : oData.vehicle && oData.vehicle.gpsData && oData.vehicle.gpsData.status || "NA";
+		tripData[i].loadingDuration = tripData[i].sourceEntryDate && tripData[i].sourceExitDate && getDuration(tripData[i].sourceEntryDate,tripData[i].sourceExitDate) || "NA";
+		tripData[i].unLoadingDuration = tripData[i].destExitDate ? (tripData[i].destEntryDate && getDuration(tripData[i].destEntryDate,tripData[i].destExitDate)) : (tripData[i].end_date ? (tripData[i].destEntryDate && getDuration(tripData[i].destEntryDate,tripData[i].end_date)) : "NA");
+		tripData[i].stopTime = oData.playBack && (oData.playBack.dur_stop/60).toFixed(2);
+		tripData[i].jobDistance = tripData[i].end_date ? (parseFloat(tripData[i] && tripData[i].playBack && (tripData[i].playBack.tot_dist/1000).toFixed(2)) || 0) : tripData[i].distance_travelled;
+		tripData[i].scheduleDistance = tripData[i].route && tripData[i].route.route_distance || 0;
+		tripData[i].delay = tripData[i].end_date && tripData[i].start_date && (((getDurationInMinute(oData.start_date,oData.end_date) - oData.tat_min ) || 0) > 0 ? ((('+' + getDurationInMinute(oData.start_date,oData.end_date) - oData.tat_min) || 0) + "M " + "late" ) : (((getDurationInMinute(oData.start_date,oData.end_date) - oData.tat_min) || 0) + "M " + "early")) || 0;
+		tripData[i].jobEta = tripData[i].end_date && tripData[i].start_date && getDurationInMinute(oData.start_date,oData.end_date) > (oData.tat_min || 0) ? "Late" : (oData.end_date && oData.start_date && getDurationInMinute(oData.start_date,oData.end_date) < (oData.tat_min || 0)  ? "Early" : "On Time");
+		tripData[i].duration = tripData[i].end_date && tripData[i].start_date && getDuration(oData.start_date,oData.end_date) || "NA";
+		tripData[i].jobCompleted = tripData[i].end_date ? "100%" : parseFloat(((tripData[i].jobDistance/tripData[i].scheduleDistance) * 100).toFixed(2)) > 100 ? "100%" : parseFloat(((tripData[i].jobDistance/tripData[i].scheduleDistance) * 100).toFixed(2)) ;
+		tripData[i].remainKM = (tripData[i].scheduleDistance > tripData[i].jobDistance) ? (tripData[i].scheduleDistance - tripData[i].jobDistance) : 0;
+		tripData[i].expectedArrival = tripData[i].expected_eta && moment(new Date(tripData[i].expected_eta)).format("DD-MM-YYYY HH:mm") || "NA";
+		tripData[i].predecteArrival = tripData[i].current_eta && moment(new Date(tripData[i].current_eta)).format("DD-MM-YYYY HH:mm") || "NA";
+		tripData[i].predectedDelay = getDuration(tripData[i].expected_eta,tripData[i].current_eta) || "NA";
+		tripData[i].actualTAT = tripData[i].end_date && tripData[i].start_date && parseFloat((getDurationInHours(tripData[i].start_date,tripData[i].end_date)).toFixed(2));
+	}
+	return tripData;
+}
+
+async function formatJobRiskyReportData(tripData){
+	for(let i=0;i<tripData.length;i++){
+		let  dur = tripData[i].start_date && tripData[i].end_date && (new Date(tripData[i].end_date).getTime() - new Date(tripData[i].start_date).getTime());
+		let oData = tripData[i];
+		tripData[i].dur = dur /60;
+		if(oData.alert && oData.alert.length){
+			tripData[i].power_cut = oData.alert.find((item) => item.code === "power_cut");
+		}
+		tripData[i].stoppage = oData.playBack && oData.playBack.stoppage ? oData.playBack.stoppage : 0;
+		tripData[i].idleStoppage = oData.playBack && oData.playBack.idleStoppage ? oData.playBack.idleStoppage : 0;
+		tripData[i].distance = oData.route && oData.route.route_distance || "NA";
+		tripData[i].riskyPoints = 0;
+		tripData[i].stoppage1 = tripData[i].stoppage > 5 ? "High Risk" : (tripData[i].stoppage < 3 ? "No Risk" : "Medium Risk");
+		tripData[i].distance1 = tripData[i].distance > 700 ? "High Risk" : (tripData[i].distance < 636 ? "No Risk" : "Medium Risk");
+		tripData[i].delayJobs = tripData[i].dur > 2100 ? "High Risk" : (tripData[i].dur < 1500 ? "No Risk" : "Medium Risk");
+		tripData[i].riskyPoints1 =  tripData[i].riskyPoints < 1 ? "No Risk"  :  "High Risk" ;
+		tripData[i].stoppage2 = tripData[i].stoppage > 5 ? 5 : (tripData[i].stoppage1 < 3 ? 0 : 3);
+		tripData[i].distance2 = tripData[i].distance > 700 ? 5 : (tripData[i].distance < 636 ? 0 : 3);
+		tripData[i].delayJobs1 = tripData[i].dur > 2100 ? 5 : (tripData[i].dur < 1500 ? 0 : 3);
+		tripData[i].riskyPoints2 = tripData[i].riskyPoints < 1 ? 0 : 5 ;
+		tripData[i].totalScore = 20 - (tripData[i].stoppage2  + tripData[i].riskyPoints2);
+		tripData[i].grade = tripData[i].totalScore > 15 ? "A" : (tripData[i].totalScore > 10 ? "B" : (tripData[i].totalScore > 5 ? "C" : "D"));
+		tripData[i].riskLevel = tripData[i].grade === "B" ? "High Risk" : (tripData[i].grade === "B" ? "High Risk" :"Medium Risk" );
+		tripData[i].jobTransitTime = oData.start_date && oData.end_date && getDuration(oData.start_date,oData.end_date) || "NA";
+
+
+	}
+	return tripData;
+}
+
+async function formatPlaybackData(data){
+	let obj = {
+		trip_id:data && data.trips && data.trips['0'] && data.trips['0'].trip_id,
+		vehicle_No:data && data.trips && data.trips['0'] && data.trips['0'].truck_number,
+		tel:data && data.trips && data.trips['0'] && data.trips['0'].tel,
+		invoice:data && data.trips && data.trips['0'] && data.trips['0'].invoice,
+		start:{
+			"latitude": data && data.trips && data.trips['0'] && data.trips['0'].origin && data.trips['0'].origin.loc[0],
+			"longitude": data && data.trips && data.trips['0'] && data.trips['0'].origin && data.trips['0'].origin.loc[1]
+		},
+		stop: {
+			"latitude": data && data.trips && data.trips['0'] && data.trips['0'].destination && data.trips['0'].destination.loc[0],
+			"longitude": data && data.trips && data.trips['0'] && data.trips['0'].destination && data.trips['0'].destination.loc[1]
+		},
+		start_time: data && data.trips && data.trips['0'] && data.trips['0'].start_time,
+		stop_addr: data && data.trips && data.trips['0'] && data.trips['0'].last_loc && data.trips['0'].last_loc.address,
+		status: data && data.trips && data.trips['0'] && data.trips['0'].trip_status,
+		eta: data && data.trips && data.trips['0'] && data.trips['0'].eta,
+		last_loc: data && data.trips && data.trips['0'] && data.trips['0'].last_loc,
+		destination_out: data && data.trips && data.trips['0'] && data.trips['0'].destination_out,
+		total_halt_time: data && data.trips && data.trips['0'] && data.trips['0'].total_halt_time,
+		rmDist: data && data.trips && data.trips['0'] && data.trips['0'].last_loc && data.trips['0'].last_loc.distance_remained || 0,
+		points:[]
+	}
+	for(const d of data && data.trips && data.trips['0'] && data.trips['0'].halts){
+		let haltData = {};
+		haltData.place_name =  d.place_name;
+		haltData.start_time =  d.start_time;
+		haltData.leaving_time =  d.leaving_time;
+		haltData.km =  d.km;
+		haltData.lat =  d.latitude;
+		haltData.lng = d.longitude;
+		haltData.latitude = d.latitude;
+		haltData.longitude = d.longitude;
+		haltData.datetime =  new Date(d.start_time);
+		haltData.duration = getDuration(d.start_time,d.leaving_time) || "NA";
+		obj.points.push(haltData);
+	}
+
+	return obj;
+}
+
+function getDuration (start, end) {
+	start = new Date(start);
+	end = new Date(end);
+	const dur = end.getTime() - start.getTime();
+	return getDurationFromSecs(parseInt(dur / 1000));
+};
+
+function getDurationInHours (start, end) {
+	start = new Date(start);
+	end = new Date(end);
+	let dur = end.getTime() - start.getTime();
+	dur = parseInt(dur/1000);
+	let days = parseInt(dur / (60 * 60 * 24));
+	let hours = parseInt((dur % (60 * 60 * 24)) / (60 * 60));
+	let totalHrs = (days * 24) + hours;
+	return totalHrs;
+};
+
+function getDurationFromSecs (dur) {
+	if (dur < 60) return dur + ' Sec ';
+	let days = parseInt(dur / (60 * 60 * 24));
+	let hours = parseInt((dur % (60 * 60 * 24)) / (60 * 60));
+	let mins = parseInt((dur % (60 * 60)) / 60);
+	days = days > 0 ? days + ' D ' : '';
+	hours = hours > 0 ? hours + ' H ' : '';
+	mins = mins > 0 ? mins + ' M ' : '';
+	return days + hours + mins;
+};
+
+
+
 module.exports = {
 	add,
 	createTrip,
@@ -9614,5 +9888,8 @@ module.exports = {
 	tripCmprTable,
 	// vehicleCmprTable,
 	tripsheetSummary,
-	addGrNumber
+	addGrNumber,
+	formatReportData,
+	formatJobRiskyReportData,
+	formatPlaybackData
 };

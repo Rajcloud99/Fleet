@@ -2,7 +2,7 @@ let moment = require("moment");
 let Trip = commonUtil.getModel('trip');
 let tripHireReport = {};
 
-tripHireReport.headers = ["S.No", "Vehicle No.", "GR No", "Bill No", "Bill Date", "Source", "Destination", "Trip Start", "HIRE SLIP No.", "Segment", "Trip No.", "Customer", "Customer Category","Billing Party", "Route", "Kilometer", "Deal Total",
+tripHireReport.headers = ["S.No", "Vehicle No.","Foreman Name", "GR No", "Bill No", "Bill Date", "Source", "Destination", "Trip Start", "HIRE SLIP No.", "Segment", "Trip No.", "Customer", "Customer Category","Billing Party", "Route", "Kilometer","GPS KM","Gps Status" ,"Deal Total",
 	"Revenue", "Profit", "Internal Profit", "Vendor Deal", "Cash Adv", "Total Advance/Paid", "Vendor Charges", "Vendor Deduction", "TDS Amount", "TDS PERCENTAGE", "TDS Amt(Extra)", "Adv/KM", "Driver", "Vendor Name",
 	"PAN CARD NO", "Trip Status", "Category", "Trip End", "Loading Ended", "Unloading Date", "Rate", "Basic Freight", "Ownership", "Branch", "COMPANY", "Id", "Remark", "Hire Party Remark", "VENDOR ADVANCE PAID", "PAY BY CHEQUE",
 	"PAY BY BROKER", "PAY BY DIESEL", "PAY BY CASH", "REMAINING AMOUNT", "Deal Date"
@@ -13,7 +13,17 @@ let count = 1;
 
 tripHireReport.transform =  function (obj) {
 	obj =   Trip.eachTripSummary([obj]);
-
+    function testNum(a){
+		let result;
+		if(obj.status == 'Trip ended'){
+		  result = 'not on Trip';
+		}else if(obj.status == 'Trip started'){
+		  result = 'Delayed';
+		}else{
+			result = 'NA'
+		}
+		return result;
+}
 	try {
 		obj = obj[0];
 		let row = {};
@@ -58,6 +68,7 @@ tripHireReport.transform =  function (obj) {
 
 		// row["S.No"] = (count++);
 		row["Vehicle No."] = obj.vehicle_no || 'NA';
+		row["Foreman Name"] = obj.vehicle && obj.vehicle.owner_group || 'NA';
 		row["GR No"] = (obj.gr && obj.gr.map(o => o.grNumber).join(' , ') ) || 'NA';
 		// row["Gr No."] = obj.grNumber ? (obj.grNumber).toString().trim() : 'NA';
 		row["Bill No"] = (obj.bills && obj.bills.billNo) || 'NA';
@@ -75,6 +86,8 @@ tripHireReport.transform =  function (obj) {
 		row["Billing Party"] = obj.billingParty && obj.billingParty.name || 'NA';
 		row["Route"] = obj.route_name || obj.rName ||  'NA';
 		row["Kilometer"] = obj.totalKm || obj.rKm || 'NA';
+		row["GPS KM"] = parseFloat(obj && obj.playBack && (obj.playBack.tot_dist/1000).toFixed(2)) || 0;
+		row["Gps Status"] =  testNum(obj.status) || 'NA';
 		row['Deal Total'] = obj.vendorDeal && obj.vendorDeal.totalDeal && parseFloat(obj.vendorDeal.totalDeal.toFixed(2) || 0);
 		for (let j = 0; j < obj.gr.length; j++) {
 			row["Revenue"] = (row["Revenue"] || 0) + (obj.gr[j].totalFreight || 0);
@@ -149,4 +162,5 @@ function formatDate(date){
 function round(num){
 	return Math.round(num * 100)/100 || 0;
 }
+
 module.exports = tripHireReport;

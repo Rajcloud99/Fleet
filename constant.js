@@ -315,7 +315,7 @@ constant.aExpenseType = ['Spare','Tyre','Other'];
 
 constant.aOwnershipVendor = ["Associate", "Market"];
 
-constant.aVendorCategory = ["Owner", "Broker"];
+constant.aVendorCategory = ["Owner", "Broker","Transporter"];
 
 constant.aOwnershipVehicle = ["Own", "Associate", "Market", "Sold"];
 

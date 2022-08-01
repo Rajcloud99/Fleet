@@ -73,7 +73,8 @@ var registeredVehicleSchema = new mongoose.Schema({
 					type: [Number],
 					default: [0, 0]
 				}
-			}
+			},
+			f_lvl:Number
 		},
 		"mTrack": {
 			address: String,

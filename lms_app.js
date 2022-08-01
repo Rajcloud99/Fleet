@@ -346,7 +346,7 @@ app.configureRoutes = function () {
 	app.use('/documents', commonUtil.getController('document'));
 	app.use('/api/dashboard', commonUtil.getController('dashBoard'));
 	app.use('/api/roles', commonUtil.getController('roles'));
-	app.use('/api/users', authUtil.authenticateRoutes, commonUtil.getController('users'));
+	app.use('/api/users',commonUtil.getController('users'));
 	app.use('/api/department', authUtil.authenticateRoutes, commonUtil.getController('department'));
 	app.use('/api/client', authUtil.authenticateRoutes, commonUtil.getController('client'));
 	app.use('/api/material', commonUtil.getController('material'));

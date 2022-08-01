@@ -142,6 +142,8 @@ function constructFilters(oQuery) {
 						oFilter[i] = {
 							$ne: oQuery[i]
 						};
+					else
+						oFilter[i] = oQuery[i];
 				} else {
 					oFilter[i] = oQuery[i];
 				}
@@ -1998,7 +2000,6 @@ router.post('/checkAdvCrDr', async (req, res, next) => {
 
 router.post('/upload', upload.single('advancesExcel'), async (req, res, next) => {
 	try {
-
 		if (!(req.clientData.accountDetails && req.clientData.accountDetails.fastagMaster)) {
 			return next(new Error('Add fastagMaster account in client collection'));
 		}
@@ -2187,7 +2188,7 @@ router.post('/upload', upload.single('advancesExcel'), async (req, res, next) =>
 				}
 			}
 		}
-        if(partialAdvances.length > 100){
+		if(partialAdvances.length > 100){
 			let str = partialAdvances.length + ' advances request is being processed. Please wait until all advances are uploaded. Please status check in csv in log.  Thank you!';
 			res.status(200).json({
 				status: 'OK',
@@ -2205,6 +2206,7 @@ router.post('/upload', upload.single('advancesExcel'), async (req, res, next) =>
 		});
 		let aRefs = [];
 		let refMap = {};
+		let length = completeAdvances.length;
 		for (let a = 0; a < completeAdvances.length; a++) {
             if(!completeAdvances[a]) continue;
 			let costAcc;
@@ -2473,7 +2475,6 @@ router.post('/upload', upload.single('advancesExcel'), async (req, res, next) =>
 				}
 			}
 		}
-
 		let refExist = await TripAdvance.aggregate([{
 			$match: {reference_no: {$in: aRefs}, clientId: req.user.clientId}
 		}, {$project: {date:1, advanceType: 1, reference_no: 1, vehicle_no: 1, editable: 1, linkable: 1}}]);
@@ -2493,12 +2494,14 @@ router.post('/upload', upload.single('advancesExcel'), async (req, res, next) =>
 					"REJECTION REASON": "Reference no already exists"
 				});
 				strRef = strRef + "  " + refExist[r].reference_no;
+				let index = completeAdvances.findIndex(item => item.reference_no == refExist[r].reference_no);
+				completeAdvances.splice(index,1);
 			}
-			return res.status(200).json({
-				status: 'OK',
-				message: "Reference no already exists " + strRef,
-				stats
-			});
+			// return res.status(200).json({
+			// 	status: 'OK',
+			// 	message: "Reference no already exists " + strRef,
+			// 	stats
+			// });
 			/*
 
 			if (!stats) stats = [];
@@ -2558,7 +2561,6 @@ router.post('/upload', upload.single('advancesExcel'), async (req, res, next) =>
 			}
 			*/
 		}
-
 		let q = {refNos: aRefs, clientId: req.user.clientId, deleted: false, no_of_docs: 2000};
 		let refVExist = await VoucherServiceV2.findVoucherByQueryAsync(q, {refNo: 1});
 		if (refVExist && refVExist.length) {
@@ -2571,16 +2573,17 @@ router.post('/upload', upload.single('advancesExcel'), async (req, res, next) =>
 					"REJECTION REASON": "ref No  in account already used"
 				});
 				strRef = strRef + "  " + refVExist[r].refNo;
+				let index = completeAdvances.findIndex(item => item.reference_no == refVExist[r].refNo);
+				completeAdvances.splice(index,1);
 			}
 			global.TRIP_ADVANCES_UPLOADING = false;
-			return res.status(200).json({
-				status: 'OK',
-				message: "Ref No already used please check in downloaded CSV " + strRef,
-				stats
-			});
+			// return res.status(200).json({
+			// 	status: 'OK',
+			// 	message: "Ref No already used please check in downloaded CSV " + strRef,
+			// 	stats
+			// });
 			telegram.sendMessage("Ref No already used in accounts " + strRef + " " + config.serverName, req.user.full_name);
 		}
-
 		let completeAdvancesTemp = [], advanceTypeStop, advanceStatus ;
 		for (let a = 0; a < completeAdvances.length; a++) {
 			if (req.clientConfig.config.tripAdv && req.clientConfig.config.tripAdv.tripSusnotAllow) {
@@ -2596,8 +2599,8 @@ router.post('/upload', upload.single('advancesExcel'), async (req, res, next) =>
 							advSettled: 1,
 							markSettle:1,
 							start_date:1,
-							end_date:1,
-						});
+							end_date:1
+						}).lean();
 						if (trip && trip.length > 0) {
 							trip = trip[trip.length - 1];
 							if (trip.advSettled && trip.advSettled.isCompletelySettled) {
@@ -2607,7 +2610,7 @@ router.post('/upload', upload.single('advancesExcel'), async (req, res, next) =>
 									'VEHICLE NO': completeAdvances[a].vehicle_no,
 									'REFERENCE NO': completeAdvances[a].reference_no,
 									"STATUS": "FAIL",
-									"REJECTION REASON": "Trip is alredy completely settled"
+									"REJECTION REASON": "Trip is already completely settled"
 								});
 							}
 							if (trip.markSettle && trip.markSettle.isSettled) {
@@ -2620,16 +2623,53 @@ router.post('/upload', upload.single('advancesExcel'), async (req, res, next) =>
 									"REJECTION REASON": "Trip is already mark settled"
 								});
 							}
-							if (trip.start_date && !(new Date(trip.start_date) < new Date(completeAdvances[a].date) && new Date(trip.end_date) > new Date(completeAdvances[a].date))) {
+							let date = new Date(completeAdvances[a].date);
+							date.setHours(23,59,59,999);
+							let tripWithDate = await Trip.findOne({
+								vehicle:oVehicle._id ,
+								start_date: {$lte: new Date(date)},
+								$or: [{end_date: {$exists: false}}, {end_date: {$gte: new Date(date)}}]
+							},{
+								trip_no: 1,
+								_id: 1,
+								advSettled: 1,
+								markSettle:1,
+								start_date:1,
+								end_date:1,
+							}).lean();
+							if(tripWithDate){
+								if (tripWithDate.advSettled && tripWithDate.advSettled.isCompletelySettled) {
+									stats.push({
+										'ADVANCE DATE': moment(completeAdvances[a].date).format("DD-MM-YYYY"),
+										'ADVANCE TYPE': completeAdvances[a].advanceType,
+										'VEHICLE NO': completeAdvances[a].vehicle_no,
+										'REFERENCE NO': completeAdvances[a].reference_no,
+										"STATUS": "FAIL",
+										"REJECTION REASON": "Trip is already completely settled"
+									});
+								}
+								if (tripWithDate.markSettle && tripWithDate.markSettle.isSettled) {
+									stats.push({
+										'ADVANCE DATE': moment(completeAdvances[a].date).format("DD-MM-YYYY"),
+										'ADVANCE TYPE': completeAdvances[a].advanceType,
+										'VEHICLE NO': completeAdvances[a].vehicle_no,
+										'REFERENCE NO': completeAdvances[a].reference_no,
+										"STATUS": "FAIL",
+										"REJECTION REASON": "Trip is already mark settled"
+									});
+								}
+							}
+							if(!tripWithDate && new Date(completeAdvances[a].date) < new Date(trip.start_date)){
 								stats.push({
 									'ADVANCE DATE': moment(completeAdvances[a].date).format("DD-MM-YYYY"),
 									'ADVANCE TYPE': completeAdvances[a].advanceType,
 									'VEHICLE NO': completeAdvances[a].vehicle_no,
 									'REFERENCE NO': completeAdvances[a].reference_no,
 									"STATUS": "FAIL",
-									"REJECTION REASON": "Trip not found in this date"
+									"REJECTION REASON": "Trip is not exist in this date"
 								});
-							} else {
+							}
+							else {
 								advanceTypeStop = completeAdvances[a].advanceType;
 								advanceStatus= completeAdvances[a].status;
 								completeAdvancesTemp.push(completeAdvances[a]);
@@ -2669,14 +2709,12 @@ router.post('/upload', upload.single('advancesExcel'), async (req, res, next) =>
 				completeAdvancesTemp.push(completeAdvances[a]);
 			}
 		}
-
 		let rejectCnt = 0;
 		let msg;
-		if (completeAdvances.length - completeAdvancesTemp.length) {
-			msg = (completeAdvances.length - completeAdvancesTemp.length) + " rejected ,  ";
-			rejectCnt = completeAdvances.length - completeAdvancesTemp.length;
+		if (length - completeAdvancesTemp.length) {
+			msg = (length - completeAdvancesTemp.length) + " rejected ,  ";
+			rejectCnt = length - completeAdvancesTemp.length;
 		}
-
 		completeAdvances = completeAdvancesTemp;
 		msg = partialAdvances.length + ' advances request is being processed. Please wait until all advances are uploaded. Please check status in csv log.  Thank you!';
 		if(partialAdvances.length < 101){
@@ -2723,7 +2761,6 @@ router.post('/upload', upload.single('advancesExcel'), async (req, res, next) =>
 				}
 			}).filter(a => a !== null);
 		}
-
 		let aBatchSize = 30;
 		if (tripAdvUp.length > aBatchSize) {
 			let nC = parseInt(tripAdvUp.length / aBatchSize);
@@ -2739,10 +2776,8 @@ router.post('/upload', upload.single('advancesExcel'), async (req, res, next) =>
 		} else if (tripAdvUp.length) {
 			let tT = await TripAdvance.bulkWrite(tripAdvUp, {ordered: false});
 		}
-
 		global.TRIP_ADVANCES_UPLOADING = false;
 		telegram.sendMessage(tripAdvUp.length + " Adv uploaded  " + config.serverName, req.user.full_name);
-
 		if((req && req.clientConfig && req.clientConfig.config && req.clientConfig.config.tripAdv && req.clientConfig.config.tripAdv.automap) || (req && req.clientConfig && req.clientConfig.config && req.clientConfig.config.tripAdv && req.clientConfig.config.tripAdv.tripSusnotAllow)){
 			if (tripUpdateOp.length > aBatchSize) {
 				let nM = parseInt(tripUpdateOp.length / aBatchSize);

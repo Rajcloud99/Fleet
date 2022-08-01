@@ -91,6 +91,14 @@
 	"Add": true,
 	"Update": true
   },
+  "Sensor": {
+	"Read": true,
+	"Add": true,
+	"Update": true,
+	"Download": true,
+	"Upload": true,
+	"Delete": true
+  },
   "Customer": {
 	"Read": true,
 	"Add": true,
@@ -984,6 +992,9 @@
 	"Read": true
   },
   "Analytics": {
+	"Read": true
+  },
+  "Fuel Level": {
 	"Read": true
   },
   "GPS Reports": {

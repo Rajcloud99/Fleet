@@ -12,13 +12,13 @@ const HEADER_FILL = {
 
 const HEADERS = [
 	// {key: 'GR ID', value: 'GR ID', width: 0},
-	{key: 'trip_no', value: "TRIP NO.", width: 8 , style: {fill: HEADER_FILL}},
+	{key: 'tripNo', value: "TRIP NO.", width: 8 , style: {fill: HEADER_FILL}},
 	{key: 'tripStartDate', value: "TRIP START DATE", width: 15 , style: {fill: HEADER_FILL}},
 	{key: 'tripEndDate', value: "TRIP END DATE", width: 15 , style: {fill: HEADER_FILL}},
 	{key: 'gateoutDate', value: "GATE OUT DATE", width: 15 , style: {fill: HEADER_FILL}},
 	{key: 'status', value: "GR STATUS", width: 8 , style: {fill: HEADER_FILL}},
 	{key: 'statusDate', value: "GR STATUS DATE", width: 8 , style: {fill: HEADER_FILL}},
-	{key: 'grNumber', value: "GR NO.", width: 15 , style: {fill: HEADER_FILL}},
+	{key: 'grNo', value: "GR NO.", width: 15 , style: {fill: HEADER_FILL}},
 	{key: 'grDate', value: "GR DATE", width: 15 , style: {fill: HEADER_FILL}},
 	// {key: 'loadingDate', value: "LOADING DATE", width: 15 , style: {fill: HEADER_FILL}},
 	{key: 'vehicle_no', value: "VEHICLE NO.", width: 15 , style: {fill: HEADER_FILL}},
@@ -78,6 +78,7 @@ const HEADERS = [
 	{key: 'arNo', value: "AR NO", width: 15 , style: {fill: HEADER_FILL}},
 	{key: 'arDate', value: "AR DATE", width: 15 , style: {fill: HEADER_FILL}},
 	{key: 'eWayBills', value: "EWAY BILLS", width: 15 , style: {fill: HEADER_FILL}},
+	{key: 'eWayBills', value: "EWAY BILL DATE", width: 15 , style: {fill: HEADER_FILL}},
 	{key: 'remarks', value: "GR REMARK", width: 15 , style: {fill: HEADER_FILL}},
 	{key: 'arRemark', value: "POD REMARK", width: 15 , style: {fill: HEADER_FILL}},
 	{key: 'entryBy', value: "ENTRY BY", width: 15 , style: {fill: HEADER_FILL}},
@@ -172,7 +173,7 @@ module.exports = class {
 		row['LAST KNOWN DATE'] = (doc.vehicle && doc.vehicle.last_known && doc.vehicle.last_known.datetime) || 'NA';
 		row[this.configName(this.configs, 'status', "GR STATUS")] = doc.status || 'NA';
 		row[this.configName(this.configs, 'statusDate', "GR STATUS DATE")] = doc.statuses && doc.statuses.find(st => st.status === doc.status) ? moment(new Date(doc.statuses.find(st => st.status === doc.status).date)).utcOffset(0, true).toDate() : 'NA';
-		row[this.configName(this.configs, 'grNumber', "GR NO.")] = doc.grNumber ? (doc.grNumber).toString().trim() : 'NA';
+		row[this.configName(this.configs, 'grNo', "GR NO.")] = doc.grNumber ? (doc.grNumber).toString().trim() : 'NA';
 		row[this.configName(this.configs, 'grDate', "GR DATE")] = doc.grDate ? moment(doc.grDate).utcOffset(0, true).toDate() : 'NA';
 		// row[this.configName(this.configs, 'loadingDate', "LOADING DATE")] = doc.statuses && doc.statuses.find(st => st.status === 'Loading Ended') ? moment(new Date(doc.statuses.find(st => st.status === 'Loading Ended').date)).utcOffset(0, true).toDate() : 'NA';
 		row[this.configName(this.configs, 'vehicle_no', "VEHICLE NO.")] = (doc.trip && doc.trip.vehicle_no) || 'NA';
@@ -228,12 +229,13 @@ module.exports = class {
 		row[this.configName(this.configs, 'ref2', "REF2")] = doc.invoices && doc.invoices.map(o => o.ref2).join(' ,') || 'NA';
 		row[this.configName(this.configs, 'ref3', "REF3")] = doc.invoices && doc.invoices.map(o => o.ref3).join(' ,') || 'NA';
 		row[this.configName(this.configs, 'ref4', "REF4")] = doc.invoices && doc.invoices.map(o => o.ref4).join(' ,') || 'NA';
-		row[this.configName(this.configs, 'eWayBills', "EWAY BILLS")] = doc.eWayBills ? doc.eWayBills.map(o => o.number+'('+moment(o.expiry).format("DD-MM-YYYY")+')').join(' ,') : 'NA';
+		row[this.configName(this.configs, 'eWayBills', "EWAY BILLS")] = doc.eWayBills ? doc.eWayBills.map(o => o.number +'('+moment(o.expiry).format("DD-MM-YYYY")+')').join(' ,') : 'NA';
+		row[this.configName(this.configs, 'eWayBills', "EWAY BILL DATE")] = doc.eWayBills && doc.eWayBills[0] && doc.eWayBills[0].expiry ? moment(doc.eWayBills[0].expiry).format("DD-MM-YYYY") : 'NA';
 		row[this.configName(this.configs, 'remarks', "GR REMARK")] = doc.remarks || 'NA';
 		row[this.configName(this.configs, 'arRemark', "POD REMARK")] = doc.pod && doc.pod.arRemark || 'NA';
-		let grAss = doc.statuses.find(st => st.status === 'GR Assigned');
-		row[this.configName(this.configs, 'entryBy', "ENTRY BY")] = grAss && grAss.user_full_name || 'NA';
-		row[this.configName(this.configs, 'entryAt', "ENTRY AT")] = grAss && grAss.date ? moment(grAss.date).utcOffset(0, true).toDate() : 'NA';
+		// let grAss = doc.statuses.find(st => st.status === 'GR Assigned');
+		row[this.configName(this.configs, 'entryBy', "ENTRY BY")] = doc.created_by_full_name || 'NA';
+		row[this.configName(this.configs, 'entryAt', "ENTRY AT")] = doc.created_at ? moment(doc.created_at).utcOffset(0, true).toDate() : 'NA';
 		row[this.configName(this.configs, 'ownershipType', "OWNERSHIP")] = (doc.trip && doc.trip.ownershipType) || 'NA';
 		// row[this.configName(this.configs, 'routeName', "ROUTE NAME")] = (doc.trip && doc.trip.route_name) || 'NA';
 		let mrRec = (((doc.moneyReceipt && doc.moneyReceipt.totalMrAmount) || 0) + ((doc.moneyReceipt && doc.moneyReceipt.deduction) || 0));
@@ -258,7 +260,6 @@ module.exports = class {
 		row[this.configName(this.configs, 'billingUnloadingTime', 'UNLOADING DATE')] = (doc.pod && doc.pod.billingUnloadingTime) ? moment(doc.pod.billingUnloadingTime).utcOffset(0, true).toDate() : 'NA';
 		row['UNLOADING TIME'] = (doc.pod && doc.pod.billingUnloadingTime) ? moment(doc.pod.billingUnloadingTime).format("HH:mm") : 'NA';
 		// row[this.configName(this.configs, 'vendorRemark', 'HIRE PARTY REMARK')] = doc.trip && doc.trip.vendorDeal && doc.trip.vendorDeal.remark || 'NA';
-		//console.log(row);
 		this.worksheet.addRow(row).commit();
 	}
 

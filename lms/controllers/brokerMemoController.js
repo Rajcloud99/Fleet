@@ -1,5 +1,7 @@
 let router = require('express').Router();
 let GR = commonUtil.getModel('tripGr');
+let Voucher = commonUtil.getModel('voucher');
+const billStationaryService = commonUtil.getService('billStationary');
 const brokerMemoService = commonUtil.getService('brokerMemo');
 
 /** Get broker Memos */
@@ -53,5 +55,177 @@ router.route('/update/:_id').post(async function (req, res, next) {
 			'message': 'Mandatory fields are required'
 		});
 });
+
+router.route('/multiPaymentAdd').post(async function (req, res, next) {
+
+	try {
+
+		let aBrokerMemo = req.body;
+
+		if (!aBrokerMemo.length)
+			throw new Error('Mandatory Fields are required');
+
+		let refNo = aBrokerMemo[0].refNo;
+		let stationaryId = aBrokerMemo[0].stationaryId;
+
+		let foundVouch= await Voucher.find({
+			refNo: refNo,
+			clientId: req.user.clientId,
+			deleted: {
+				$not: {
+					$eq: true
+				}
+			},
+		});
+
+		if (foundVouch.length)
+			throw new Error('Reference No. already used');
+
+		//Find stationary number if stationary id not provided to maintain 1 to 1 binding of stationary and Ref No.
+		if (!stationaryId) {
+			let foundStationary = await billStationaryService.findByRefAndType({
+				bookNo: refNo,
+				type: 'Ref No',
+				clientId: req.user.clientId
+			});
+
+			if (foundStationary) {
+				stationaryId = foundStationary._id;
+
+				req.body.forEach(o => {
+					o.stationaryId = stationaryId;
+				});
+			}
+		}
+
+		if (stationaryId && (await billStationaryService.isUsed(stationaryId)))
+			throw new Error('Reference No. already used');
+
+		next();
+
+	} catch (e) {
+		return res.status(500).json({
+			status: 'ERROR',
+			message: e.toString(),
+		});
+	}
+
+}, brokerMemoService.multiPaymentAdd);
+
+router.route('/multiPaymentEdit').post(async function (req, res, next) {
+
+	try {
+
+		let refNo = req.body.refNo;
+		let aBrokerMemo = req.body.aBrokerMemo;
+
+		if (!refNo) {
+			return res.status(500).json({
+				status: 'ERROR',
+				message: 'Reference no. is a required field',
+			});
+		}
+
+		let foundVouch = await Voucher.findOne({
+			refNo: refNo,
+			clientId: req.user.clientId,
+			deleted: {
+				$not: {
+					$eq: true
+				}
+			},
+		});
+
+		if (!(foundVouch && foundVouch._id))
+			throw new Error('No Voucher Found');
+
+		let nStationaryId = aBrokerMemo[0].stationaryId;
+		let oStationaryId = foundVouch.stationaryId;
+
+		let nRefNo = aBrokerMemo[0].refNo;
+		let oRefNo = foundVouch.refNo;
+
+		if (!nStationaryId) {
+			let foundStationary = await billStationaryService.findByRefAndType({
+				bookNo: nRefNo,
+				type: 'Ref No',
+				clientId: req.user.clientId
+			});
+
+			if (foundStationary) {
+				nStationaryId = foundStationary._id;
+
+				aBrokerMemo.forEach(o => {
+					o.stationaryId = nStationaryId;
+				});
+			}
+		}
+
+		if (nRefNo != oRefNo) {
+
+			let usedVoucher = await Voucher.findOne({
+				refNo: refNo,
+				clientId: req.user.clientId,
+				deleted: {
+					$not: {
+						$eq: true
+					}
+				},
+			});
+
+			if (usedVoucher && usedVoucher._id)
+				throw new Error('Reference No. already used');
+
+			if (nStationaryId && (await billStationaryService.isUsed(nStationaryId)))
+				throw new Error('Reference No. already used');
+
+			await billStationaryService.setUnset({
+				modelName: 'voucher',
+				userName: req.user.full_name,
+			}, {
+				refNo: nRefNo,
+				stationaryId: nStationaryId
+			}, {
+				refNo: oRefNo,
+				stationaryId: oStationaryId
+			});
+
+		}
+
+		next();
+
+	} catch (e) {
+		return res.status(500).json({
+			status: 'ERROR',
+			message: e.toString(),
+		});
+	}
+
+}, brokerMemoService.multiPaymentEdit);
+
+router.route('/multiPaymentDel').put(async function (req, res, next) {
+
+	try {
+
+		let refNo = req.body.refNo;
+
+		if (!refNo) {
+			return res.status(500).json({
+				status: 'ERROR',
+				message: 'Reference no. is a required field',
+			});
+		}
+
+		next();
+
+	} catch (e) {
+		return res.status(500).json({
+			status: 'ERROR',
+			message: e.toString(),
+		});
+	}
+
+}, brokerMemoService.multiPaymentDel);
+
 
 module.exports = router;

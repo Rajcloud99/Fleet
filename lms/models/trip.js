@@ -299,6 +299,13 @@ let tripSchema = new mongoose.Schema({
 			remark: String,
 			gpsData: Object,
 		}],
+		gpsKM : Number,
+		v_status : String,
+		live_status : {
+			delay : Number,
+			early : Number,
+			on_time : Number
+		},
 		gr: [{
 			type: mongoose.Schema.Types.ObjectId,
 			ref: 'TripGr'
@@ -904,7 +911,7 @@ tripSchema.statics.findByAdvanceDateAdvUpV2 = function (filterQuery, proj = {}) 
 	]);
 };
 
-tripSchema.statics.findByAdvanceDate = function (filterQuery, proj = {}) {
+tripSchema.statics.findByAdvanceDate = function (filterQuery, proj ={}) {
 	let startOfTheAdvanceDay = new Date(filterQuery.advanceDate),
 		endOfTheAdvanceDay = new Date(filterQuery.advanceDate);
 	startOfTheAdvanceDay.setHours(0, 0, 0, 0);
@@ -1148,6 +1155,20 @@ tripSchema.statics.findByAdvanceDate = function (filterQuery, proj = {}) {
 		{
 			$unwind: {
 				path: '$driver',
+				preserveNullAndEmptyArrays: true
+			}
+		},
+		{
+			$lookup: {
+				from: 'transportroutes',
+				localField: 'route',
+				foreignField: '_id',
+				as: 'route'
+			}
+		},
+		{
+			$unwind: {
+				path: '$route',
 				preserveNullAndEmptyArrays: true
 			}
 		},
@@ -1540,21 +1561,52 @@ tripSchema.statics.eachTripSummary =  function (aTrip, configs) {
 		}
 		*/
 		/***************************** block start ******************/
-		// calculate net budget
-		if (oTrip.serviceTyp && oTrip.vehicle && oTrip.vehicle.current_budget && oTrip.vehicle.current_budget[oTrip.serviceTyp] && oTrip.vehicle.current_budget[oTrip.serviceTyp].rpk) {
-			oTrip.netBudget = (oTrip.vehicle.current_budget[oTrip.serviceTyp].rpk * oTrip.totalKm) || 0;
-		} else if(oTrip.vehicle && oTrip.vehicle.current_budget && oTrip.vehicle.current_budget.rpk) {
-			oTrip.netBudget = (oTrip.vehicle.current_budget.rpk * oTrip.totalKm) || 0;
-		}
+		//route wise budgeting calculation
+		if(configs && configs.tripAdv && configs.tripAdv.AdvisedBudget) {
+			if (oTrip.tripBudget && oTrip.totalKm) {
+				oTrip.netBudget = 0;
+				oTrip.dieselBudgetLtr = 0;
+				if(oTrip.tripBudget.rateKm) {
+					oTrip.netBudget = (oTrip.tripBudget.rateKm * oTrip.totalKm) || 0;
+				}
+				if(oTrip.tripBudget.dieselKm) {
+					oTrip.dieselBudgetLtr = oTrip.totalKm / (oTrip.tripBudget.dieselKm) || 0;
+					oTrip.dieselBudgetLtr = Math.round(oTrip.dieselBudgetLtr * 100) / 100;
+				}
+			} else {
+				// calculate net budget
+				if (oTrip.serviceTyp && oTrip.vehicle && oTrip.vehicle.current_budget && oTrip.vehicle.current_budget[oTrip.serviceTyp] && oTrip.vehicle.current_budget[oTrip.serviceTyp].rpk) {
+					oTrip.netBudget = (oTrip.vehicle.current_budget[oTrip.serviceTyp].rpk * oTrip.totalKm) || 0;
+				} else if (oTrip.vehicle && oTrip.vehicle.current_budget && oTrip.vehicle.current_budget.rpk) {
+					oTrip.netBudget = (oTrip.vehicle.current_budget.rpk * oTrip.totalKm) || 0;
+				}
 
-		// calculate diesel budget
-		if(oTrip.serviceTyp && oTrip.vehicle && oTrip.vehicle.current_budget && oTrip.vehicle.current_budget[oTrip.serviceTyp] && oTrip.vehicle.current_budget[oTrip.serviceTyp].mileage) {
-			oTrip.dieselBudgetLtr = oTrip.totalKm / oTrip.vehicle.current_budget[oTrip.serviceTyp].mileage;
-		} else if (oTrip.vehicle && oTrip.vehicle.current_budget && oTrip.vehicle.current_budget.mileage)
-			oTrip.dieselBudgetLtr = oTrip.totalKm / oTrip.vehicle.current_budget.mileage;
-		else
-			oTrip.dieselBudgetLtr = 0;
-		oTrip.dieselBudgetLtr = Math.round(oTrip.dieselBudgetLtr * 100) / 100;
+				// calculate diesel budget
+				if (oTrip.serviceTyp && oTrip.vehicle && oTrip.vehicle.current_budget && oTrip.vehicle.current_budget[oTrip.serviceTyp] && oTrip.vehicle.current_budget[oTrip.serviceTyp].mileage) {
+					oTrip.dieselBudgetLtr = oTrip.totalKm / oTrip.vehicle.current_budget[oTrip.serviceTyp].mileage;
+				} else if (oTrip.vehicle && oTrip.vehicle.current_budget && oTrip.vehicle.current_budget.mileage)
+					oTrip.dieselBudgetLtr = oTrip.totalKm / oTrip.vehicle.current_budget.mileage;
+				else
+					oTrip.dieselBudgetLtr = 0;
+				oTrip.dieselBudgetLtr = Math.round(oTrip.dieselBudgetLtr * 100) / 100;
+			}
+		}else {
+			// calculate net budget
+			if (oTrip.serviceTyp && oTrip.vehicle && oTrip.vehicle.current_budget && oTrip.vehicle.current_budget[oTrip.serviceTyp] && oTrip.vehicle.current_budget[oTrip.serviceTyp].rpk) {
+				oTrip.netBudget = (oTrip.vehicle.current_budget[oTrip.serviceTyp].rpk * oTrip.totalKm) || 0;
+			} else if (oTrip.vehicle && oTrip.vehicle.current_budget && oTrip.vehicle.current_budget.rpk) {
+				oTrip.netBudget = (oTrip.vehicle.current_budget.rpk * oTrip.totalKm) || 0;
+			}
+
+			// calculate diesel budget
+			if (oTrip.serviceTyp && oTrip.vehicle && oTrip.vehicle.current_budget && oTrip.vehicle.current_budget[oTrip.serviceTyp] && oTrip.vehicle.current_budget[oTrip.serviceTyp].mileage) {
+				oTrip.dieselBudgetLtr = oTrip.totalKm / oTrip.vehicle.current_budget[oTrip.serviceTyp].mileage;
+			} else if (oTrip.vehicle && oTrip.vehicle.current_budget && oTrip.vehicle.current_budget.mileage)
+				oTrip.dieselBudgetLtr = oTrip.totalKm / oTrip.vehicle.current_budget.mileage;
+			else
+				oTrip.dieselBudgetLtr = 0;
+			oTrip.dieselBudgetLtr = Math.round(oTrip.dieselBudgetLtr * 100) / 100;
+		}
 		/***************************** block end ******************/
 		// cal internal freight i.e. sum of internal rate on each gr
 		if (Array.isArray(oTrip.gr))
@@ -1629,6 +1681,15 @@ tripSchema.statics.tripSummary = async function (aTrip) {
 		driverPenalty = 0,
 		driverPenaltyVch = 0,
 		driverPayment = 0;
+
+	let aSortedTrip = aTrip.map(o => {
+		let status = o.statuses.find(os => os.status === 'Trip started');
+		o.tripStarted = status && new Date(status.date).getTime() || 0;
+		return o;
+	});
+
+	aSortedTrip.sort((a, b) => new Date(a.tripStarted) - new Date(b.tripStarted));
+
 
 	aTrip.forEach(oTrip => {
 		Array.isArray(oTrip.payments) && oTrip.payments.forEach(oPayment => {
@@ -1740,39 +1801,64 @@ tripSchema.statics.tripSummary = async function (aTrip) {
 		summary.netExpVchObj.vendor += ['Vendor Advance', 'Vendor Balance', 'TDS', 'Damage'].reduce((a, str) => a + (oTrip.expenseAggr && oTrip.expenseAggr[str] && oTrip.expenseAggr[str].amtVch || 0), 0);
 	});
 
-	let aSortedTrip = aTrip.map(o => {
-		let status = o.statuses.find(os => os.status === 'Trip started');
-		o.tripStarted = status && new Date(status.date).getTime() || 0;
-		return o;
-	});
-
-	aSortedTrip.sort((a, b) => new Date(a.tripStarted) - new Date(b.tripStarted));
-
 	let driverBal = 0;
-	if (aSortedTrip[0].driver && aSortedTrip[0].driver.account) {
-		driverBal = await AcBal.findOne({
-			account: aSortedTrip[0].driver.account._id,
-			date: {$lte: moment(aSortedTrip[0].tripStarted).startOf('day').toDate()}
-		}, {ob: 1, date: 1, cb: 1}).sort({date: -1}).limit(1).lean();
+	if(aSortedTrip[0].advSettled && aSortedTrip[0].advSettled.isCompletelySettled){
+		driverBal = aSortedTrip[0].advSettled.openingBal || 0;
+	}else{
+		// last Main RT settle
+		let oTripFil = {
+			clientId: aSortedTrip[0].clientId,
+			'advSettled.isCompletelySettled': true,
+			'end_date': {
+				$lte: new Date(aSortedTrip[0].start_date)
+			},
+			'driver': aSortedTrip[0].driver && aSortedTrip[0].driver._id || aSortedTrip[0].driver,
+		};
+		let aggrPipe = [
+			{$match:oTripFil},
+			{$sort:{end_date:-1}},
+			{$limit: 1},
+			{$project:{_id:1,advSettled:1,markSettle:1,vehicle:1,end_date:1}}
+		];
+		let aFoundTrips = await this.aggregate(aggrPipe);
 
-		if (driverBal) {
-			if (moment(driverBal.date).diff(aSortedTrip[0].tripStarted, 'days') == 0)
-				driverBal = driverBal.ob;
-			else
-				driverBal = driverBal.cb;
+		if(aFoundTrips && aFoundTrips.length){                            // if only main RT found then will take that`s closingBal
+			driverBal = Number(aFoundTrips[0].advSettled.closingBal) || 0;
+		}else{
+			if (aSortedTrip[0].driver && aSortedTrip[0].driver.account) {  // if RT not found fatch driver balance from accountBal
+				let dAcId = aSortedTrip[0].driver.account;
+				if (aSortedTrip[0].driver.account._id) {
+					dAcId = aSortedTrip[0].driver.account._id
+				}
+				driverBal = await AcBal.findOne({
+					account: dAcId,
+					date: { $lte: moment(aSortedTrip[0].tripStarted).startOf('day').toDate() }
+				}, { ob: 1, date: 1, cb: 1 }).sort({ date: -1 }).limit(1).lean();
+
+				if (driverBal) {
+					driverBal = driverBal.cb;
+				}
+			}
 		}
 
-		let conf = await ClientConf.findOne({"clientId" : aSortedTrip[0].clientId},{"config":1}).lean();
-		if(conf) conf = conf.config;
+	}
+	if (aSortedTrip[0].driver && aSortedTrip[0].driver.account) {
+		let dAcId = aSortedTrip[0].driver.account;
+		if (aSortedTrip[0].driver.account._id) {
+			dAcId = aSortedTrip[0].driver.account._id
+		}
 
-		if(conf.tripSettlement && conf.tripSettlement.driverSecurity){
+		let conf = await ClientConf.findOne({"clientId": aSortedTrip[0].clientId}, {"config": 1}).lean();
+		if (conf) conf = conf.config;
+
+		if (conf.tripSettlement && conf.tripSettlement.driverSecurity) {
 
 			let aggQuery = [{
 				$match: {
 					clientId: aSortedTrip[0].clientId,
 					deleted: {$not: {$eq: true}},
 					'vT': "Driver Security",
-					'ledgers.account': mongoose.Types.ObjectId(aSortedTrip[0].driver.account._id)
+					'ledgers.account': mongoose.Types.ObjectId(dAcId)
 				}
 			}, {
 				$project: {
@@ -1785,16 +1871,17 @@ tripSchema.statics.tripSummary = async function (aTrip) {
 			},
 				{
 					"$group": {
-						"_id":  null,
+						"_id": null,
 						// "data":{$push: "$$ROOT"},
-						"amount":{$sum:{$cond:[{$eq:["$ledgers.cRdR","CR"]},"$ledgers.amount",0]}},
+						"amount": {$sum: {$cond: [{$eq: ["$ledgers.cRdR", "CR"]}, "$ledgers.amount", 0]}},
 					}
 				}
 			];
 			let foundData = await Voucher.aggregate(aggQuery);
-			if(foundData && foundData.length)
+			if (foundData && foundData.length)
 				summary.totDrSecurity = foundData[0].amount || 0;
 		}
+	}
 
        /*
 		let oData = await VoucherService.getDrSecurity({account:aSortedTrip[0].driver.account._id, vT: "Driver Security", clientId: aSortedTrip[0].clientId });
@@ -1820,7 +1907,7 @@ tripSchema.statics.tripSummary = async function (aTrip) {
 		// if(vehData && vehData.total){
 		// 	driverBal += vehData.total;
 		// }
-	}
+
 
 	// let driverBal = aSortedTrip[0] && aSortedTrip[0].driver && aSortedTrip[0].driver.account && aSortedTrip[0].driver.account.balance || 0;
 	// let happayBal = aSortedTrip[0] && aSortedTrip[0].driver && aSortedTrip[0].driver.happay && aSortedTrip[0].driver.happay.balance || 0;

@@ -13,7 +13,10 @@ roles['/api/users']={
 			["Tyre Master","Return"],["Account Master","Add"],["Account Master","Update"],["Create GR","Read"],["Trip Expense","Deal Acknowledge"]],
 		'/update/*':[["User","Update"]],
 		'/delete/*':[["User","Delete"]],
-		'/fetch_password_lms/*': [["User","Password"]]
+		'/fetch_password_lms/*': [["User","Password"]],
+		'/getusertrim': [["User","Read"]],
+		'/updateusernotifid/*': [["User","Update"]],
+		'/removeusernotifid': [["User","Update"]]
 	}
 };
 roles['/api/department']={
@@ -728,6 +731,42 @@ roles['/api/maintenance/diesel']={
 	"url":{
 		"/add":[["Maintenance Diesel","In-Out"]],
 		"/get":[["Maintenance Diesel","Read"]]
+	}
+};
+
+roles['/api/gps/sim_master']={
+	"url":{
+		"/add":[["Sim Inventory","Add"]],
+		"/get":[["Sim Inventory","Read"]],
+		"/update/*":["Sim Inventory","Update"],
+		"/delete/*":["Sim Inventory","Delete"]
+	}
+};
+
+roles['/api/gps/sim_type_master']={
+	"url":{
+		"/add":[],
+		"/get":[],
+		"/update/*":[],
+		"/delete/*":[]
+	}
+};
+
+roles['/api/gps/device_type_master']={
+	"url":{
+		"/add":[["Device Inventory","Add"]],
+		"/get":[["Device Inventory","Read"]],
+		"/update/*":[["Device Inventory","Update"]],
+		"/delete/*":[["Device Inventory","Delete"]]
+	}
+};
+
+roles['/api/gps/device_master']={
+	"url":{
+		"/add":[["Device Inventory","Add"]],
+		"/get":[["Device Inventory","Read"]],
+		"/update/*":[["Device Inventory","Update"]],
+		"/delete/*":[["Device Inventory","Delete"]]
 	}
 };
 

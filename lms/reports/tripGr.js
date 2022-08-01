@@ -74,9 +74,9 @@ tripGrReport.transform = function (obj) {
 		row["EWAY BILLS"] = obj.eWayBills ? obj.eWayBills.map(o => o.number+'('+moment(o.expiry).format("DD-MM-YYYY")+')').join(' ,') : 'NA';
 		row["GR REMARK"] = obj.remarks || 'NA';
 		row["POD REMARK"] = obj.pod && obj.pod.arRemark || 'NA';
-		let grAss = obj.statuses.find(st => st.status === 'GR Assigned');
-		row["ENTRY BY"] = grAss && grAss.user_full_name || 'NA';
-		row["ENTRY AT"] = grAss && grAss.date ?  moment(grAss.date).format("DD-MM-YYYY") : 'NA';
+		// let grAss = obj.statuses.find(st => st.status === 'GR Assigned');
+		row["ENTRY BY"] = obj.created_by_full_name || 'NA';
+		row["ENTRY AT"] = obj.created_at ? moment(obj.created_at).format("DD-MM-YYYY")  : 'NA';
 		row["OWNERSHIP"] = (obj.trip && obj.trip.ownershipType) || 'NA';
 		// row["ROUTE NAME"] = (obj.trip && obj.trip.route_name) || 'NA';
 		let mrRec = (((obj.moneyReceipt && obj.moneyReceipt.totalMrAmount) || 0) + ((obj.moneyReceipt && obj.moneyReceipt.deduction) || 0));

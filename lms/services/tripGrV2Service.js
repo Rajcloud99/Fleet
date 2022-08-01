@@ -2815,6 +2815,7 @@ function constructFiltersNew(oQuery) {
 				startDate.setSeconds(0);
 				startDate.setHours(0);
 				startDate.setMinutes(0);
+				startDate.setMilliseconds(0);
 				if (constant.grItemStatus.indexOf(oQuery.dateType) >= 0) {
 					oFilter['statuses'] = oFilter['statuses'] || {};
 					oFilter['statuses']['$elemMatch'] = oFilter['statuses']['$elemMatch'] || {};
@@ -2836,6 +2837,7 @@ function constructFiltersNew(oQuery) {
 				endDate.setSeconds(59);
 				endDate.setHours(23);
 				endDate.setMinutes(59);
+				endDate.setMilliseconds(999);
 				if (constant.grItemStatus.indexOf(oQuery.dateType) >= 0) {
 					oFilter['statuses'] = oFilter['statuses'] || {};
 					oFilter['statuses']['$elemMatch'] = oFilter['statuses']['$elemMatch'] || {};
@@ -3058,6 +3060,8 @@ async function reportDownload(req, res) {
 			charges: 1,
 			basicFreight: 1,
 			totalFreight: 1,
+			created_by_full_name: 1,
+			created_at : 1,
 			cGST: 1,
 			sGST: 1,
 			iGST: 1,
@@ -3666,7 +3670,7 @@ async function reportDownloadV2(req, res) {
 		}
 		//const tripStatusFilter= tripFilter && tripFilter.status ? {"trip.status":tripFilter.status}:{};
 		let bill_query = {};
-		if (req.body.billQuery) {
+		if (req.body.bill_query) {
 			bill_query = constructBillFilters(req.body);
 			delete bill_query.billDate;
 			if(req.body.dateType){
@@ -3690,6 +3694,8 @@ async function reportDownloadV2(req, res) {
 			charges: 1,
 			basicFreight: 1,
 			totalFreight: 1,
+			created_by_full_name: 1,
+			created_at : 1,
 			cGST: 1,
 			sGST: 1,
 			iGST: 1,
@@ -4125,9 +4131,9 @@ async function reportDownloadV2(req, res) {
 
 		let tableAcc = [];
 		if (req.body.tableId) {
-			let tableAcc = await tableAccessService.findTableAccessFilterAsync(req.body.tableId);
-			if (tableAcc && tableAcc.length > 0)
-				tableAcc = tableAcc[0].access;
+			let table = await tableAccessService.findTableAccessFilterAsync(mongoose.Types.ObjectId(req.body.tableId));
+			if (table && table.length > 0)
+				tableAcc = table[0].access;
 		}
 
 		let report;
@@ -4321,10 +4327,15 @@ async function dailyMISreport(req, res){
 				},
 			},
 			// {$sort: {grNumber: 1}},
-			{$sort: {grNumber: 1 , trip_no: 1}},
+			// {$sort: {grNumber: 1 , trip_no: 1}},
 
 		];
 		let oQuery = {aggQuery: aggrQuery, no_of_docs: 10000};
+		if(req.body.sort){
+			oQuery.sort = req.body.sort;
+		}else{
+			oQuery.sort = {trip_no: 1,grNumber : 1};
+		}
 		let getData = await serverSidePage.requestData(GR, oQuery);
 
 		// if (req.body.download) {

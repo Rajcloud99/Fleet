@@ -271,15 +271,28 @@ router.post('/trial_balances', async function(req, res, next) {
 				'message': 'From date is mandatory'
 			});
 		}
-	let trialBal = await AccountsService.getTrialBalances(req, res);
-	if(trialBal)
-	{
-		return res.status(200).json({
-			status: trialBal.status,
-			message: trialBal.message,
-	    	data: trialBal.data,
-		});
-	}
+		let oPLConf = await ClientConf.findOne({clientId:req.body.clientId},{'config.trial_bal':1}).lean();
+		if(!(oPLConf && oPLConf.config.trial_bal)){
+			let trialBal = await AccountsService.getTrialBalances(req, res);
+			if(trialBal)
+			{
+				return res.status(200).json({
+					status: trialBal.status,
+					message: trialBal.message,
+					data: trialBal.data,
+				});
+			}
+		}else{
+			req.body.oPLConf = oPLConf;
+			let trialBal = await AccountsService.getTrialBalances1(req, res);
+			if(trialBal){
+				return res.status(200).json({
+					status: trialBal.status,
+					message: trialBal.message,
+					data: trialBal.data,
+				});
+			}
+		}
 	} catch (e) {
 		next(e);
 	}
