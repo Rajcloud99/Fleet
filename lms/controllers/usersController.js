@@ -513,28 +513,6 @@ router.delete('/delete/:_id',
 
   });
 
-router.post('/updateUserNotifId/:_id', async function (req, res, next) {
-
-	try {
-
-		await UserModel.updateOne({
-			_id: req.params._id
-		},{
-			$set: {
-				notifId: req.body.notifId
-			},
-		});
-
-		return res.status(200).json({
-			'status': 'OK',
-			'message': 'Updated Successfully'
-		});
-
-	} catch (e) {
-		throw e;
-	}
-});
-
 router.post('/getUsertrim/', async function (req, res, next) {
 
 	try {
@@ -574,7 +552,7 @@ router.post('/updateUserNotifId/:_id', async function (req, res, next) {
 	try {
 
 		await UserModel.updateOne({
-			_id: req.params._id
+			_id: mongoose.Types.ObjectId(req.params._id)
 		},{
 			$set: {
 				notifId: req.body.notifId
@@ -596,7 +574,7 @@ router.post('/removeUserNotifId/', async function (req, res, next) {
 	try {
 
 		await UserModel.updateMany({
-			_id: {$in: req.body._id}
+			_id: {$in: mongoose.Types.ObjectId(req.body._id)},
 		},{
 			$set: {
 				notifId:1

@@ -593,6 +593,10 @@ module.exports.liveTripGrouped = (newAggrData, group_by, clientId, cb) => {
 
 module.exports.tripHistoryGrouped = (newAggrData, group_by, clientId, cb) => {
 	var wb = new xl.Workbook();
+	let folderType = 'TripHistoryReport';
+	let dir = 'reports/' + clientId + '/' + folderType + '/';
+	mkdirp.sync('./files/' + dir);
+
 	var headerStyles = wb.createStyle({
 		font: {color: '#272727', size: 10, bold: true},
 		alignment: {horizontal: 'center', vertical: 'center', wrapText: true},
@@ -665,7 +669,7 @@ module.exports.tripHistoryGrouped = (newAggrData, group_by, clientId, cb) => {
 								? moment(newAggrData[consign][status][i].gr.loading_ended_status.date).format("DD-MM-YYYY h:mma")
 								: "NA"
 						).style(style); // loading ended date
-						ws.cell(c + 3, 7).string(newAggrData[consign][status][i].t_status || "NA").style(style); // status
+						ws.cell(c + 3, 7).string(newAggrData[consign][status][i].trip.v_status || newAggrData[consign][status][i].t_status || "NA").style(style); // status
 						ws.cell(c + 3, 8).string(
 							newAggrData[consign][status][i].gr.unloading_started_status
 								? moment(newAggrData[consign][status][i].gr.unloading_started_status.date).format("DD-MM-YYYY h:mma")
@@ -690,6 +694,7 @@ module.exports.tripHistoryGrouped = (newAggrData, group_by, clientId, cb) => {
 			c += 2;
 		}
 	}
+
 
 	var a = `/reports/${clientId}/TripHistoryReport/${group_by}_${moment(new Date()).format("DD-MM-YYYY")}.xlsx`;
 	var path = `files${a}`;
@@ -14439,8 +14444,8 @@ module.exports.jobOrderReport = function(aData, reqBody, clientId, callback){
 			row["Current Status"] = oData.currentStatus || "NA";
 			row["% Job Completed"] = oData.jobCompleted || "NA";
 			row["Remaining Km To Next Point"] = oData.remainKM || 0;
-			row["Expected Time Of Arrival"] = oData.expectedArrival || "NA";
-			row["Predicated Time Of Arrival"] = oData.predecteArrival || "NA";
+			row["Expected Time Of Arrival"] = oData.expectedArrival || 0;
+			row["Predicated Time Of Arrival"] = oData.predecteArrival || 0;
 			row["Predicted Delay"] = oData.predectedDelay; // not clear by rajat
 			row["TAT"] = (oData.tat_hr || "00") + " : " + (oData.tat_min || "00");
 			row["Actual TAT(Hrs)"] = oData.actualTAT || 0;

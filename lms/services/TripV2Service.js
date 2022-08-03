@@ -4845,7 +4845,7 @@ async function getAlertV2(oTrip, req, callback) {
 		filter.to = oTrip.endDate || new Date();
 		request.post({
 			headers: {'content-type': 'application/json', 'Authorization': gpsgaadiAdminToken},
-			url: 'http://13.229.178.235:4242/alert/getV2',
+			url:  config.geographyUrl + '/alert/getV2',
 			body: JSON.stringify(filter)
 		}, function (error, response, body) {
 			if (error) {
@@ -4882,7 +4882,7 @@ async function getAlert(oTrip, req, callback) {
 
 		request.post({
 			headers: {'content-type': 'application/json', 'Authorization': gpsgaadiAdminToken},
-			url: 'http://13.229.178.235:4242/alert/groupAlerts',
+			url: config.geographyUrl + '/alert/groupAlerts',
 			body: JSON.stringify(filter)
 		}, function (error, response, body) {
 			if (error) {
@@ -4909,9 +4909,13 @@ async function getAlert(oTrip, req, callback) {
 
 async function playBackData(obj){
 	try {
+		let url = "http://localhost:8081/api/reports/playback";
+		if(config.gpsApi){
+			url = "http://"+config.gpsApi.host+":"+config.gpsApi.port+"/api/reports/playback";
+		}
 		const option = {
 			method: "POST",
-			url:"http://trucku.in:8081/api/reports/playback",
+			url:url,
 			body: {
 				device_id: obj.device_id,
 				start_time: obj.start_time,
@@ -4951,7 +4955,7 @@ async function getActionAlert(oTrip, req, callback) {
 
 		request.post({
 			headers: {'content-type': 'application/json', 'Authorization': gpsgaadiAdminToken},
-			url: 'http://13.229.178.235:4242/alert/action_alerts',
+			url: config.geographyUrl + '/alert/action_alerts',
 			body: JSON.stringify(filter)
 		}, function (error, response, body) {
 			if (error) {
@@ -5104,9 +5108,13 @@ async function bulkStatusUpdate(req, res, next) {
 							}
 							if(req && req.clientConfig && req.clientConfig.config && req.clientConfig.config.trips && req.clientConfig.config.trips.playBackData){
 								try {
+									let url = "http://localhost:8081/api/reports/playback";
+									if(config.gpsApi){
+										url = "http://"+config.gpsApi.host+":"+config.gpsApi.port+"/api/reports/playback";
+									}
 									const option = {
 										method: "POST",
-										url:"http://trucku.in:8081/api/reports/playback",
+										url:url,
 										body: {
 											device_id: oTrip.device.imei,
 											start_time: oTrip.start_date,
@@ -6638,11 +6646,11 @@ async function update_status(req, res, next) {
 
 		//send response
 		res.status(200).json(oRes);
-		if(oTrip && oTrip.device && oTrip.device.imei){
+		if((oTrip && oTrip.device && oTrip.device.imei) || (oTrip.vehicle && oTrip.vehicle.device_imei)){
 			if(req.body.status === 'Trip ended' && req && req.clientConfig && req.clientConfig.config && req.clientConfig.config.trips && req.clientConfig.config.trips.playBackData){
 				try {
 					let obj = {
-						device_id: oTrip.device.imei,
+						device_id: oTrip.device.imei ||  oTrip.vehicle.device_imei,
 						start_time: oTrip.start_date,
 						end_time: oUpdatedBy.date,
 						idling:true,

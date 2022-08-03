@@ -74,6 +74,7 @@ module.exports = class checkConsent {
 	async _fetchDataFromTraqoApi(mobileNo) {
 		try {
 			const option = {
+				strictSSL: false,
 				method: config.traqoApi.getConsent.method,
 				url: config.traqoApi.getConsent.url,
 				body: JSON.stringify({

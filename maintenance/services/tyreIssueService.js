@@ -110,6 +110,8 @@ module.exports.getTyreIssue = function (oQuery, next) {
 		oQuery['issued_tyre.taskId'] = oQuery.taskId;
 		delete oQuery.taskId;
 	}
+	delete oQuery.request_id;
+	delete oQuery.validate;
 	TyreIssue.findAsync(oQuery)
 		.then(function (available) {
 			return next(null, available);

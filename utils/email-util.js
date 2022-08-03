@@ -8,14 +8,14 @@ console.log("Email enabled :" +commonUtil.getConfig("enable_email"));
 var transporter = nodemailer.createTransport({
     service: 'gmail',
     auth: {
-        user: 'futuretrucksakh@gmail.com',
-        pass: 'truckhunter'
+        user: 'kamal.mewada@gmail.com',
+        pass: 'kamal123'
     }
 });
 
 var defaultMailOptions = {
-    from: 'LMS <futuretrucksakh@gmail.com>', // sender address
-    to: 'LMS <kamal@futuretrucks.in>', // list of receivers
+    from: 'LMS <kamal.mewada@gmail.com>', // sender address
+    to: 'LMS <kamal.mewada@gmail.com>', // list of receivers
     subject: 'Greetings from LMS✔', // Subject line
     text: 'Greetings fron LMS', // plaintext body
 };
@@ -32,7 +32,7 @@ function sendMail(oMailOptions) {
         }
         defaultMailOptions.html =  oMailOptions.html + sSignatures ;
         if (!oMailOptions.from){
-            defaultMailOptions.from = 'LMS <futuretrucksakh@gmail.com>';
+            defaultMailOptions.from = 'LMS <kamal.mewada@gmail.com>';
         } else{
             defaultMailOptions.from = oMailOptions.from;
         }
@@ -70,7 +70,7 @@ function sendMailWithAttachments(oMailOptions){
 
 module.exports.mailToRepoOwners = function(logText, callback){
     var oMailOptions = {
-        from: 'LMS <futuretrucksakh@gmail.com>', // sender address
+        from: 'LMS <kamal.mewada@gmail.com>', // sender address
         to: constants.repoOwnerEmails, // list of receivers
         subject: ' ', // Subject line
         text: ' ' + logText, // plaintext body

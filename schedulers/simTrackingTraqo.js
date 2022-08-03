@@ -264,3 +264,32 @@ module.exports.fetchTripTraqo = async function(obj){
 		return null;
 	}
 }
+
+
+module.exports.fetchHistoryTraqo = async function(obj){
+	try {
+		const option = {
+			strictSSL: false,
+			method: config.traqoApi.fetchHistory.method,
+			url: config.traqoApi.fetchHistory.url,
+			body: JSON.stringify({
+				"phone_number":obj
+			}),
+			'headers': {
+				'Authorization': "Basic " + new Buffer(config.traqoApi.userName + ":" + config.traqoApi.password).toString("base64"),
+				'Content-Type': 'application/json'
+			},
+			// json: true
+		};
+		let data = await request(option);
+		if (data) {
+			return data;
+		} else {
+			return undefined;
+		}
+	} catch (e) {
+		console.error('[Tracqo Api  error]', e);
+		//telegram.sendMessage('[Fastag Api error] ' + e.message);
+		return null;
+	}
+}

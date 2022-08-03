@@ -1763,7 +1763,6 @@ async function getBalancesForGroup(oFilters,lvl,oLvl,lMap) {
 				console.error('child node id not found for',oAcc.name);
 			}
 		}
-		// console.log(aChild);
 		let filterData = (allChild && allChild[0] && allChild.length > 0) ? allChild : aChild;
 		oFil.account = {$in: filterData};
 		aggrQuery = [{$match:oFil},

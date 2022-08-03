@@ -566,6 +566,8 @@ router.get('/trip-history', (req, res, next) => {
 					var newAggrData = dbData.data.reduce((acc, curr, i) => {
 						var consignor = (curr.gr && curr.gr[req.query.group_by] && curr.gr[req.query.group_by].name) || `${req.query.group_by} not assigned trips`;
 						var matched = curr.t_status.match(/^Early|Delayed|On Time/i)[0];
+						if(curr.trip && curr.trip.v_status)
+							matched = curr.trip.v_status.match(/^Early|Delayed|On Time/i)[0];
 						if (acc[consignor]) {
 							if (acc[consignor][matched]) {
 								acc[consignor][matched].push(curr);
@@ -590,6 +592,8 @@ router.get('/trip-history', (req, res, next) => {
 					var newAggrData = dbData.data.reduce((acc, curr, i) => {
 						var consignor = (curr.trip && curr.trip.driver && curr.trip.driver.name) || `${req.query.group_by} not defined trips`;
 						var matched = curr.t_status.match(/^Early|Delayed|On Time/i)[0];
+						if(curr.trip && curr.trip.v_status)
+							matched = curr.trip.v_status.match(/^Early|Delayed|On Time/i)[0];
 						if (acc[consignor]) {
 							if (acc[consignor][matched]) {
 								acc[consignor][matched].push(curr);
@@ -613,7 +617,9 @@ router.get('/trip-history', (req, res, next) => {
 				if (req.query.group_by === 'segment') {
 					var newAggrData = dbData.data.reduce((acc, curr, i) => {
 						var consignor = (curr.vehicle && curr.vehicle.segment_type) || `${req.query.group_by} not defined trips`;
-						var matched = curr.t_status.match(/^Early|Delayed|On Time/i)[0];
+						var matched =  curr.t_status.match(/^Early|Delayed|On Time/i)[0];
+						if(curr.trip && curr.trip.v_status)
+							matched = curr.trip.v_status.match(/^Early|Delayed|On Time/i)[0];
 						if (acc[consignor]) {
 							if (acc[consignor][matched]) {
 								acc[consignor][matched].push(curr);
@@ -861,10 +867,13 @@ router.post('/gpsKmAnalysis', async (req, res, next) => {
 			"selected_uid": req.clientData.gpsgaadi_user_id,
 			"login_uid":  req.clientData.gpsgaadi_user_id
 		};
-
+		let url = "http://localhost:8081/api/reports/mileage";
+		if(config.gpsApi){
+			url = "http://"+config.gpsApi.host+":"+config.gpsApi.port+"/api/reports/mileage";
+		}
 		request.post({
 			headers: {'content-type': 'application/json', 'Authorization': req.clientData.gpsgaadi_token},
-			url: 'http://trucku.in:8081/api/reports/mileage',
+			url: url,
 			body: JSON.stringify(requestObj)
 		}, function (error, response, body) {
 			if (body) body = JSON.parse(body);

@@ -72,6 +72,7 @@ tripGrReport.transform = function (obj) {
 		row["REF3"] = obj.invoices.map(o => o.ref3).join(' ,') || 'NA';
 		row["REF4"] = obj.invoices.map(o => o.ref4).join(' ,') || 'NA';
 		row["EWAY BILLS"] = obj.eWayBills ? obj.eWayBills.map(o => o.number+'('+moment(o.expiry).format("DD-MM-YYYY")+')').join(' ,') : 'NA';
+		row["EWAY BILL DATE"] = obj.eWayBills && obj.eWayBills[0] && obj.eWayBills[0].expiry ? moment(obj.eWayBills[0].expiry).format("DD-MM-YYYY") : 'NA';
 		row["GR REMARK"] = obj.remarks || 'NA';
 		row["POD REMARK"] = obj.pod && obj.pod.arRemark || 'NA';
 		// let grAss = obj.statuses.find(st => st.status === 'GR Assigned');

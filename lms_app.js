@@ -239,8 +239,12 @@ app.setupDB = function (oInitialize) {
 	mongoose.connection.once('open', () => {
 		if(oInitialize.fork && config.cacheVehicle){
 			let cronJob = require('./vehiclewise/vehicleCache');
+			if(config.gpsServerDetail && config.gpsServerDetail.gpsReceiverIntegration){
+				let GPS_receiver = require(projectHome + '/gpsIntegration/index');
+			}
 		   cronJob.runCacheCron();
 		}
+
 	});
 };
 

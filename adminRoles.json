@@ -187,7 +187,8 @@
 	"Read": true,
 	"Update": true,
 	"Add": true,
-	"delete": true
+	"delete": true,
+	"Doc Upload Preview": true
   },
   "Eway Bill": {
 	  "Update": true,

@@ -4247,6 +4247,41 @@ router.route('/jobOrderPowerConnectReport').post(async function (req, res, next)
 	}
 });
 
+router.route('/consentHistory').post(async function (req, res) {
+	try {
+		if((!req.body.mobile)){
+			throw new Error('Phone  No is Mandatory');
+		}
+		if(req.body.mobile){
+			try {
+				let data = await traqoApiService.fetchHistoryTraqo(req.body.mobile);
+				data = JSON.parse(data);
+				if(data.status === "success"){
+					return res.status(200).json({
+						status: 'OK',
+						message: "Consent history data  Get Successfully",
+						data:data
+					});
+
+				}else{
+					return res.status(200).json({
+						status: 'OK',
+						message: data.status,
+						data:[]
+					});
+				}
+			} catch (e) {
+				console.error('[Tracqo Api  error]', e);
+			}
+		}
+	} catch (e) {
+		return res.status(500).json({
+			status: 'ERROR',
+			message: e.toString(),
+		});
+	}
+});
+
 async function formatReportData(tripData){
 	for(let i=0;i<tripData.length;i++){
 		let oData = tripData[i];
@@ -4303,9 +4338,9 @@ async function formatReportData(tripData){
 		tripData[i].duration = tripData[i].end_date && tripData[i].start_date && getDuration(oData.start_date,oData.end_date) || "NA";
 		tripData[i].jobCompleted = tripData[i].end_date ? "100%" : parseFloat(((tripData[i].jobDistance/tripData[i].scheduleDistance) * 100).toFixed(2)) > 100 ? "100%" : parseFloat(((tripData[i].jobDistance/tripData[i].scheduleDistance) * 100).toFixed(2)) ;
 		tripData[i].remainKM = (tripData[i].scheduleDistance > tripData[i].jobDistance) ? (tripData[i].scheduleDistance - tripData[i].jobDistance) : 0;
-		tripData[i].expectedArrival = tripData[i].expected_eta && moment(new Date(tripData[i].expected_eta)).format("DD-MM-YYYY HH:mm") || "NA";
-		tripData[i].predecteArrival = tripData[i].current_eta && moment(new Date(tripData[i].current_eta)).format("DD-MM-YYYY HH:mm") || "NA";
-		tripData[i].predectedDelay = getDuration(tripData[i].expected_eta,tripData[i].current_eta) || "NA";
+		tripData[i].expectedArrival = tripData[i].expected_eta && moment(new Date(tripData[i].expected_eta)).format("DD-MM-YYYY HH:mm") || 0;
+		tripData[i].predecteArrival = tripData[i].current_eta && moment(new Date(tripData[i].current_eta)).format("DD-MM-YYYY HH:mm") || 0;
+		tripData[i].predectedDelay = tripData[i].expected_eta && tripData[i].current_eta && getDuration(tripData[i].expected_eta,tripData[i].current_eta) || 0;
 		tripData[i].actualTAT = tripData[i].end_date && tripData[i].start_date && parseFloat((getDurationInHours(tripData[i].start_date,tripData[i].end_date)).toFixed(2));
 	}
 	return tripData;

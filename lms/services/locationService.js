@@ -11,9 +11,13 @@ let gpsgaadiAdminToken = 'eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJfaWQiOiJncHNnY
 let httPostUtil = promise.promisifyAll(require('../../utils/httpPostUtil.js'));
 
 exports.getSingleLocation = function (reg_no, callback) {
+	let url = 'http://localhost:8081/api/location/getLocationFromRegno';
+	if(config.gpsApi){
+		url = config.gpsApi.host+":"+config.gpsApi.port+"/api/location/getLocationFromRegno";
+	}
 	request.post({
 		headers: {'content-type': 'application/json', 'Authorization': gpsgaadiAdminToken},
-		url: 'http://trucku.in:8081/api/location/getLocationFromRegno',
+		url: url,
 		body: JSON.stringify({reg_no: reg_no})
 	}, function (error, response, body) {
 		if (body) body = JSON.parse(body);
@@ -385,7 +389,7 @@ function prepareGPSGAADIDeviceAllocationData(oData) {
 }
 
 function getOdometer(req, callback) {
-	let url = "http://trucku.in:8081";
+	let url = "http://localhost:8081";
 	if(config.gpsApi){
 		url = config.gpsApi.host+":"+config.gpsApi.port;
 	}
@@ -423,7 +427,7 @@ function getOdometer(req, callback) {
 };
 
 function getTracksheetData(req, callback) {
-	let url = "http://trucku.in:8081";
+	let url = "http://localhost:8081";
 	if(config.gpsApi){
 		url = config.gpsApi.host+":"+config.gpsApi.port;
 	}
@@ -516,21 +520,24 @@ module.exports.getTracksheetDataAsync = (req) => {
 
 exports.updateTripAlerts = function (oDevice, callback) {
 	//TODO identify server ip based on device type in futur for load balancing multi server architecutre
-	request.post({
-		headers: {'content-type': 'application/json', 'Authorization': gpsgaadiAdminToken},
-		url: 'http://truckadda.in:5006/api/deviceCon/updateTripAlerts',
-		body: JSON.stringify({device_id: oDevice.device_id,device_type:oDevice.device_type})
-	}, function (error, response, body) {
-		if (body) body = JSON.parse(body);
-		if (error) {
-			winston.error('updateTripAlerts ', error);
-			callback(error);
-			return;
-		}
-		if(callback){
-			callback(error, body);
-		}
-	});
+	if(config.gpsServerDetail && config.gpsServerDetail.ip){
+		let url = "http://"+config.gpsServerDetail.ip+":"+config.gpsServerDetail.port+"/api/deviceCon/updateTripAlerts"
+		request.post({
+			headers: {'content-type': 'application/json', 'Authorization': gpsgaadiAdminToken},
+			url: url,
+			body: JSON.stringify({device_id: oDevice.device_id,device_type:oDevice.device_type})
+		}, function (error, response, body) {
+			if (body) body = JSON.parse(body);
+			if (error) {
+				winston.error('updateTripAlerts ', error);
+				callback(error);
+				return;
+			}
+			if(callback){
+				callback(error, body);
+			}
+		});
+	}
 };
 
 /*

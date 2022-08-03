@@ -21,6 +21,38 @@ router.post('/getGeofences',
 	function (req, res, next) {
 		getGeofences(req, res, next);
 });
+
+router.post('/getTripGeofences', async function (req, res, next) {
+		if (!req.body.device_id) {
+			return res.status(500).json({
+				'status': 'ERROR',
+				'message': 'Please send imei'
+			});
+		} else {
+			req.body.device_id = req.body.device_id.toString();
+			req.body.aggQuery = [{
+					$match: {
+						"device.imei": req.body.device_id,
+						status: {
+							$nin: ["Trip ended", "Trip cancelled"]
+						}
+					}
+				},
+				{$project:{"geofence_points":1}},
+				{$limit:2}
+			];
+			try{
+				let aData = await Trip.aggregate(req.body.aggQuery);
+				return res.status(200).json({status: "OK", "message":"OK", data:aData && aData[0] && aData[0].geofence_points || [] });
+			}catch (err){
+				return res.status(500).json({
+					"status": "ERROR",
+					"message": err.toString()
+				});
+			}
+		}
+	});
+
 router.post('/updateGrGeofence',
 	function (req, res, next) {
 		if (!req.body.l_id) {
@@ -35,19 +67,70 @@ router.post('/updateGrGeofence',
 	function (req, res, next) {
 		updateGrGeofence(req, res, next);
 	});
-router.post('/updateTripGeofence',
-	function (req, res, next) {
+
+router.post('/updateTripGeofence',async function (req, res, next) {
 		if (!req.body.l_id) {
 			return res.status(500).json({
 				'status': 'ERROR',
 				'message': 'Please send geofence_id'
 			});
 		} else {
-			return next();
+			let oRes = {status: "ERROR", message: "some error"};
+			try {
+				console.log('updateTripGeofence ', req.body.l_id, req.body.request_id);
+				oRes = {status: "OK"};
+				let oFilTrip = {
+					'geofence_points._id': mongoose.Types.ObjectId(req.body.l_id),
+					status: {$nin: ['Trip ended', 'Trip cancelled']}
+				};
+				let aggrTrip = [
+					{$match: oFilTrip},
+					{$project: {_id: 1, geofence_points: 1, status: 1, isCancelled: 1}},
+					{$limit: 1}
+				];
+				let oTrip = await Trip.aggregate(aggrTrip);
+				if (oTrip && oTrip[0]) {
+					oTrip = oTrip[0]
+				} else {
+					oRes.message = 'reCheckTripGeofence';
+					telegram.sendMessage('no trip found for geofence',req.body.l_id);
+					return res.status(200).json(oRes);
+				}
+				let msgTel = " updateTripGeofence " + req.body.l_id + " request id "+  req.body.request_id;
+				for (let i = 0; i < oTrip.geofence_points.length; i++) {
+					if (oTrip.geofence_points[i]._id.toString() == req.body.l_id) {
+						if (req.body.modified && req.body.modified.location_buffer && req.body.modified.location_buffer.length) {
+							oTrip.geofence_points[i].location_buffer = req.body.modified.location_buffer;
+							msgTel = msgTel + " with location buffers " + req.body.modified.location_buffer.length;
+						}else{
+							msgTel = msgTel + " without location buffers ";
+						}
+						if (req.body.modified) {
+							oTrip.geofence_points[i].is_inside = req.body.modified.is_inside;
+							msgTel = msgTel + " is_inside "+ req.body.modified.is_inside;
+						}
+						if (req.body.modified && req.body.modified.events) {
+							if(oTrip.geofence_points[i].events && oTrip.geofence_points[i].events.length > 4){
+								msgTel = msgTel + " events replaced ";
+								oTrip.geofence_points[i].events = [req.body.modified.events];
+							}else {
+								msgTel = msgTel + " events pushed ";
+								oTrip.geofence_points[i].events.push(req.body.modified.events);
+							}
+						}
+					}
+				}
+				let oUpTrp = await Trip.update({_id:oTrip._id},{$set:{geofence_points:oTrip.geofence_points}});
+				telegram.sendMessage(msgTel);
+				oRes.message = 'Trip geofences updated';
+				return res.status(200).json(oRes);
+			} catch (err) {
+				telegram.sendMessage(" updateTripGeofence error "+ err.message);
+				console.error('updateTripGeofence errror ',err.message);
+				oRes.message = err.message;
+				return res.status(500).json(oRes);
+			}
 		}
-	},
-	function (req, res, next) {
-		updateTripGeofence(req, res, next);
 	});
 
 async function getGeofences(req,res,next) {
@@ -241,59 +324,6 @@ async function updateGrGeofence(req, res, next) {
 		//send response
 		res.status(200).json(oRes);
 	} catch(err) {
-		next(err);
-	}
-}
-
-async function updateTripGeofence(req, res, next) {
-	try {
-		console.log('updateTripGeofence ', req.body.l_id);
-		let oRes = {status: "OK", message: "Nothing to update"};
-		let oFilTrip = {
-			'geofence_points._id': mongoose.Types.ObjectId(req.body.l_id),
-			status: {$nin: ['Trip ended', 'Trip cancelled']}
-		};
-		let aggrTrip = [
-			{$match: oFilTrip},
-			{$project: {_id: 1, geofence_points: 1, status: 1, isCancelled: 1}},
-			{$limit: 1}
-		]
-		let oTrip = await Trip.aggregate(aggrTrip);
-		if (oTrip && oTrip[0]) {
-			oTrip = oTrip[0]
-		} else {
-			oRes.message = 'reCheckTripGeofence';
-			telegram.sendMessage('no trip found for geofence',req.body.l_id);
-			return res.status(200).json(oRes);
-		}
-        let msgTel = " updateTripGeofence " + req.body.l_id + " ";
-		for (let i = 0; i < oTrip.geofence_points.length; i++) {
-			if (oTrip.geofence_points[i]._id.toString() == req.body.l_id) {
-				if (req.body.modified && req.body.modified.location_buffer) {
-					oTrip.geofence_points[i].location_buffer = req.body.modified.location_buffer;
-					msgTel = msgTel + " with location buffers ";
-				}
-				if (req.body.modified) {
-					oTrip.geofence_points[i].is_inside = req.body.modified.is_inside;
-					msgTel = msgTel + " is_inside "+ req.body.modified.is_inside;
-				}
-				if (req.body.modified && req.body.modified.events) {
-					if(oTrip.geofence_points[i].events && oTrip.geofence_points[i].events.length > 4){
-						msgTel = msgTel + " events replaced ";
-						oTrip.geofence_points[i].events = [req.body.modified.events];
-					}else {
-						msgTel = msgTel + " events pused ";
-						oTrip.geofence_points[i].events.push(req.body.modified.events);
-					}
-				}
-			}
-		}
-		let oUpTrp = await Trip.update({_id:oTrip._id},{$set:{geofence_points:oTrip.geofence_points}});
-		telegram.sendMessage(msgTel);
-		oRes.message = 'Trip geofences updated';
-		return res.status(200).json(oRes);
-	} catch (err) {
-		console.error('updateTripGeofence errror ',err.message);
 		next(err);
 	}
 }

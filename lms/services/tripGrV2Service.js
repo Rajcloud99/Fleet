@@ -687,7 +687,35 @@ async function get(req, res, next) {
 		next(err);
 	}
 }
-
+async function getGrTrim(req, res, next) {
+	try {
+		let oRes = {status: 'OK'};
+		if (req.clientConfig && req.clientConfig.config && req.clientConfig.config.clientOps && req.clientConfig.config.clientOps) {
+			req.body.clientId = req.clientConfig.config.clientOps;
+		} else if (req.user.clientId) {
+			req.body.clientId = req.user.clientId;
+		}
+		let oQuery = req.body;
+		oQuery = constructFilters(oQuery);
+		let aTripGR = await GR.aggregate(
+			{
+				$match: oQuery
+			},
+			{
+				$project:{
+					grNumber:1,
+					trip:1
+				}
+			},
+			{
+				$limit: req.body.no_of_docs
+			},
+		);
+		return res.status(200).json((oRes.data = (aTripGR ? aTripGR : []), oRes.message = 'GR found.', oRes));
+	} catch (err) {
+		next(err);
+	}
+}
 function constructShipmentTrackingFilters(oQuery) {
 	let oFilter = {tripCancelled: {$not: {$eq: true}}};
 	for (let i in oQuery) {
@@ -5019,7 +5047,7 @@ async function getLatLng(gpsData, req, callback) {
 			lon: gpsData.longitude,
 			detail: true
 		};
-		let url = 'http://13.229.178.235:4242/reverse2';
+		let url = config.geographyUrl + '/reverse2';
 		var url_with_params = url + prepareQeuryParams(filter);
 
 		request.post({
@@ -5144,6 +5172,7 @@ function prepareQeuryParams(oQuery) {
 module.exports = {
 	documentsUpload,
 	get,
+	getGrTrim,
 	getGr,
 	getV2Lite,
 	addGr,

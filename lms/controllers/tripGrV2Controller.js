@@ -290,6 +290,7 @@ router.post('/grSummary', async function(req, res, next){
 
 /** POST /api/trip_gr/get - Get trips */
 router.route('/get').post(tripGrService.get);
+router.route('/getGrTrim').post(tripGrService.getGrTrim);
 
 router.route('/getV2Lite').post(tripGrService.getV2Lite);
 
