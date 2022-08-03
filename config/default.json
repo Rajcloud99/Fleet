@@ -975,15 +975,54 @@
 	  "user"
 	]
   },
-  "gpsServer": "http://localhost:8081",
-  "gpsServerDetail": {
-	"port": 5007,
-	"ip": "localhost"
-  },
   "_cacheVehicle":{
 		"interval":500,
 		"time":"8-20",
 		"runOnInit": false
 
-  }
+  },
+	"gpsServerDetail": {
+		"port": 5007,
+		"ip": "43.205.24.249",
+		"gpsReceiverIntegration": true
+	},
+	"gpsApi": {
+		"port": 8081,
+		"ip": "43.205.24.249"
+	},
+	"gpsServer": "http://43.205.24.249:8081",
+	"traqoApi": {
+		"userName": "9535888738",
+		"password": "9535888738@123",
+		"clientIds" : ["12406"],
+		"createTrip": {
+			"method": "POST",
+			"url":"https://dashboard.traqo.in/api/v3/trip/create/"
+		},
+		"endTrip": {
+			"method": "POST",
+			"url":"https://dashboard.traqo.in/api/v3/trip/end/"
+		},
+		"updateTrip": {
+			"method": "POST",
+			"url":"https://dashboard.traqo.in/api/v3/trip/update/"
+		},
+		"individual": {
+			"get_location": "https://dashboard.traqo.in/api/v2/location/",
+			"method": "GET"
+		},
+		"getConsent": {
+			"method": "GET",
+			"url":"https://dashboard.traqo.in/api/v3/check_consent/"
+		},
+		"fetchTrip": {
+			"method": "GET",
+			"url":"https://dashboard.traqo.in/api/v4/trip/fetch/"
+		},
+		"fetchHistory":{
+			"method": "POST",
+			"url":"https://dashboard.traqo.in/api/v2/ivr_calls_history/"
+		}
+	},
+	"geographyUrl":"http://13.229.178.235:4242"
 }

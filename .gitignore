@@ -4,3 +4,4 @@
 /test/
 /.idea/
 /config/dev.json
+/package-lock.json
